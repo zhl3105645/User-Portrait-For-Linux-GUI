@@ -1,9 +1,17 @@
 from evdev import InputDevice, ecodes
+import tkinter as tk
+
+
+root = tk.Tk()
+width = root.winfo_screenwidth()
+height = root.winfo_screenheight()
+print(width,height)
 
 # 打开鼠标设备
 dev = InputDevice('/dev/input/event2')
 # print(ecodes.EV_REL, ecodes.EV_KEY, ecodes.EV_ABS, ecodes.EV_SYN)
 # print(ecodes.ABS_X, ecodes.ABS_Y)
+
 
 # 循环监听事件
 for event in dev.read_loop():
@@ -17,8 +25,7 @@ for event in dev.read_loop():
             print('Right button pressed')
     # 如果事件是鼠标移动事件 
     elif event.type == ecodes.EV_ABS:
-        print(event.code, event.value)
         if event.code == ecodes.ABS_X:
-            print("X: ", event.value)
+            print("X: ", event.value / ((pow(2, 16)) - 1) * width)
         elif event.code == ecodes.ABS_Y:
-            print("Y: ", event.value)
+            print("Y: ", event.value / ((pow(2, 16)) - 1) * height)
