@@ -3,6 +3,10 @@ import time
 from pynput import mouse, keyboard
 import subprocess
 
+# 全局变量
+window_id = 0
+win_info = ""
+
 def mouse_listener():
     def on_move(x, y):
         print(f'Mouse moved to ({x}, {y})')
@@ -34,11 +38,16 @@ def keyboard_listener():
         listener.join()
 
 def window_listener():
+    global window_id
+    global window_info
     while True:
         window = subprocess.run(['xprop', '-root', '_NET_ACTIVE_WINDOW'], capture_output=True)
-        window_id = window.stdout.split()[-1]
-        window_info = subprocess.run(['xwininfo', '-id', window_id], capture_output=True)
-        print("win_info", window_info.stdout.decode())
+        cur_window_id = window.stdout.split()[-1]
+        if window_id != cur_window_id:
+            window_id = cur_window_id
+            window_info = subprocess.run(['xwininfo', '-id', window_id], capture_output=True)
+            win_info = window_info.stdout.decode()
+            print("win_info", win_info)
         time.sleep(1)
 
 t1 = threading.Thread(target=mouse_listener)
