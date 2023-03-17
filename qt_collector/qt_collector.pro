@@ -1,4 +1,5 @@
-QT -= gui
+QT += gui
+QT += core widgets
 
 TEMPLATE = lib
 CONFIG += staticlib
@@ -18,11 +19,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     agent.cpp \
-    event_analyzer.cpp
+    event_analyzer.cpp \
+    tool.cpp
 
 HEADERS += \
     agent.h \
-    event_analyzer.h
+    event_analyzer.h \
+    tool.h
 
 # Default rules for deployment.
 unix {
