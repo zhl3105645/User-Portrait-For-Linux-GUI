@@ -80,11 +80,13 @@ private:
     struct {
         QEvent::Type type = QEvent::None;
         QDateTime timestamp;
-        // QPoint globalPos;
-        // Qt::MouseButtons buttons;
-        // QString widgetName;
         QStringList lastRes; // 上次鼠标移动的记录
-    } lastMouseEvent_; // 上次鼠标移动事件
+    } lastMouseMoveEvent_; // 上次鼠标移动事件
+    struct {
+        QEvent::Type type = QEvent::None;
+        QDateTime timestamp;
+        Qt::MouseButton button;
+    } lastMouseClickEvent_; // 上次鼠标点击事件
     size_t keyPress_ = 0; // 按下键码的个数
     size_t keyRelease_ = 0; // 松开键码的个数
 };
