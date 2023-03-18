@@ -1,8 +1,19 @@
-#include <QtCore>
+#include <QKeySequence>
+#include <QPoint>
+#include <QtCore/QDateTime>
+#include <QtCore/QEvent>
+#include <QtCore/QObject>
+#include <QtCore/QString>
+#include <functional>
+
 #include <QtEvents>
 #include <QDateTime>
 #include <QCursor>
 #include <QApplication>
+#include <cstdlib>
+#include <cstring>
+#include <QDebug>
+#include <QWidget>
 
 namespace qt_collector
 {
@@ -62,7 +73,7 @@ private:
         QObject *obj;       //!< the same as in QObject::eventFilter
         QEvent *event;      //!< the same as in QObject::eventFilter
         // 组件信息， 根据widget获取
-        QWidget *widget;    //!< widget to which related this event, may be null
+        //QWidget *widget;    //!< widget to which related this event, may be null
 
         QPoint globalPos; // 全局坐标
         EventType type; // 事件类型
@@ -87,8 +98,6 @@ private:
         QDateTime timestamp;
         Qt::MouseButton button;
     } lastMouseClickEvent_; // 上次鼠标点击事件
-    size_t keyPress_ = 0; // 按下键码的个数
-    size_t keyRelease_ = 0; // 松开键码的个数
 };
 
 }

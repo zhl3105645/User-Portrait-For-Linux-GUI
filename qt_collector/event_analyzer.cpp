@@ -1,6 +1,5 @@
 #include "event_analyzer.h"
 
-
 using qt_collector::UserEventAnalyzer;
 using qt_collector::Agent;
 
@@ -62,6 +61,52 @@ static QKeySequence parseKeyReleaseEvent(QKeyEvent *keyEvent)
     return keySeq;
 }
 
+// 同级中相同类型的序号
+static QString numAmongOthersWithTheSameClass(const QObject &w)
+{
+    QObject *p = w.parent();
+    if (p == nullptr)
+        return QString();
+
+    const QObjectList &childs = p->children();
+    int order = 0;
+    for (QObject *obj : childs) {
+        if (obj == &w) {
+            if (order == 0)
+                return QString();
+            else
+                return QString(",%1").arg(order);
+            continue;
+        }
+        if (std::strcmp(obj->metaObject()->className(),w.metaObject()->className()) == 0)
+            ++order;
+    }
+    return QString();
+}
+
+// 控件id： objectName ? <class_name=${className}[order]>
+static QString qtObjectId(const QObject &w)
+{
+    const QString name = w.objectName();
+    if (name.isEmpty()) {
+        return QString("<class_name=%1%2>")
+            .arg(w.metaObject()->className(),numAmongOthersWithTheSameClass(w));
+    }
+    return name;
+}
+
+static QString fullQtWidgetId(const QObject &w)
+{
+    QString res = qtObjectId(w);
+    QObject *cur_obj = w.parent();
+    while (cur_obj != nullptr) {
+        res = qtObjectId(*cur_obj) + "." + res;
+        cur_obj = cur_obj->parent();
+    }
+    return res;
+}
+
+
 UserEventAnalyzer::UserEventAnalyzer(Agent &agent, QObject *parent)
     : QObject(parent), agent_(agent)
 {
@@ -111,7 +156,7 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         if (w == nullptr) {
             w = QApplication::widgetAt(QCursor::pos());
         }
-        eventInfo.widget = w;
+        //eventInfo.widget = w;
         eventInfo.type = KeyClick;
         eventInfo.keyClickType = (keySeq.count() == 1 ? Single : Component);
         eventInfo.keyValue = keySeq.toString();
@@ -133,7 +178,7 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         if (w == nullptr) {
             w = QApplication::widgetAt(QCursor::pos());
         }
-        eventInfo.widget = w;
+        //eventInfo.widget = w;
         eventInfo.type = MouseMove;
 
         QDateTime now = QDateTime::currentDateTime();
@@ -206,7 +251,7 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         if (w == nullptr) {
             w = QApplication::widgetAt(QCursor::pos());
         }
-        eventInfo.widget = w;
+        //eventInfo.widget = w;
         eventInfo.type = MouseClick;
         eventInfo.mouseClickType = (event->type() == QEvent::MouseButtonDblClick ? Two : One);
         if (mouseEvent->button() == Qt::LeftButton) {
@@ -276,10 +321,14 @@ QStringList UserEventAnalyzer::geneDataInForm()
 
     // 公共参数
     if (eventInfo.type == KeyClick || eventInfo.type == MouseClick || eventInfo.type == MouseMove) {
-        res.append(QString());
+        QWidget *w = QApplication::widgetAt(eventInfo.globalPos);
+        res.append(QString(fullQtWidgetId(*w)));
         res.append(QString());
         res.append(QString());
     }
 
     return res;
 }
+
+
+
