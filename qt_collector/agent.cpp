@@ -14,15 +14,16 @@ Agent::Agent()
     assert(gAgent_ == nullptr);
     gAgent_ = this;
 
+    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) +"/data_" +qAppName() + "/";
     // 创建数据目录
-    QDir dir(DataFileDir);
+    QDir dir(dirPath);
     if (!dir.exists()) {
-        QDir().mkpath(DataFileDir);
+        QDir().mkpath(dirPath);
     }
 
     // 创建数据文件
     qint64 curTimeOfMS = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    QString dataFileName = DataFileDir + "/data_" + QString::number(curTimeOfMS, 10) + ".csv";
+    QString dataFileName = dirPath + QString::number(curTimeOfMS, 10) + ".csv";
     qDebug() << "dataFileName = " << dataFileName;
     dataFile.setFileName(dataFileName);
     openSuccess = dataFile.open(QFile::WriteOnly | QFile::Append);
@@ -77,6 +78,8 @@ void Agent::writeData(QStringList &list)
     if (list.isEmpty()) {
         return ;
     }
+
+    qDebug() << "list=" << list;
 
     QTextStream output(&dataFile);
     for (int idx = 0; idx < list.length(); idx++) {

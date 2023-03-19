@@ -3,7 +3,6 @@
 #include <QString>
 #include <QtCore>
 
-
 QString ConvertString2CSV(QString& s);
 
 #endif // TOOL_H

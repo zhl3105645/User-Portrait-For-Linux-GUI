@@ -66,12 +66,14 @@ static QKeySequence parseKeyReleaseEvent(QKeyEvent *keyEvent)
     return keySeq;
 }
 
-QStringList geneQPushButton(QWidget *w);
-
 UserEventAnalyzer::UserEventAnalyzer(Agent &agent)
     : agent_(agent)
 {
-    for (auto &&fun: {geneQPushButton, geneQLabel}) {
+    for (auto &&fun: {geneQAbstractButton,geneQComboBox,geneText,
+                        geneSpin,geneSlider,geneCalendar,geneLcd, geneProgress,
+                        geneListView, geneTreeView, geneTableView, geneColumnView,
+                        geneAction,geneContainer,
+                        geneNone}) {
         componentAnalyzer_.emplace_back(fun);
     }
 }
@@ -87,16 +89,15 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         && (event->type() == QEvent::KeyPress || event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)) {
         lastMouseMoveEvent_.type = QEvent::None;
 
-        //qDebug() << "移动结束：" << lastMouseMoveEvent_.lastRes;
         // 保存结束数据
         emit userEvent(lastMouseMoveEvent_.lastRes);
     }
 
     switch (event->type()) {
-    case QEvent::KeyPress:
-        // 单击点击时不记入，松开时记录数据
+    case QEvent::KeyRelease:
+        // 释放时不记入，点击时记录数据
         break;
-    case QEvent::KeyRelease: {
+    case QEvent::KeyPress: {
         QDateTime now = QDateTime::currentDateTime();
         auto keyEvent = static_cast<QKeyEvent *>(event);
 
@@ -115,8 +116,6 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
             || keyEvent->key() == Qt::Key_Control || keyEvent->key() == Qt::Key_Meta) {
             break;
         }
-
-        //qDebug() << "keyEvent.type=" << keyEvent->type() << "; keyEvent.key=" << keyEvent->key();
 
         QKeySequence keySeq = parseKeyReleaseEvent(keyEvent);
 
@@ -157,7 +156,6 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         } else if (lastMouseMoveEvent_.type == QEvent::MouseMove) {
             // 时间间隔过久
             // 保存结束数据
-            //qDebug() << "移动结束：" << lastMouseMoveEvent_.lastRes;
             emit userEvent(lastMouseMoveEvent_.lastRes);
             // 重新开始移动
             eventInfo.mouseMoveType = Begin;
@@ -166,9 +164,6 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
             lastMouseMoveEvent_.lastRes = res;
             lastMouseMoveEvent_.type = QEvent::MouseMove;
             lastMouseMoveEvent_.timestamp = now;
-
-
-            //qDebug() << "移动开始：" << res;
 
             // 保存移动开始数据
             emit userEvent(res);
@@ -180,9 +175,6 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
             lastMouseMoveEvent_.lastRes = res;
             lastMouseMoveEvent_.type = QEvent::MouseMove;
             lastMouseMoveEvent_.timestamp = now;
-
-
-            //qDebug() << "移动开始：" << res;
 
             // 保存移动开始数据
             emit userEvent(res);
@@ -207,8 +199,6 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
             break;
         }
 
-        //qDebug() << "mouseEvent->type() = " << mouseEvent->type() << "clickPos = " << mouseEvent->globalPos();
-
         QPoint clickPos = mouseEvent->globalPos();
 
         eventInfo.obj = obj;
@@ -230,6 +220,29 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         lastMouseClickEvent_.button = mouseEvent->button();
 
         emit userEvent(res);
+        break;
+    }
+    case QEvent::Shortcut: {
+        // 快捷键
+        QShortcutEvent *shortcutEvent = static_cast<QShortcutEvent *>(event);
+        if (shortcutEvent == nullptr) {
+            break;
+        }
+
+        QKeySequence seq = shortcutEvent->key();
+
+        eventInfo.obj = obj;
+        eventInfo.event = event;
+        eventInfo.globalPos = QCursor::pos();
+
+        eventInfo.type = Shortcut;
+        eventInfo.keyClickType = Component;
+        eventInfo.keyValue = seq.toString();
+
+        QStringList res = geneDataInForm();
+
+        emit userEvent(res);
+        break;
     }
     default:
         break;
@@ -243,18 +256,13 @@ QStringList UserEventAnalyzer::geneDataInForm()
     QStringList res = {};
 
     // 公共参数
-    if (eventInfo.type == KeyClick || eventInfo.type == MouseClick || eventInfo.type == MouseMove) {
-        res.append(QString::number(eventInfo.type, 10));
-        res.append(QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch(), 10));
-        res.append(QString("(%1,%2)").arg(eventInfo.globalPos.x()).arg(eventInfo.globalPos.y()));
-    } else {
-        res.append(QString());
-        res.append(QString());
-        res.append(QString());
-    }
+    res.append(QString::number(eventInfo.type, 10));
+    res.append(QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch(), 10));
+    res.append(QString("(%1,%2)").arg(eventInfo.globalPos.x()).arg(eventInfo.globalPos.y()));
 
 
     switch (eventInfo.type) {
+    case Shortcut:
     case KeyClick: {
         res.append(QString());
         res.append(QString());
@@ -301,10 +309,6 @@ QStringList UserEventAnalyzer::geneDataInForm()
         res.append(QString("%1").arg(c[0]));
         res.append(QString("%1").arg(c[1]));
         res.append(QString("%1").arg(c[2]));
-    } else {
-        res.append(QString());
-        res.append(QString());
-        res.append(QString());
     }
 
     return res;

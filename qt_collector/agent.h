@@ -1,7 +1,6 @@
 #include <QtCore>
 #include "tool.h"
 
-const QString DataFileDir = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)+"/data/";
 const int HeaderNum = 11;
 static QStringList FileHeader{"事件类型", "事件时间","坐标",
                              "鼠标点击类型","鼠标点击按键","鼠标移动类型",
