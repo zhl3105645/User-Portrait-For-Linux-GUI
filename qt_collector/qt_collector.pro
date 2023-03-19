@@ -19,11 +19,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     agent.cpp \
+    component_analyzer.cpp \
     event_analyzer.cpp \
     tool.cpp
 
 HEADERS += \
     agent.h \
+    component_annlyzer.h \
     event_analyzer.h \
     tool.h
 

@@ -9,7 +9,7 @@ using qt_collector::UserEventAnalyzer;
 Agent *Agent::gAgent_ = nullptr; // agent 实例
 
 Agent::Agent()
-    : eventAnalyzer_(new UserEventAnalyzer(*this, this))
+    : eventAnalyzer_(new UserEventAnalyzer(*this))
 {
     assert(gAgent_ == nullptr);
     gAgent_ = this;

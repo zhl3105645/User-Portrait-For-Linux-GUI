@@ -1,7 +1,9 @@
 #include "event_analyzer.h"
 
 using qt_collector::UserEventAnalyzer;
+using qt_collector::ComponentAnalyzer;
 using qt_collector::Agent;
+using qt_collector::CustomComponent;
 
 static constexpr int repeatKeyEventTimeoutMs = 20;
 static constexpr int repeatMouseClickEventTimeoutMs = 20;
@@ -10,6 +12,10 @@ static constexpr int repeatMouseMoveEventTimeoutMs = 500;
 // 键盘事件解析
 static QKeySequence parseKeyReleaseEvent(QKeyEvent *keyEvent)
 {
+    if (keyEvent == nullptr) {
+        return QStringLiteral();
+    }
+
     if (keyEvent->key() == 0)
         return QStringLiteral("//some special key");
 
@@ -44,8 +50,7 @@ static QKeySequence parseKeyReleaseEvent(QKeyEvent *keyEvent)
         break;
     case 3:
         if (keyEvent->key() != Qt::Key_unknown)
-            keySeq = QKeySequence(modifiers[0], modifiers[1], modifiers[2],
-                                  keyEvent->key());
+            keySeq = QKeySequence(modifiers[0], modifiers[1], modifiers[2], keyEvent->key());
         else
             keySeq = QKeySequence(modifiers[0], modifiers[1], modifiers[2]);
         break;
@@ -61,66 +66,28 @@ static QKeySequence parseKeyReleaseEvent(QKeyEvent *keyEvent)
     return keySeq;
 }
 
-// 同级中相同类型的序号
-static QString numAmongOthersWithTheSameClass(const QObject &w)
-{
-    QObject *p = w.parent();
-    if (p == nullptr)
-        return QString();
+QStringList geneQPushButton(QWidget *w);
 
-    const QObjectList &childs = p->children();
-    int order = 0;
-    for (QObject *obj : childs) {
-        if (obj == &w) {
-            if (order == 0)
-                return QString();
-            else
-                return QString(",%1").arg(order);
-            continue;
-        }
-        if (std::strcmp(obj->metaObject()->className(),w.metaObject()->className()) == 0)
-            ++order;
+UserEventAnalyzer::UserEventAnalyzer(Agent &agent)
+    : agent_(agent)
+{
+    for (auto &&fun: {geneQPushButton, geneQLabel}) {
+        componentAnalyzer_.emplace_back(fun);
     }
-    return QString();
-}
-
-// 控件id： objectName ? <class_name=${className}[order]>
-static QString qtObjectId(const QObject &w)
-{
-    const QString name = w.objectName();
-    if (name.isEmpty()) {
-        return QString("<class_name=%1%2>")
-            .arg(w.metaObject()->className(),numAmongOthersWithTheSameClass(w));
-    }
-    return name;
-}
-
-static QString fullQtWidgetId(const QObject &w)
-{
-    QString res = qtObjectId(w);
-    QObject *cur_obj = w.parent();
-    while (cur_obj != nullptr) {
-        res = qtObjectId(*cur_obj) + "." + res;
-        cur_obj = cur_obj->parent();
-    }
-    return res;
-}
-
-
-UserEventAnalyzer::UserEventAnalyzer(Agent &agent, QObject *parent)
-    : QObject(parent), agent_(agent)
-{
-
 }
 
 bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
 {
+    if (obj == nullptr || event == nullptr) {
+        return QObject::eventFilter(obj, event);
+    }
+
     // 鼠标移动停止: 鼠标点击 键盘输入等事件
     if (lastMouseMoveEvent_.type == QEvent::MouseMove && event->type() != QEvent::MouseMove
         && (event->type() == QEvent::KeyPress || event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)) {
         lastMouseMoveEvent_.type = QEvent::None;
 
-        qDebug() << "移动结束：" << lastMouseMoveEvent_.lastRes;
+        //qDebug() << "移动结束：" << lastMouseMoveEvent_.lastRes;
         // 保存结束数据
         emit userEvent(lastMouseMoveEvent_.lastRes);
     }
@@ -132,6 +99,10 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
     case QEvent::KeyRelease: {
         QDateTime now = QDateTime::currentDateTime();
         auto keyEvent = static_cast<QKeyEvent *>(event);
+
+        if (keyEvent == nullptr) {
+            break;
+        }
 
         // 重复事件不记录
         if (lastKeyEvent_.type == event->type() && lastKeyEvent_.key == keyEvent->key()
@@ -145,18 +116,14 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
             break;
         }
 
-        qDebug() << "keyEvent.type=" << keyEvent->type() << "; keyEvent.key=" << keyEvent->key();
+        //qDebug() << "keyEvent.type=" << keyEvent->type() << "; keyEvent.key=" << keyEvent->key();
 
         QKeySequence keySeq = parseKeyReleaseEvent(keyEvent);
 
         eventInfo.obj = obj;
         eventInfo.event = event;
         eventInfo.globalPos = QCursor::pos();
-        QWidget *w = QApplication::focusWidget();
-        if (w == nullptr) {
-            w = QApplication::widgetAt(QCursor::pos());
-        }
-        //eventInfo.widget = w;
+
         eventInfo.type = KeyClick;
         eventInfo.keyClickType = (keySeq.count() == 1 ? Single : Component);
         eventInfo.keyValue = keySeq.toString();
@@ -174,11 +141,7 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         eventInfo.obj = obj;
         eventInfo.event = event;
         eventInfo.globalPos = QCursor::pos();
-        QWidget *w = QApplication::focusWidget();
-        if (w == nullptr) {
-            w = QApplication::widgetAt(QCursor::pos());
-        }
-        //eventInfo.widget = w;
+
         eventInfo.type = MouseMove;
 
         QDateTime now = QDateTime::currentDateTime();
@@ -194,7 +157,7 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         } else if (lastMouseMoveEvent_.type == QEvent::MouseMove) {
             // 时间间隔过久
             // 保存结束数据
-            qDebug() << "移动结束：" << lastMouseMoveEvent_.lastRes;
+            //qDebug() << "移动结束：" << lastMouseMoveEvent_.lastRes;
             emit userEvent(lastMouseMoveEvent_.lastRes);
             // 重新开始移动
             eventInfo.mouseMoveType = Begin;
@@ -205,7 +168,7 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
             lastMouseMoveEvent_.timestamp = now;
 
 
-            qDebug() << "移动开始：" << res;
+            //qDebug() << "移动开始：" << res;
 
             // 保存移动开始数据
             emit userEvent(res);
@@ -219,7 +182,7 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
             lastMouseMoveEvent_.timestamp = now;
 
 
-            qDebug() << "移动开始：" << res;
+            //qDebug() << "移动开始：" << res;
 
             // 保存移动开始数据
             emit userEvent(res);
@@ -234,24 +197,24 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         QDateTime now = QDateTime::currentDateTime();
         QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
 
+        if (mouseEvent == nullptr) {
+            break;
+        }
+
         // 重复事件不记录
         if (lastMouseClickEvent_.type == event->type() &&  mouseEvent->button() == lastMouseClickEvent_.button
                 && std::llabs(now.msecsTo(lastMouseClickEvent_.timestamp)) < repeatMouseClickEventTimeoutMs) {
             break;
         }
 
-        qDebug() << "mouseEvent->type() = " << mouseEvent->type() << "clickPos = " << mouseEvent->globalPos();
+        //qDebug() << "mouseEvent->type() = " << mouseEvent->type() << "clickPos = " << mouseEvent->globalPos();
 
         QPoint clickPos = mouseEvent->globalPos();
 
         eventInfo.obj = obj;
         eventInfo.event = event;
         eventInfo.globalPos = clickPos;
-        QWidget *w = QApplication::focusWidget();
-        if (w == nullptr) {
-            w = QApplication::widgetAt(QCursor::pos());
-        }
-        //eventInfo.widget = w;
+
         eventInfo.type = MouseClick;
         eventInfo.mouseClickType = (event->type() == QEvent::MouseButtonDblClick ? Two : One);
         if (mouseEvent->button() == Qt::LeftButton) {
@@ -284,12 +247,15 @@ QStringList UserEventAnalyzer::geneDataInForm()
         res.append(QString::number(eventInfo.type, 10));
         res.append(QString::number(QDateTime::currentDateTime().toMSecsSinceEpoch(), 10));
         res.append(QString("(%1,%2)").arg(eventInfo.globalPos.x()).arg(eventInfo.globalPos.y()));
+    } else {
+        res.append(QString());
+        res.append(QString());
+        res.append(QString());
     }
 
 
     switch (eventInfo.type) {
     case KeyClick: {
-        qDebug() << eventInfo.keyValue;
         res.append(QString());
         res.append(QString());
         res.append(QString());
@@ -316,19 +282,51 @@ QStringList UserEventAnalyzer::geneDataInForm()
         break;
     }
     default:
+        res.append(QString());
+        res.append(QString());
+        res.append(QString());
+        res.append(QString());
+        res.append(QString());
         break;
     }
 
     // 公共参数
     if (eventInfo.type == KeyClick || eventInfo.type == MouseClick || eventInfo.type == MouseMove) {
-        QWidget *w = QApplication::widgetAt(eventInfo.globalPos);
-        res.append(QString(fullQtWidgetId(*w)));
+
+        QStringList c = geneComponent();
+        if (c.length() < 3) {
+            return res;
+        }
+
+        res.append(QString("%1").arg(c[0]));
+        res.append(QString("%1").arg(c[1]));
+        res.append(QString("%1").arg(c[2]));
+    } else {
+        res.append(QString());
         res.append(QString());
         res.append(QString());
     }
 
     return res;
 }
+
+QStringList UserEventAnalyzer::geneComponent() {
+    QWidget *w = QApplication::widgetAt(eventInfo.globalPos);
+    if (w == nullptr) {
+        return QStringList();
+    }
+
+    QStringList res;
+    for (auto &&fun : componentAnalyzer_) {
+        res = fun(w);
+        if (res.length() == 3) {
+            return res;
+        }
+    }
+
+    return QStringList();
+}
+
 
 
 

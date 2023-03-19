@@ -14,6 +14,9 @@
 #include <cstring>
 #include <QDebug>
 #include <QWidget>
+#include <QPushButton>
+
+#include <component_annlyzer.h>
 
 namespace qt_collector
 {
@@ -58,7 +61,7 @@ signals:
     void userEvent(QStringList &);
 
 public:
-    UserEventAnalyzer(Agent &agent, QObject *parent = nullptr);
+    UserEventAnalyzer(Agent &agent);
 
 private:
     // 重写事件过滤
@@ -66,14 +69,14 @@ private:
 
     // 根据格式生成数据
     QStringList geneDataInForm();
+    // 根据位置生成组件信息
+    QStringList geneComponent();
 
 private:
     Agent &agent_;
     struct {
         QObject *obj;       //!< the same as in QObject::eventFilter
         QEvent *event;      //!< the same as in QObject::eventFilter
-        // 组件信息， 根据widget获取
-        //QWidget *widget;    //!< widget to which related this event, may be null
 
         QPoint globalPos; // 全局坐标
         EventType type; // 事件类型
@@ -98,6 +101,7 @@ private:
         QDateTime timestamp;
         Qt::MouseButton button;
     } lastMouseClickEvent_; // 上次鼠标点击事件
+    std::list<ComponentAnalyzer> componentAnalyzer_;
 };
 
 }
