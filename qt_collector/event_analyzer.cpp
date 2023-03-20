@@ -235,7 +235,7 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         eventInfo.event = event;
         eventInfo.globalPos = QCursor::pos();
 
-        eventInfo.type = Shortcut;
+        eventInfo.type = KeyClick;
         eventInfo.keyClickType = Component;
         eventInfo.keyValue = seq.toString();
 
@@ -262,7 +262,6 @@ QStringList UserEventAnalyzer::geneDataInForm()
 
 
     switch (eventInfo.type) {
-    case Shortcut:
     case KeyClick: {
         res.append(QString());
         res.append(QString());
