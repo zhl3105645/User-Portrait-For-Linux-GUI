@@ -4,7 +4,7 @@ QString ConvertString2CSV(QString& s)
 {
 
    for (auto& c:s){
-       if(c=='"' || c==','){
+       if(c=='"' || c==',' || c == '\n'){
            //触发添加双引号
             QString r;
             r.push_back('"');

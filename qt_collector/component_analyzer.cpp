@@ -49,9 +49,9 @@ static QString fullQtWidgetId(const QObject &w)
     return res;
 }
 
-static QWidget* searchThroghSuperClassesAndParents(QWidget *widget, const char *wname)
+static QWidget* searchThroghSuperClassesAndParents(QWidget *widget, const char *wname/*, size_t limit = size_t(-1)*/)
 {
-    for (size_t i = 0; widget != nullptr; ++i) {
+    for (size_t i = 0; widget != nullptr /*&& i < limit*/; ++i) {
         const QMetaObject *mo = widget->metaObject();
         while (mo != nullptr && std::strcmp(mo->className(), wname) != 0) {
             mo = mo->superClass();
@@ -121,14 +121,20 @@ QStringList qt_collector::geneQComboBox(QWidget *w)
         return res;
     }
 
-    QComboBox *b = qobject_cast<QComboBox *>(w);
+    QWidget *tmp =  searchThroghSuperClassesAndParents(w, "QComboBox");
+
+    if (tmp == nullptr) {
+        return res;
+    }
+
+    QComboBox *b = qobject_cast<QComboBox *>(tmp);
 
     if (b == nullptr) {
         return res;
     }
 
     c.type = qt_collector::Combo;
-    c.name = fullQtWidgetId(*w);
+    c.name = fullQtWidgetId(*tmp);
     c.desc = b->currentText();
 
     res.append(QString("%1").arg(c.name));
@@ -152,31 +158,44 @@ QStringList qt_collector::geneText(QWidget *w)
     QPlainTextEdit *e3;
     QLabel *l;
 
+    QWidget * tmp1;
+    QWidget * tmp2;
+
     // QLineEdit
     e1 = qobject_cast<QLineEdit *>(w);
     if (e1 != nullptr) {
         c.desc = e1->text();
+        c.name = fullQtWidgetId(*w);
         goto end;
     }
 
     // QTextEdit
-    e2 = qobject_cast<QTextEdit *>(w);
-    if (e2 != nullptr) {
-        c.desc = e2->toPlainText();
-        goto end;
+    tmp1 =  searchThroghSuperClassesAndParents(w, "QTextEdit");
+    if (tmp1 != nullptr) {
+        e2 = qobject_cast<QTextEdit *>(tmp1);
+        if (e2 != nullptr) {
+            c.desc = e2->toPlainText();
+            c.name = fullQtWidgetId(*tmp1);
+            goto end;
+        }
     }
 
     // QPlainTextEdit
-    e3 = qobject_cast<QPlainTextEdit *>(w);
-    if (e3 != nullptr) {
-        c.desc = e3->toPlainText();
-        goto end;
+    tmp2 =  searchThroghSuperClassesAndParents(w, "QPlainTextEdit");
+    if (tmp2 != nullptr) {
+        e3 = qobject_cast<QPlainTextEdit *>(tmp2);
+        if (e3 != nullptr) {
+            c.desc = e3->toPlainText();
+            c.name = fullQtWidgetId(*tmp2);
+            goto end;
+        }
     }
 
     // QLabel
     l = qobject_cast<QLabel *>(w);
     if (l != nullptr) {
         c.desc = l->text();
+        c.name = fullQtWidgetId(*w);
         goto end;
     }
 
@@ -184,7 +203,6 @@ QStringList qt_collector::geneText(QWidget *w)
 
 end:
     c.type = qt_collector::Text;
-    c.name = fullQtWidgetId(*w);
 
     res.append(QString("%1").arg(c.name));
     res.append(QString("%1").arg(c.type));
@@ -202,14 +220,19 @@ QStringList qt_collector::geneSpin(QWidget *w)
         return res;
     }
 
-    QAbstractSpinBox *b = qobject_cast<QAbstractSpinBox *>(w);
+    QWidget *tmp =  searchThroghSuperClassesAndParents(w, "QAbstractSpinBox");
+    if (tmp == nullptr) {
+        return res;
+    }
+
+    QAbstractSpinBox *b = qobject_cast<QAbstractSpinBox *>(tmp);
 
     if (b == nullptr) {
         return res;
     }
 
     c.type = qt_collector::Spin;
-    c.name = fullQtWidgetId(*w);
+    c.name = fullQtWidgetId(*tmp);
     c.desc = b->text();
 
     res.append(QString("%1").arg(c.name));
@@ -266,7 +289,7 @@ QStringList qt_collector::geneCalendar(QWidget *w)
     }
 
     c.type = qt_collector::Calendar;
-    c.name = fullQtWidgetId(*w);
+    c.name = fullQtWidgetId(*calendar);
     c.desc = b->selectedDate().toString();
 
     res.append(QString("%1").arg(c.name));
@@ -353,7 +376,7 @@ QStringList qt_collector::geneListView(QWidget *w)
     QModelIndex idx = b->indexAt(pos);
 
     c.type = qt_collector::List;
-    c.name = fullQtWidgetId(*w);
+    c.name = fullQtWidgetId(*listView);
     c.desc = idx.data().toString();
 
     res.append(QString("%1").arg(c.name));
@@ -390,7 +413,7 @@ QStringList qt_collector::geneTreeView(QWidget *w)
     QModelIndex idx = b->indexAt(pos);
 
     c.type = qt_collector::Tree;
-    c.name = fullQtWidgetId(*w);
+    c.name = fullQtWidgetId(*tree_view);
     c.desc = idx.data().toString();
 
     res.append(QString("%1").arg(c.name));
@@ -427,7 +450,7 @@ QStringList qt_collector::geneTableView(QWidget *w)
     QModelIndex idx = b->indexAt(pos);
 
     c.type = qt_collector::Table;
-    c.name = fullQtWidgetId(*w);
+    c.name = fullQtWidgetId(*table_view);
     c.desc = idx.data().toString();
 
     res.append(QString("%1").arg(c.name));
@@ -464,7 +487,7 @@ QStringList qt_collector::geneColumnView(QWidget *w)
     QModelIndex idx = b->indexAt(pos);
 
     c.type = qt_collector::Column;
-    c.name = fullQtWidgetId(*w);
+    c.name = fullQtWidgetId(*column_view);
     c.desc = idx.data().toString();
 
     res.append(QString("%1").arg(c.name));
@@ -529,6 +552,7 @@ QStringList qt_collector::geneContainer(QWidget *w)
     b1 = qobject_cast<QGroupBox *>(w);
     if (b1 != nullptr) {
         c.desc = b1->title();
+        c.name = fullQtWidgetId(*w);
         goto end;
     }
 
@@ -537,6 +561,7 @@ QStringList qt_collector::geneContainer(QWidget *w)
         b2 = qobject_cast<QToolBox *>(tool_box);
         if (b2 != nullptr) {
             c.desc = b2->itemText(b2->currentIndex());
+            c.name = fullQtWidgetId(*tool_box);
             goto end;
         }
     }
@@ -546,6 +571,7 @@ QStringList qt_collector::geneContainer(QWidget *w)
         b3 = qobject_cast<QTabWidget *>(tab_box);
         if (b3 != nullptr) {
             c.desc = b3->tabText(b3->currentIndex());
+            c.name = fullQtWidgetId(*tab_box);
             goto end;
         }
     }
@@ -554,13 +580,14 @@ QStringList qt_collector::geneContainer(QWidget *w)
     b4 = qobject_cast<QStackedWidget *>(stack_box);
     if (b4 != nullptr) {
         c.desc = b4->currentWidget()->objectName();
+        c.name = fullQtWidgetId(*stack_box);
         goto end;
     }
 
+    return res;
 end:
 
     c.type = qt_collector::Container;
-    c.name = fullQtWidgetId(*w);
 
     res.append(QString("%1").arg(c.name));
     res.append(QString("%1").arg(c.type));

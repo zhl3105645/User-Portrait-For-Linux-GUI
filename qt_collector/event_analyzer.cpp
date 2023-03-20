@@ -69,10 +69,9 @@ static QKeySequence parseKeyReleaseEvent(QKeyEvent *keyEvent)
 UserEventAnalyzer::UserEventAnalyzer(Agent &agent)
     : agent_(agent)
 {
-    for (auto &&fun: {geneQAbstractButton,geneQComboBox,geneText,
-                        geneSpin,geneSlider,geneCalendar,geneLcd, geneProgress,
-                        geneListView, geneTreeView, geneTableView, geneColumnView,
-                        geneAction,geneContainer,
+    for (auto &&fun: {geneQAbstractButton,geneQComboBox,geneSpin,geneText,geneAction,
+                        geneCalendar,geneLcd, geneProgress,
+                        geneColumnView,geneListView,geneTableView,geneTreeView,geneContainer,geneSlider,
                         geneNone}) {
         componentAnalyzer_.emplace_back(fun);
     }
