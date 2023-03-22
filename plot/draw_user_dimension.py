@@ -58,21 +58,21 @@ component_type_num = { #  类型数量
 }
 
 component_type_to_str = {  # 中文含义
-    ComponentType.Unknow: '空白区域',
-    ComponentType.Button : '按钮',
-    ComponentType.Combo : '下拉框',
-    ComponentType.Text : '文本',
-    ComponentType.Spin : '滚轮',
-    ComponentType.Slider : '滑块',
-    ComponentType.Calendar : '日历',
-    ComponentType.Lcd: 'Lcd显示屏',
-    ComponentType.Progress : '进度条',
-    ComponentType.List : '列表视图',
-    ComponentType.Tree : '树视图',
-    ComponentType.Table : '表格视图',
-    ComponentType.Column : '列视图',
-    ComponentType.Action : '快捷键',
-    ComponentType.Container : '容器',
+    ComponentType.Unknow: 'Unknow',
+    ComponentType.Button : 'Button',
+    ComponentType.Combo : 'Combo',
+    ComponentType.Text : 'Text',
+    ComponentType.Spin : 'Spin',
+    ComponentType.Slider : 'Slider',
+    ComponentType.Calendar : 'Calendar',
+    ComponentType.Lcd: 'Lcd',
+    ComponentType.Progress : 'Progress',
+    ComponentType.List : 'List',
+    ComponentType.Tree : 'Tree',
+    ComponentType.Table : 'Table',
+    ComponentType.Column : 'Column',
+    ComponentType.Action : 'Action',
+    ComponentType.Container : 'Container',
 }
 component_name_to_front_name_map = {} # 映射到图像的名字
 
@@ -305,7 +305,7 @@ def draw():
     for key in sort1:
         key_name.append(key[0])
         key_cnt.append(key[1])
-    axs[1, 0].set_xticklabels(key_name[:10])
+    axs[1, 0].set_xticklabels(key_name[:10],rotation = 270)
     axs[1, 0].bar(key_name[ : 10], key_cnt[:10])
     axs[1, 0].legend()
 
