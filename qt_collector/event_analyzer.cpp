@@ -7,6 +7,7 @@ using qt_collector::CustomComponent;
 
 static constexpr int repeatKeyEventTimeoutMs = 20;
 static constexpr int repeatMouseClickEventTimeoutMs = 20;
+static constexpr int repeatWheelEventTimeoutMs = 20;
 static constexpr int repeatMouseMoveEventTimeoutMs = 500;
 
 // 键盘事件解析
@@ -93,6 +94,29 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
     }
 
     switch (event->type()) {
+    case QEvent::Wheel: {
+        QDateTime now = QDateTime::currentDateTime();
+        // 重复事件不记录
+        if (lastWheelEvent_.type == event->type()
+                && std::llabs(now.msecsTo(lastWheelEvent_.timestamp)) < repeatWheelEventTimeoutMs) {
+            break;
+        }
+
+        eventInfo.obj = obj;
+        eventInfo.event = event;
+        eventInfo.globalPos = QCursor::pos();
+
+        eventInfo.type = Wheel;
+
+        QStringList res = geneDataInForm();
+
+        lastWheelEvent_.type = event->type();
+        lastWheelEvent_.timestamp = now;
+
+        emit userEvent(res);
+
+        break;
+    }
     case QEvent::KeyRelease:
         // 释放时不记入，点击时记录数据
         break;
@@ -287,6 +311,14 @@ QStringList UserEventAnalyzer::geneDataInForm()
         res.append(QString());
         break;
     }
+    case Wheel: {
+        res.append(QString());
+        res.append(QString());
+        res.append(QString());
+        res.append(QString());
+        res.append(QString());
+        break;
+    }
     default:
         res.append(QString());
         res.append(QString());
@@ -297,7 +329,7 @@ QStringList UserEventAnalyzer::geneDataInForm()
     }
 
     // 公共参数
-    if (eventInfo.type == KeyClick || eventInfo.type == MouseClick || eventInfo.type == MouseMove) {
+    if (eventInfo.type == KeyClick || eventInfo.type == MouseClick || eventInfo.type == MouseMove || eventInfo.type == Wheel) {
 
         QStringList c = geneComponent();
         if (c.length() < 3) {
