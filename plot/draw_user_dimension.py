@@ -1,4 +1,5 @@
 from cProfile import label
+from cmath import nan
 import os
 import numpy as np
 import pandas as pd
@@ -58,21 +59,21 @@ component_type_num = { #  类型数量
 }
 
 component_type_to_str = {  # 中文含义
-    ComponentType.Unknow: '空白区域',
-    ComponentType.Button : '按钮',
-    ComponentType.Combo : '下拉框',
-    ComponentType.Text : '文本',
-    ComponentType.Spin : '滚轮',
-    ComponentType.Slider : '滑块',
-    ComponentType.Calendar : '日历',
-    ComponentType.Lcd: 'Lcd显示屏',
-    ComponentType.Progress : '进度条',
-    ComponentType.List : '列表视图',
-    ComponentType.Tree : '树视图',
-    ComponentType.Table : '表格视图',
-    ComponentType.Column : '列视图',
-    ComponentType.Action : '快捷键',
-    ComponentType.Container : '容器',
+    ComponentType.Unknow: 'Unknow',
+    ComponentType.Button : 'Button',
+    ComponentType.Combo : 'Combo',
+    ComponentType.Text : 'Text',
+    ComponentType.Spin : 'Spin',
+    ComponentType.Slider : 'Slider',
+    ComponentType.Calendar : 'Calendar',
+    ComponentType.Lcd: 'Lcd',
+    ComponentType.Progress : 'Progress',
+    ComponentType.List : 'List',
+    ComponentType.Tree : 'Tree',
+    ComponentType.Table : 'Table',
+    ComponentType.Column : 'Column',
+    ComponentType.Action : 'Action',
+    ComponentType.Container : 'Container',
 }
 component_name_to_front_name_map = {} # 映射到图像的名字
 
@@ -163,13 +164,15 @@ def data_process(file: str):
                 continue
             com_typ = int(row[9])
             com_extra = str(row[10])
+            if row[10] != row[10]:
+                com_extra = ''
 
             # 组件类型数目
             component_type_num[com_typ] = component_type_num[com_typ] + 1
             # 生成图像名字
             if com_name not in component_name_to_front_name_map.keys():
-                if com_typ in (ComponentType.Button, ComponentType.Combo, ComponentType.Spin, ComponentType.Action):
-                    component_name_to_front_name_map[com_name] = component_type_to_str[com_typ] + com_extra
+                if com_extra != '':
+                    component_name_to_front_name_map[com_name] = component_type_to_str[com_typ] +': ' + com_extra
                 else:
                     component_name_to_front_name_map[com_name] = component_type_to_str[com_typ] + str(component_type_num[com_typ])
 
@@ -274,8 +277,8 @@ def draw():
     #fig.set_size_inches(12, 12)
 
     # 单次使用时长统计
-    axs[0, 0].set_title('单次应用使用时长')
-    axs[0, 0].set_ylabel('使用时长(s)')
+    axs[0, 0].set_title('run time pre run')
+    axs[0, 0].set_ylabel('time(s)')
     x1_pos = np.arange(0, 2 * len(app_run_time), 2)
     width = 0.6
     axs[0, 0].bar(x1_pos - width/2, app_operate_time, width=width, label="用户操作时间")
@@ -285,33 +288,33 @@ def draw():
     axs[0, 0].legend()
 
     # 事件次数统计
-    axs[0, 1].set_title('单次应用用户事件')
-    axs[0, 1].set_ylabel('次数')
+    axs[0, 1].set_title('event count pre run')
+    axs[0, 1].set_ylabel('count')
     x2_pos = np.arange(0, 3 * len(event_num), 3)
     width = 0.8
-    axs[0, 1].bar(x2_pos - width, event_key_click_num, width=width, label='键盘点击事件')
-    axs[0, 1].bar(x2_pos, event_mouse_click_num, width=width, label='鼠标点击事件')
-    axs[0, 1].bar(x2_pos + width, event_mouse_move_num, width=width, label='鼠标移动事件')
+    axs[0, 1].bar(x2_pos - width, event_key_click_num, width=width, label='key click event')
+    axs[0, 1].bar(x2_pos, event_mouse_click_num, width=width, label='mouse click event')
+    axs[0, 1].bar(x2_pos + width, event_mouse_move_num, width=width, label='mouse move event')
     axs[0, 1].set_xticks(x2_pos)
     axs[0, 1].set_xticklabels(range(len(event_num)))
     axs[0, 1].legend()
 
     # 键盘点击键统计
-    axs[1, 0].set_title('键码点击次数（降序）')
-    axs[1, 0].set_ylabel('键码点击次数')
+    axs[1, 0].set_title('key_code click count(desc)')
+    axs[1, 0].set_ylabel('count')
     sort1 = sorted(all_key_value_map.items(), key = lambda x: x[1], reverse=True)
     key_name = []
     key_cnt = []
     for key in sort1:
         key_name.append(key[0])
         key_cnt.append(key[1])
-    axs[1, 0].set_xticklabels(key_name[:10])
+    axs[1, 0].set_xticklabels(key_name[:10],rotation = 270)
     axs[1, 0].bar(key_name[ : 10], key_cnt[:10])
     axs[1, 0].legend()
 
     # 鼠标点击组件统计
-    axs[1, 1].set_title('组件点击次数（降序）')
-    axs[1, 1].set_ylabel('组件点击次数')
+    axs[1, 1].set_title('component click count(desc)')
+    axs[1, 1].set_ylabel('count')
     sort2 = sorted(all_component_name_map.items(), key = lambda x: x[1], reverse=True)
     com_name = []
     com_cnt = []
