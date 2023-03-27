@@ -12,4 +12,5 @@ module.exports = {
         },
     },
     publicPath: './',
+    lintOnSave: false, // 解决编译问题
 }
