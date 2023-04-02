@@ -2,7 +2,10 @@ module backend
 
 go 1.17
 
-require github.com/cloudwego/hertz v0.6.0
+require (
+	github.com/apache/thrift v0.18.1
+	github.com/cloudwego/hertz v0.6.0
+)
 
 require (
 	github.com/bytedance/go-tagexpr/v2 v2.9.2 // indirect
@@ -24,3 +27,5 @@ require (
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 )
+
+replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
