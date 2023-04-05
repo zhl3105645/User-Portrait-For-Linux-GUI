@@ -29,6 +29,7 @@ enum EventType {
     MouseMove = 4, // 鼠标移动
     KeyClick = 5, // 键盘点击
     Wheel = 6, // 鼠标滚轮
+    ShortCut = 7, // 快捷键
 };
 
 enum MouseButtonType {

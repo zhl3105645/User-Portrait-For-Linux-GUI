@@ -84,9 +84,11 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         return QObject::eventFilter(obj, event);
     }
 
-    // 鼠标移动停止: 鼠标点击 键盘输入等事件
+    // 鼠标移动停止: 鼠标点击 键盘输入 快捷键 等事件
     if (lastMouseMoveEvent_.type == QEvent::MouseMove && event->type() != QEvent::MouseMove
-        && (event->type() == QEvent::KeyPress || event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonDblClick)) {
+        && (event->type() == QEvent::KeyPress || event->type() == QEvent::MouseButtonRelease
+            || event->type() == QEvent::MouseButtonDblClick || event->type() == QEvent::Shortcut || event->type() == QEvent::Wheel)) {
+
         lastMouseMoveEvent_.type = QEvent::None;
 
         // 保存结束数据
@@ -258,8 +260,8 @@ bool UserEventAnalyzer::eventFilter(QObject *obj, QEvent *event)
         eventInfo.event = event;
         eventInfo.globalPos = QCursor::pos();
 
-        eventInfo.type = KeyClick;
-        eventInfo.keyClickType = Component;
+        eventInfo.type = ShortCut;
+        eventInfo.keyClickType = (seq.count() == 1 ? Single : Component);
         eventInfo.keyValue = seq.toString();
 
         QStringList res = geneDataInForm();
@@ -286,6 +288,15 @@ QStringList UserEventAnalyzer::geneDataInForm()
 
     switch (eventInfo.type) {
     case KeyClick: {
+        res.append(QString());
+        res.append(QString());
+        res.append(QString());
+        res.append(QString::number(eventInfo.keyClickType, 10));
+        res.append(eventInfo.keyValue);
+
+        break;
+    }
+    case ShortCut: {
         res.append(QString());
         res.append(QString());
         res.append(QString());
