@@ -95,6 +95,8 @@ QStringList qt_collector::geneQAbstractButton(QWidget *w)
         return res;
     }
 
+    //qDebug() << fullQtWidgetId(*w);
+
     QAbstractButton *b = qobject_cast<QAbstractButton *>(w);
 
     if (b == nullptr) {
@@ -561,7 +563,7 @@ QStringList qt_collector::geneContainer(QWidget *w)
         b2 = qobject_cast<QToolBox *>(tool_box);
         if (b2 != nullptr) {
             c.desc = b2->itemText(b2->currentIndex());
-            c.name = fullQtWidgetId(*tool_box);
+            c.name = QString("%1.%2").arg(fullQtWidgetId(*tool_box), QString::number(b2->currentIndex()));
             goto end;
         }
     }
@@ -571,7 +573,7 @@ QStringList qt_collector::geneContainer(QWidget *w)
         b3 = qobject_cast<QTabWidget *>(tab_box);
         if (b3 != nullptr) {
             c.desc = b3->tabText(b3->currentIndex());
-            c.name = fullQtWidgetId(*tab_box);
+            c.name = QString("%1.%2").arg(fullQtWidgetId(*tab_box), QString::number(b3->currentIndex()));
             goto end;
         }
     }
@@ -580,7 +582,7 @@ QStringList qt_collector::geneContainer(QWidget *w)
     b4 = qobject_cast<QStackedWidget *>(stack_box);
     if (b4 != nullptr) {
         c.desc = b4->currentWidget()->objectName();
-        c.name = fullQtWidgetId(*stack_box);
+        c.name = QString("%1.%2").arg(fullQtWidgetId(*stack_box), QString::number(b4->currentIndex()));
         goto end;
     }
 
