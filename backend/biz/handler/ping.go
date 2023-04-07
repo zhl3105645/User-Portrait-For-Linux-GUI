@@ -3,7 +3,9 @@
 package handler
 
 import (
+	"backend/dal/query"
 	"context"
+	"github.com/bytedance/gopkg/util/logger"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/utils"
@@ -12,6 +14,16 @@ import (
 
 // Ping .
 func Ping(ctx context.Context, c *app.RequestContext) {
+
+	tests, err := query.Test.WithContext(ctx).FindAll()
+	if err != nil {
+		logger.Info("err != nil, err=", err)
+	} else {
+		logger.Info("err == nil, len(tests)=", len(tests))
+		for _, test := range tests {
+			logger.Info("ID=", *test.ID, "; Name=", *test.Name)
+		}
+	}
 	c.JSON(consts.StatusOK, utils.H{
 		"message": "pong",
 	})

@@ -3,6 +3,7 @@
 package main
 
 import (
+	"backend/dal"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
@@ -10,5 +11,7 @@ func main() {
 	h := server.Default()
 
 	register(h)
+
+	dal.Init()
 	h.Spin()
 }
