@@ -547,15 +547,20 @@ QStringList qt_collector::geneContainer(QWidget *w)
     QTabWidget * b3;
     QStackedWidget * b4;
 
+    QWidget *group_box;
     QWidget *tool_box;
     QWidget *tab_box;
     QWidget *stack_box;
 
-    b1 = qobject_cast<QGroupBox *>(w);
-    if (b1 != nullptr) {
-        c.desc = b1->title();
-        c.name = fullQtWidgetId(*w);
-        goto end;
+
+    group_box = searchThroghSuperClassesAndParents(w, "QGroupBox");
+    if (group_box != nullptr) {
+        b1 = qobject_cast<QGroupBox *>(group_box);
+        if (b1 != nullptr) {
+            c.desc = b1->title();
+            c.name = fullQtWidgetId(*group_box);
+            goto end;
+        }
     }
 
     tool_box = searchThroghSuperClassesAndParents(w, "QToolBox");

@@ -340,17 +340,14 @@ QStringList UserEventAnalyzer::geneDataInForm()
     }
 
     // 公共参数
-    if (eventInfo.type == KeyClick || eventInfo.type == MouseClick || eventInfo.type == MouseMove || eventInfo.type == Wheel) {
-
-        QStringList c = geneComponent();
-        if (c.length() < 3) {
-            return res;
-        }
-
-        res.append(QString("%1").arg(c[0]));
-        res.append(QString("%1").arg(c[1]));
-        res.append(QString("%1").arg(c[2]));
+    QStringList c = geneComponent();
+    if (c.length() < 3) {
+        return res;
     }
+
+    res.append(QString("%1").arg(c[0]));
+    res.append(QString("%1").arg(c[1]));
+    res.append(QString("%1").arg(c[2]));
 
     return res;
 }
