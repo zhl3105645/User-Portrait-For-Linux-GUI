@@ -1,0 +1,433 @@
+Rules:
+- Id: 1
+  Name: 新建文件
+  Events:
+  - (3|1|1|||<class_name=QMenu>.actionNew)
+  - (3|1|1|||MainWindow.toolbarMain.<class_name=QToolButton>)
+  - (7|||1|Ctrl+N|)
+- Id: 1
+  Name: 打开文件
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuFile.actionOpen)
+  - (3|1|1|||MainWindow.toolbarMain.<class_name=QToolButton,1>)
+  - (7|||1|Ctrl+O|)
+- Id: 1
+  Name: 保存文件
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuFile.actionSave)
+  - (3|1|1|||MainWindow.toolbarMain.<class_name=QToolButton,2>)
+  - (3|1|1|||MainWindow.toolbarMain.<class_name=QToolButton,3>)
+  - (7|||1|Ctrl+S|)
+  - (7|||1|Ctrl+Shift+S|)
+- Id: 1
+  Name: 关闭文件
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuWindow.actionClose)
+  - (7|||1|Ctrl+W|)
+  - (7|||1|Ctrl+Shift+W|)
+- Id: 1
+  Name: 导出文件
+  Events:
+  - (3|1|1|||<class_name=QMenu>.actionExport)
+- Id: 1
+  Name: 打印文件
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuFile.actionPrint)
+  - (7|||1|Ctrl+P|)
+- Id: 1
+  Name: 退出应用
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuFile.actionExit)
+- Id: 5
+  Name: 恢复上一步操作
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionUndo)
+  - (7|||1|Ctrl+Z|)
+- Id: 5
+  Name: 撤销恢复操作
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionRedo)
+  - (7|||1|Ctrl+Y|)
+- Id: 5
+  Name: 剪切
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionCut)
+  - (7|||1|Ctrl+X|)
+- Id: 5
+  Name: 复制
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionCopy)
+  - (7|||1|Ctrl+C|)
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionDuplicate_Line)
+  - (7|||1|Ctrl+D|)
+- Id: 5
+  Name: 粘贴
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionPaste)
+  - (7|||1|Ctrl+V|)
+- Id: 5
+  Name: (取消)缩进
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionIndent)
+  - (7|||1|Tab|)
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionUnIndent)
+  - (7|||1|Shift+Tab|)
+- Id: 5
+  Name: 注释
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionToggleComment)
+  - (7|||1|Ctrl+/|)
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionToggle_Block_Comment)
+  - (7|||1|Alt+Shift+A|)
+- Id: 5
+  Name: 修改文件编码
+  Events:
+  - (3|1|1|||<class_name=QMenu>.actionAuto_Detect)
+  - (3|1|1|||<class_name=QMenu>.actionEncode)
+  - (3|1|1|||<class_name=QMenu>.actionConvert)
+- Id: 5
+  Name: 收起/展开
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionFoldAll)
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionUnfoldAll)
+- Id: 5
+  Name: 删除代码
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionDelete)
+  - (7|||1|Ctrl+E|)
+  - (7|||1|Ctrl+Shift+D|)
+  - (7|||1|Ctrl+Shift+B|)
+  - (7|||1|Ctrl+Shift+E|)
+  - (7|||1|Ctrl+Backspace|)
+  - (7|||1|Ctrl+Del|)
+  - (3|1|1|||MainWindow.menubar.menuCode.actionTrim_trailing_spaces)
+- Id: 5
+  Name: 切换只读模式
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuEdit.actionToggle_Readonly)  
+- Id: 5
+  Name: 选择代码
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuSelection.actionSelectAll) 
+  - (3|1|1|||MainWindow.menubar.menuSelection.actionSelect_Word) 
+  - (7|||1|Ctrl+A|)
+- Id: 5
+  Name: 移动代码
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuSelection.actionMove) 
+  - (7|||1|Ctrl+Shift+Up|)
+  - (7|||1|Ctrl+Shift+Down|)
+- Id: 5
+  Name: 视图
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuView) 
+  - (7|||1|Ctrl+F9|)
+  - (7|||1|Ctrl+F10|)
+- Id: 5
+  Name: 查找
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuSearch.actionFind) 
+  - (7|||1|Ctrl+F|)
+  - (7|||1|Ctrl+Shift+F|)
+  - (7|||1|F3|)
+  - (7|||1|Shift+F3|)
+- Id: 5
+  Name: 替换
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuSearch.actionReplace) 
+  - (7|||1|Ctrl+R|)
+- Id: 5
+  Name: 代码跳转
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuCode.actionBack)
+  - (3|1|1|||MainWindow.menubar.menuCode.actionForward)
+  - (3|1|1|||MainWindow.toolbarCode.<class_name=QToolButton>)
+  - (3|1|1|||MainWindow.toolbarCode.<class_name=QToolButton,1>)
+  - (7|||1|Ctrl+Alt+Left|)
+  - (7|||1|Ctrl+Alt+Right|)
+  - (3|1|1|||MainWindow.menubar.menuCode.actionGo_to_Line)
+  - (3|1|1|||MainWindow.menubar.menuCode.actionGoto_block_start)
+  - (3|1|1|||MainWindow.menubar.menuCode.actionGoto_block_end)
+  - (7|||1|Ctrl+Alt+Up|)
+  - (7|||1|Ctrl+Alt+Down|)
+- Id: 5
+  Name: 添加书签
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuCode.actionAdd_bookmark)
+- Id: 5
+  Name: 删除书签
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuCode.actionRemove_Bookmark)
+- Id: 5
+  Name: 修改书签描述
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuCode.actionModify_Bookmark_Description)
+- Id: 5
+  Name: 重构
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuRefactor) 
+  - (7|||1|Shift+F6|)
+- Id: 5
+  Name: 项目新建文件
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuProject.actionProject_New_File)
+  - (3|1|1|||MainWindow.menubar.menuProject.actionNew_Class)
+  - (3|1|1|||MainWindow.menubar.menuProject.actionNew_Header)
+- Id: 5
+  Name: 项目添加文件
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuProject.actionAdd_to_project)
+- Id: 5
+  Name: 从项目删除
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuProject.actionRemove_from_project)
+- Id: 5
+  Name: 文件夹中打开
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuProject.actionProject_Open_Folder_In_Explorer)
+- Id: 5
+  Name: 终端中打开
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuProject.actionProject_Open_In_Terminal)
+- Id: 5
+  Name: 查看Makefile
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuProject.actionView_Makefile)
+- Id: 5
+  Name: 清理构建文件
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuProject.actionMakeClean)
+- Id: 5
+  Name: 项目属性
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuProject.actionProject_options)
+- Id: 1
+  Name: 编译
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionCompile)
+  - (3|1|1|||MainWindow.toolbarCompile.<class_name=QToolButton>)
+  - (7|||1|F9|)
+- Id: 2
+  Name: 重编译
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionRebuild)
+  - (3|1|1||MainWindow.toolbarCompile.<class_name=QToolButton,2>)
+  - (7|||1|F12|)
+- Id: 3
+  Name: 运行
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionCompile)
+  - (3|1|1|||MainWindow.toolbarCompile.<class_name=QToolButton,1>)
+  - (7|||1|F10|)
+- Id: 3
+  Name: 生成汇编
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionGenerate_Assembly)
+- Id: 4
+  Name: 运行参数
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionRun_Parameters)
+  - (3|1|1||MainWindow.toolbarCompile.<class_name=QToolButton,3>)
+- Id: 5
+  Name: 编译器选项
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionCompiler_Options)
+  - (3|1|1|||MainWindow.toolbarCompilerSet.<class_name=QToolButton>)
+- Id: 5
+  Name: 调试
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionDebug)
+  - (3|1|1|||MainWindow.toolbarDebug.<class_name=QToolButton>)
+  - (7|||1|F5|)
+- Id: 6
+  Name: 中断（调试）
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionInterrupt)
+  - (3|1|1|||MainWindow.toolbarDebug.<class_name=QToolButton,1>)
+- Id: 5
+  Name: 单步跨过
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionStep_Over)
+  - (3|1|1|||MainWindow.toolbarDebug.<class_name=QToolButton,2>)
+  - (7|||1|F8|)
+- Id: 5
+  Name: 单步进入
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionStep_Into)
+  - (3|1|1|||MainWindow.toolbarDebug.<class_name=QToolButton,3>)
+  - (7|||1|F7|)
+- Id: 5
+  Name: 单步跳出
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionStep_Out)
+  - (3|1|1|||MainWindow.toolbarDebug.<class_name=QToolButton,4>)
+  - (7|||1|Ctrl+F8|)
+- Id: 5
+  Name: 执行到光标处
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionRun_To_Cursor)
+  - (3|1|1|||MainWindow.toolbarDebug.<class_name=QToolButton,5>)
+  - (7|||1|Ctrl+F5|)
+- Id: 5
+  Name: 继续执行
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionContinue)
+  - (3|1|1|||MainWindow.toolbarDebug.<class_name=QToolButton,6>)
+  - (7|||1|F4|)
+- Id: 5
+  Name: 停止执行
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionStop_Execution)
+  - (3|1|1|||MainWindow.toolbarDebug.<class_name=QToolButton,7>)
+  - (7|||1|F6|)
+- Id: 5
+  Name: 添加监视
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionAdd_Watch)
+  - (3|1|1|||MainWindow.toolbarDebug.<class_name=QToolButton,8>)
+- Id: 5
+  Name: 添加变量断点
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionAdd_Watchpoint)
+- Id: 5
+  Name: 打开CPU信息窗口
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionView_CPU_Window)
+- Id: 5
+  Name: 编译器
+  Events:
+  - (3|1|1|||MainWindow.toolbarCompilerSet.<class_name=QComboBox>)
+- Id: 5
+  Name: Git
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuGit) 
+- Id: 5
+  Name: 工具
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuTools)
+- Id: 5
+  Name: 窗口
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuWindow) 
+  - (7|||1|Ctrl+Shift+W|)
+  - (7|||1|Ctrl+W|)
+  - (7|||1|Ctrl+F11|)
+  - (7|||1|Ctrl+M|)
+  - (7|||1|Ctrl+Tab|)
+  - (7|||1|Ctrl+Shift+Tab|)
+- Id: 5
+  Name: 帮助
+  Events:
+  - (3|1|1|||MainWindow.menubar.menuHelp)
+  - (7|||1|F1|)
+- Id: 5
+  Name: 点击文件侧边栏
+  Events:
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.0)
+- Id: 5
+  Name: 当前工作文件夹路径
+  Events:
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.qt_tabwidget_stackedwidget.tabFiles.panelFiles.cbFilesPath)
+- Id: 5
+  Name: 选择当前工作文件夹
+  Events:
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.qt_tabwidget_stackedwidget.tabFiles.panelFiles.<class_name=QToolButton>)
+- Id: 5
+  Name: 定位当前文件
+  Events:
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.qt_tabwidget_stackedwidget.tabFiles.panelFiles.<class_name=QToolButton,1>)
+- Id: 5
+  Name: 隐藏不支持文件
+  Events:
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.qt_tabwidget_stackedwidget.tabFiles.panelFiles.<class_name=QToolButton,2>)
+- Id: 5
+  Name: 文件视图点击
+  Events:
+  - (3|2|1|||MainWindow.dockExplorer.tabExplorer.qt_tabwidget_stackedwidget.tabFiles.treeFiles)
+- Id: 5
+  Name: 点击项目侧边栏
+  Events:
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.1)
+- Id: 5
+  Name: 项目视图点击
+  Events:
+  - (3|2|1|||MainWindow.dockExplorer.tabExplorer.qt_tabwidget_stackedwidget.tabProject.projectView)
+- Id: 5
+  Name: 点击监视侧边栏
+  Events:
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.2)
+- Id: 5
+  Name: 监视变量视图
+  Events:
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.qt_tabwidget_stackedwidget.tabWatch.watchView)
+- Id: 5
+  Name: 点击结构侧边栏
+  Events:
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.3)
+- Id: 5
+  Name: 结构视图配置修改
+  Events:
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.qt_tabwidget_stackedwidget.tabStructure.<class_name=QWidget>.<class_name=QToolButton>)
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.qt_tabwidget_stackedwidget.tabStructure.<class_name=QWidget>.<class_name=QToolButton,1>)
+  - (3|1|1|||MainWindow.dockExplorer.tabExplorer.qt_tabwidget_stackedwidget.tabStructure.<class_name=QWidget>.<class_name=QToolButton,2>)
+- Id: 5
+  Name: 跳转指定结构
+  Events:
+  - (3|2|1|||MainWindow.dockExplorer.tabExplorer.3)
+- Id: 5
+  Name: 点击编译器底部栏
+  Events:
+  - (3|1|1|||MainWindow.dockMessages.tabMessages.0)
+- Id: 5
+  Name: 跳转编译问题
+  Events:
+  - (3|2|1|||MainWindow.dockMessages.tabMessages.qt_tabwidget_stackedwidget.tabIssues.tableIssues)
+- Id: 5
+  Name: 点击工具输出底部栏
+  Events:
+  - (3|1|1|||MainWindow.dockMessages.tabMessages.1)
+- Id: 5
+  Name: 点击调试底部栏
+  Events:
+  - (3|1|1|||MainWindow.dockMessages.tabMessages.2)
+- Id: 5
+  Name: 点击调试视图，主控台等
+  Events:
+  - (3|1|1|||MainWindow.dockMessages.tabMessages.qt_tabwidget_stackedwidget.tabDebug.splitterDebug.debugViews.0)
+  - (3|1|1|||MainWindow.dockMessages.tabMessages.qt_tabwidget_stackedwidget.tabDebug.splitterDebug.debugViews.1)
+  - (3|1|1|||MainWindow.dockMessages.tabMessages.qt_tabwidget_stackedwidget.tabDebug.splitterDebug.debugViews.2)
+  - (3|1|1|||MainWindow.dockMessages.tabMessages.qt_tabwidget_stackedwidget.tabDebug.splitterDebug.debugViews.3)
+  - (3|1|1|||MainWindow.dockMessages.tabMessages.qt_tabwidget_stackedwidget.tabDebug.splitterDebug.debugViews.4)
+- Id: 5
+  Name: 调试视图查看 # TODO 其余视图
+  Events:
+  - (6|0|0|||MainWindow.dockMessages.tabMessages.qt_tabwidget_stackedwidget.tabDebug.splitterDebug.debugViews.0)
+- Id: 5
+  Name: 点击查找底部栏
+  Events:
+  - (3|1|1|||MainWindow.dockMessages.tabMessages.3)
+- Id: 5
+  Name: 点击TODO底部栏
+  Events:
+  - (3|1|1|||MainWindow.dockMessages.tabMessages.4)
+- Id: 5
+  Name: 跳转TODO
+  Events:
+  - (3|2|1|||MainWindow.dockMessages.tabMessages.qt_tabwidget_stackedwidget.tabTODO.tableTODO)
+- Id: 5
+  Name: 点击书签底部栏
+  Events:
+  - (3|1|1|||MainWindow.dockMessages.tabMessages.5)
+- Id: 5
+  Name: 跳转书签
+  Events:
+  - (3|2|1|||MainWindow.dockMessages.tabMessages.qt_tabwidget_stackedwidget.tabBookmark.tableBookmark)
+- Id: 5
+  Name: 代码区输入
+  Events:
+  - (5|0|0|1||MainWindow.centralwidget.EditorPanel.splitterEditorPanel.EditorTabs)
+  - (5|0|0|2||MainWindow.centralwidget.EditorPanel.splitterEditorPanel.EditorTabs)
+- Id: 5
+  Name: 代码区查看
+  Events:
+  - (6|0|0|0||MainWindow.centralwidget.EditorPanel.splitterEditorPanel.EditorTabs)
