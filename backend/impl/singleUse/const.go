@@ -1,5 +1,8 @@
 package singleUse
 
+// MaxNoOperateTimeS 允许最大不操作时间
+const MaxNoOperateTimeS = 10
+
 type EventType string
 
 const (

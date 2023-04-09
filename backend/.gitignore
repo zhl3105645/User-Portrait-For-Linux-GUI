@@ -34,4 +34,7 @@ _testmain.go
 /output
 *.local.yml
 dumped_hertz_remote_config.json
+/impl/singleUse/basicBehavior.yaml
+/impl/UserUse/multiUse.yaml
+/impl/component.yaml
 		  

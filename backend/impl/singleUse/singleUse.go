@@ -25,6 +25,8 @@ type BasicBehavior struct {
 
 	EventRuleData    string `yaml:"EventRuleData"`    // 事件规则数据
 	BehaviorRuleData string `yaml:"BehaviorRuleData"` // 行为规则数据
+
+	BehaviorTime map[int64]int64 // 各类行为时长
 }
 
 type AppComponent struct {
@@ -37,9 +39,12 @@ type QTComponent struct {
 }
 
 type RuleData struct {
-	ID   int64  // 规则ID
-	Time string // 发生时间
+	ID   int64 // 规则ID
+	Time int64 // 发生时间
 }
+
+const StopOperate = -1
+const BeginOperate = -2
 
 func Process(filePath string, componentMap map[string]*QTComponent, eventRules []*rule.EventRule, behaviorRules []*rule.BehaviorRule) *BasicBehavior {
 	// 1 获取数据
@@ -81,9 +86,14 @@ func Process(filePath string, componentMap map[string]*QTComponent, eventRules [
 	// 2.2 事件数据
 	moving := false
 	beginPos := ""
+	lastEventTimeMs, _ := strconv.ParseInt(events[1][1], 10, 64)
 	for i := 2; i < len(events)-1; i++ {
 		e := events[i]
 		if len(e) < 11 {
+			continue
+		}
+		eventTimeMs, err := strconv.ParseInt(e[1], 10, 64)
+		if err != nil {
 			continue
 		}
 		switch EventType(e[0]) {
@@ -141,25 +151,48 @@ func Process(filePath string, componentMap map[string]*QTComponent, eventRules [
 		}
 
 		// 事件数据
-		if eventRuleId := getEventRuleID(e, eventRules); eventRuleId != 0 {
+		if eventTimeMs-lastEventTimeMs > MaxNoOperateTimeS*1000 {
 			eventRuleData = append(eventRuleData, &RuleData{
-				ID:   int64(eventRuleId),
-				Time: e[1],
+				ID:   StopOperate,
+				Time: lastEventTimeMs,
 			})
+			eventRuleData = append(eventRuleData, &RuleData{
+				ID:   BeginOperate,
+				Time: eventTimeMs,
+			})
+		} else {
+			if eventRuleId := getEventRuleID(e, eventRules); eventRuleId != 0 {
+				eventRuleData = append(eventRuleData, &RuleData{
+					ID:   int64(eventRuleId),
+					Time: eventTimeMs,
+				})
+			}
 		}
+		lastEventTimeMs = eventTimeMs
 	}
 
 	// 事件数据
 	eventData := ""
 	for _, ruleData := range eventRuleData {
-		eventData = eventData + fmt.Sprintf("(%d,%s)", ruleData.ID, ruleData.Time)
+		eventData = eventData + fmt.Sprintf("(%d,%d)", ruleData.ID, ruleData.Time)
 	}
 
 	// 行为数据
 	behaviorRuleData := getBehaviorRuleIDs(eventRuleData, behaviorRules)
 	behaviorData := ""
-	for _, ruleData := range behaviorRuleData {
-		behaviorData = behaviorData + fmt.Sprintf("(%d,%s)", ruleData.ID, ruleData.Time)
+	behaviorTimeMap := make(map[int64]int64)
+	for i := 0; i < len(behaviorRuleData); i++ {
+		ruleData := behaviorRuleData[i]
+		behaviorData = behaviorData + fmt.Sprintf("(%d,%d)", ruleData.ID, ruleData.Time)
+		if i > 0 {
+			last := behaviorRuleData[i-1]
+			time := ruleData.Time - last.Time
+			if v, ok := behaviorTimeMap[last.ID]; ok {
+				behaviorTimeMap[last.ID] = v + time
+			} else {
+				behaviorTimeMap[last.ID] = time
+			}
+		}
 	}
 
 	// 写入文件
@@ -170,6 +203,11 @@ func Process(filePath string, componentMap map[string]*QTComponent, eventRules [
 	}
 	defer basicBehaviorFile.Close()
 
+	keySpeed := 0.0
+	if keyContinueClickTime > 0 {
+		keySpeed = float64(keyContinueClickCnt) / float64(keyContinueClickTime)
+	}
+
 	data := &BasicBehavior{
 		UseTimeMS:        appUseTimeMs,
 		MouseClickCnt:    mouseClickCnt,
@@ -178,9 +216,10 @@ func Process(filePath string, componentMap map[string]*QTComponent, eventRules [
 		KeyClickCnt:      keyClickCnt,
 		ShortcutCnt:      shortcutCnt,
 		MouseMoveDis:     mouseMoveDis,
-		KeyClickSpeed:    float64(keyContinueClickCnt) / float64(keyContinueClickTime),
+		KeyClickSpeed:    keySpeed,
 		EventRuleData:    eventData,
 		BehaviorRuleData: behaviorData,
+		BehaviorTime:     behaviorTimeMap,
 	}
 
 	encoder := yaml.NewEncoder(basicBehaviorFile)

@@ -46,5 +46,13 @@ func GetRules() ([]*EventRule, []*BehaviorRule) {
 		return eventRules.Rules, nil
 	}
 
+	if len(behaviorRules.Rules) > 0 {
+		behaviorRules.Rules = append(behaviorRules.Rules, &BehaviorRule{
+			Id:        0,
+			Name:      "未操作",
+			Behaviors: []string{"(-1,-2)"},
+		})
+	}
+
 	return eventRules.Rules, behaviorRules.Rules
 }

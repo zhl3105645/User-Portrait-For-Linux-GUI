@@ -5,6 +5,8 @@ import (
 	"backend/impl/singleUse"
 	"gopkg.in/yaml.v2"
 	"os"
+	"sort"
+	"strings"
 )
 
 type UserBasicBehavior struct {
@@ -13,8 +15,30 @@ type UserBasicBehavior struct {
 }
 
 func Process(paths []string, componentMap map[string]*singleUse.QTComponent, eventRules []*rule.EventRule, behaviorRules []*rule.BehaviorRule) {
+	// 读取已有component
+	comFile, err1 := os.Open("./impl/component.yaml")
+	if err1 != nil {
+		return
+	}
+	defer comFile.Close()
+
+	existUi := &singleUse.AppComponent{}
+	uiDecoder := yaml.NewDecoder(comFile)
+	if err := uiDecoder.Decode(existUi); err != nil {
+		return
+	}
+
+	for _, info := range existUi.Components {
+		if info == nil {
+			continue
+		}
+		componentMap[info.Name] = info
+	}
+
+	// 开始执行
 	basicBehaviors := make([]*singleUse.BasicBehavior, 0, len(paths))
 	ave := &singleUse.BasicBehavior{}
+	behaviorTimeMap := make(map[int64]int64)
 	for _, path := range paths {
 		basic := singleUse.Process(path, componentMap, eventRules, behaviorRules)
 		if basic != nil {
@@ -28,7 +52,18 @@ func Process(paths []string, componentMap map[string]*singleUse.QTComponent, eve
 			ave.ShortcutCnt += basic.ShortcutCnt
 			ave.MouseMoveDis += basic.MouseMoveDis
 			ave.KeyClickSpeed += basic.KeyClickSpeed
+			for id, add := range basic.BehaviorTime {
+				if v, ok := behaviorTimeMap[id]; ok {
+					behaviorTimeMap[id] = v + add
+				} else {
+					behaviorTimeMap[id] = add
+				}
+			}
 		}
+	}
+
+	for id, v := range behaviorTimeMap {
+		behaviorTimeMap[id] = v / int64(len(basicBehaviors))
 	}
 
 	ave.UseTimeMS /= int64(len(basicBehaviors))
@@ -39,6 +74,7 @@ func Process(paths []string, componentMap map[string]*singleUse.QTComponent, eve
 	ave.ShortcutCnt /= int64(len(basicBehaviors))
 	ave.MouseMoveDis /= float64(len(basicBehaviors))
 	ave.KeyClickSpeed /= float64(len(basicBehaviors))
+	ave.BehaviorTime = behaviorTimeMap
 
 	// 用户维度基础数据
 	userBasicFile, err := os.Create("./impl/UserUse/multiUse.yaml")
@@ -75,6 +111,10 @@ func Process(paths []string, componentMap map[string]*singleUse.QTComponent, eve
 
 		coms = append(coms, com)
 	}
+
+	sort.Slice(coms, func(i, j int) bool {
+		return strings.Compare(coms[i].Name, coms[j].Name) < 0
+	})
 
 	ui := &singleUse.AppComponent{
 		Components: coms,
