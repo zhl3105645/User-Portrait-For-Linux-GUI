@@ -1,73 +1,216 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import {createRouter, createWebHistory, createWebHashHistory} from 'vue-router'
+import LayoutAdmin from "@/layout/LayoutAdmin";
+import LayoutUser from "@/layout/LayoutUser";
+import LayoutNew from "@/layout/LayoutNew";
 
-Vue.use(Router)
-
-const commonRoutes = [
+const routes = [
+    {
+      path: '/',
+      redirect: '/login',
+    },
+    {
+        path: '/front',
+        component: LayoutNew,
+        redirect: "/front/home",
+        children: [
+            {
+                path: 'basic_behavior_data',
+                component: () => import("@/views/new/BasicBehaviorData")
+            },
+            {
+                path: 'behavior_rule',
+                component: () => import("@/views/new/BehaviorRule")
+            },
+            {
+                path: 'behavior_rule_data',
+                component: () => import("@/views/new/BehaviorRuleData")
+            },
+            {
+                path: 'data_mean',
+                component: () => import("@/views/new/DataMean")
+            },
+            {
+                path: 'event_rule',
+                component: () => import("@/views/new/EventRule")
+            },
+            {
+                path: 'event_rule_data',
+                component: () => import("@/views/new/EventRuleData")
+            },
+            {
+                path: 'home',
+                component: () => import("@/views/new/Home")
+            },
+            {
+                path: 'label',
+                component: () => import("@/views/new/Label")
+            },
+            {
+                path: 'learning_model',
+                component: () => import("@/views/new/LearningModel")
+            },
+            {
+                path: 'predict',
+                component: () => import("@/views/new/Predict")
+            },
+            {
+                path: 'statistics_model',
+                component: () => import("@/views/new/StatisticsModel")
+            },
+            {
+                path: 'user_record',
+                component: () => import("@/views/new/UserRecord")
+            }
+        ]
+    },
+    {
+        path: '/admin',
+        // name: 'Admin',
+        component: LayoutAdmin,
+        redirect: "/admin/home",
+        children: [
+            {
+                path: 'home',
+                // name: 'Home',
+                component: () => import("@/views/admin/Home")
+            },
+            {
+                path: 'department',
+                // name: 'Department',
+                component: () => import("@/views/admin/Department")
+            },
+            {
+                path: 'goods',
+                // name: 'Goods',
+                component: () => import("@/views/admin/Goods")
+            },
+            {
+                path: 'insurance',
+                // name: 'Insurance',
+                component: () => import("@/views/admin/Insurance")
+            },
+            {
+                path: 'log',
+                // name: 'Log',
+                component: () => import("@/views/admin/Log")
+            },
+            {
+                path: 'manager',
+                // name: 'Manager',
+                component: () => import("@/views/admin/Manager")
+            },
+            {
+                path: 'order',
+                // name: 'Order',
+                component: () => import("@/views/admin/Order")
+            },
+            {
+                path: 'price',
+                // name: 'Price',
+                component: () => import("@/views/admin/Price")
+            },
+            {
+                path: 'profile',
+                // name: 'Profile',
+                component: () => import("@/views/admin/Profile")
+            },
+            {
+                path: 'staff',
+                // name: 'Staff',
+                component: () => import("@/views/admin/Staff")
+            },
+            {
+                path: 'storehouse',
+                // name: 'Storehouse',
+                component: () => import("@/views/admin/Storehouse")
+            },
+            {
+                path: 'user',
+                // name: 'User',
+                component: () => import("@/views/admin/User")
+            },
+            {
+                path: 'vehicle',
+                // name: 'Vehicle',
+                component: () => import("@/views/admin/Vehicle")
+            }
+        ]
+    },
+    {
+        path: '/user',
+        // name: 'user',
+        component: LayoutUser,
+        redirect: "/user/home",
+        children: [
+            {
+                path: 'home',
+                // name: 'Home',
+                component: () => import("@/views/user/Home")
+            },
+            {
+                path: 'profile',
+                // name: 'Profile',
+                component: () => import("@/views/user/Profile")
+            },
+            {
+                path: 'goods',
+                // name: 'Goods',
+                component: () => import("@/views/user/Goods")
+            },
+            {
+                path: 'order',
+                // name: 'Order',
+                component: () => import("@/views/user/Order")
+            }
+        ]
+    },
     {
         path: '/login',
-        name: 'login',
-        meta: { title: '登录' },
-        component: () => import('../components/Login.vue'),
+        // name: 'Login',
+        component: () => import("@/views/Login")
     },
     {
-        path: '/other', // 点击侧边栏跳到一个单独的路由页面，需要定义，层级和其他顶级路由一样
-        name: 'other',
-        meta: { title: '单独的路由' },
-        component: () => import('../views/Other.vue'),
+        path: '/register',
+        // name: 'Register',
+        component: () => import("@/views/Register")
     },
-    {
-        path: '/404',
-        name: '404',
-        meta: { title: '404' },
-        component: () => import('../components/404.vue'),
-    },
-    { path: '/', redirect: '/home' },
 ]
 
-// 本地所有的页面 需要配合后台返回的数据生成页面
-export const asyncRoutes = {
-    home: {
-        path: 'home',
-        name: 'home',
-        meta: { title: '主页' },
-        component: () => import('../views/Home.vue'),
-    },
-    t1: {
-        path: 't1',
-        name: 't1',
-        meta: { title: '表格' },
-        component: () => import('../views/T1.vue'),
-    },
-    password: {
-        path: 'password',
-        name: 'password',
-        meta: { title: '修改密码' },
-        component: () => import('../views/Password.vue'),
-    },
-    msg: {
-        path: 'msg',
-        name: 'msg',
-        meta: { title: '通知消息' },
-        component: () => import('../views/Msg.vue'),
-    },
-    userinfo: {
-        path: 'userinfo',
-        name: 'userinfo',
-        meta: { title: '用户信息' },
-        component: () => import('../views/UserInfo.vue'),
-    },
-}
-
-const createRouter = () => new Router({
-    routes: commonRoutes,
+const router = createRouter({
+    history: createWebHashHistory(process.env.BASE_URL),
+    
+    routes
 })
 
-const router = createRouter()
-
-export function resetRouter() {
-    const newRouter = createRouter()
-    router.matcher = newRouter.matcher
+function isEmptyStr(s) {
+    if (s === undefined || s == null || s === '') {
+        return true
+    }
+    return false
 }
+
+// 限制某些页面禁止未登录访问
+let limitPagePath = ['/about']
+router.beforeEach((to, from, next) => {
+    if (limitPagePath.includes(to.path)) {
+        // 判断sessionStorage是否保存了用户信息
+        let userStr = sessionStorage.getItem("user") || "{}"
+        let user = JSON.parse(userStr)
+        // 判断sessionStorage是否保存了管理员信息
+        let adminStr = sessionStorage.getItem("admin") || "{}"
+        let admin = JSON.parse(adminStr)
+        console.log(adminStr)
+        console.log(admin)
+        if (isEmptyStr(user.username) && isEmptyStr(admin.accountName)) {
+            // 跳转到登录页面
+            next({path: "/login"})
+        } else {
+            next()
+        }
+    } else {
+        next()
+    }
+
+})
 
 export default router

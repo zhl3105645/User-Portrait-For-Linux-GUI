@@ -3,28 +3,18 @@
 package handler
 
 import (
-	"backend/dal/query"
+	"backend/biz/mw"
+	"backend/cmd/dal/model"
 	"context"
-	"github.com/bytedance/gopkg/util/logger"
-
+	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/utils"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // Ping .
 func Ping(ctx context.Context, c *app.RequestContext) {
-
-	tests, err := query.Test.WithContext(ctx).FindAll()
-	if err != nil {
-		logger.Info("err != nil, err=", err)
-	} else {
-		logger.Info("err == nil, len(tests)=", len(tests))
-		for _, test := range tests {
-			logger.Info("ID=", *test.ID, "; Name=", *test.Name)
-		}
-	}
-	c.JSON(consts.StatusOK, utils.H{
-		"message": "pong",
+	account, _ := c.Get(mw.IdentityKey)
+	c.JSON(200, utils.H{
+		"message": fmt.Sprintf("AccountID:%v", account.(*model.Account).AccountID),
 	})
 }

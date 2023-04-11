@@ -1,20 +1,19 @@
-import Vue from 'vue'
-import axios from 'axios'
-import ViewUI from 'view-design'
-import App from './App'
-import store from './store'
+import { createApp } from 'vue'
+import App from './App.vue'
 import router from './router'
-import 'view-design/dist/styles/iview.css'
-import './permission'
+import store from './store'
+import ElementPlus from 'element-plus';
+import 'element-plus/lib/theme-chalk/index.css';
+// import 'dayjs/locale/zh-cn'
+// import locale from 'element-plus/lib/locale/lang/zh-cn'
 
-Vue.config.productionTip = false
-Vue.use(ViewUI)
+import * as echarts from 'echarts'
 
-Vue.prototype.$axios = axios
+import '@/assets/css/global.css'
 
-new Vue({
-    el: '#app',
-    router,
-    store,
-    render: h => h(App),
-})
+const app = createApp(App)
+    .use(store)
+    .use(router)
+    .use(ElementPlus, {size: 'small' })
+    .mount('#app')
+app.echarts = echarts

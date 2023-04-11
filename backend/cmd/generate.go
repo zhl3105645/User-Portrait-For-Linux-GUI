@@ -1,15 +1,15 @@
 package main
 
 import (
-	"backend/dal"
+	dal2 "backend/cmd/dal"
 	"gorm.io/gen"
 )
 
 func main() {
-	dal.Init()
+	dal2.Init()
 
 	g := gen.NewGenerator(gen.Config{
-		OutPath:           "./dal/query",
+		OutPath:           "./cmd/dal/query",
 		Mode:              gen.WithDefaultQuery,
 		FieldNullable:     true,
 		FieldCoverable:    false,
@@ -18,7 +18,7 @@ func main() {
 		FieldWithTypeTag:  true,
 	})
 
-	g.UseDB(dal.DB)
+	g.UseDB(dal2.DB)
 
 	// 自定义字段的数据类型
 	// 统一数字类型为int64,兼容protobuf
@@ -33,7 +33,9 @@ func main() {
 
 	// 创建模型的结构体,生成文件在 model 目录; 先创建的结果会被后面创建的覆盖
 	// 这里创建个别模型仅仅是为了拿到`*generate.QueryStructMeta`类型对象用于后面的模型关联操作中
-	User := g.GenerateModel("test")
+	Test := g.GenerateModel("test")
+	App := g.GenerateModel("app")
+	Account := g.GenerateModel("account")
 
 	// 创建有关联关系的模型文件
 	// 可以用于指定外键
@@ -44,9 +46,10 @@ func main() {
 	//		gen.FieldRelate(field.HasMany, "user", User, &field.RelateConfig{GORMTag: "foreignKey:UID"}),
 	//	)...,
 	//)
-	g.ApplyBasic(User)
+	g.ApplyBasic(Test, App, Account)
 
-	g.ApplyInterface(func(dal.QueryAll) {}, User)
+	g.ApplyInterface(func(dal2.QueryAll) {}, Test)
+	g.ApplyInterface(func(app dal2.MethodForApp) {}, App)
 
 	g.Execute()
 }

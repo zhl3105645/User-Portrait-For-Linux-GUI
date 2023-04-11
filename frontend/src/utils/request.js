@@ -1,57 +1,63 @@
 import axios from 'axios'
-import { Message } from 'view-design'
-import router from '@/router'
-import { showLoading, closeLoading } from '@/utils/loading'
-import { resetTokenAndClearUser } from '@/utils'
+import router from "@/router";
 
-const service = axios.create({
-    baseURL: window.location.origin,
-    timeout: 60000,
+const request = axios.create({
+    baseURL: "/",
+    timeout: 5000
 })
 
-service.interceptors.request.use(config => {
-    showLoading()
-    if (localStorage.getItem('token')) {
-        config.headers.Authorization = localStorage.getItem('token')
-    }
+// 请求白名单，如果请求在白名单里面，将不会被拦截校验权限
+const whiteUrls = ["/login", '/register', "/applist"]
 
-    return config
-}, (error) => Promise.reject(error))
-
-service.interceptors.response.use(response => {
-    closeLoading()
-    const res = response.data
-    // 这里是接口处理的一个示范，可以根据自己的项目需求更改
-    // 错误处理
-    if (res.code != 0 && res.msg) {
-        Message.error({
-            content: res.msg,
-        })
-
-        // token 无效，清空路由，退出登录
-        if (res.code == 2) {
-            resetTokenAndClearUser()
-            router.push('login')
+// request 拦截器
+// 可以自请求发送前对请求做一些处理
+// 比如统一加token，对请求参数统一加密
+request.interceptors.request.use(config => {
+    config.headers['Content-Type'] = 'application/json;charset=utf-8';
+    
+    if (!whiteUrls.includes(config.url)) { // 校验请求白名单
+        let token = sessionStorage.getItem("token")
+        console.log("token=", token)
+        if (isEmptyStr(token)) {
+            router.push("/login")
+        } else {
+            console.log("加token头:" + token)
+            config.headers['Authorization'] = "Bearer " + token;  // 设置请求头 ，将用户的token保存在请求头中
         }
-
-        return Promise.reject()
     }
-
-    // 如果接口正常，直接返回数据
-    return res
-}, (error) => {
-    closeLoading()
-    if (error.name == 'Error') {
-        Message.error({
-            content: error.msg,
-        })
-    } else {
-        Message.error({
-            content: error.response.data.data || error.message,
-        })
-    }
-
+    return config
+}, error => {
     return Promise.reject(error)
-})
+});
 
-export default service
+// response 拦截器
+// 可以在接口响应后统一处理结果
+request.interceptors.response.use(
+    response => {
+        let res = response.data;
+        // 如果是返回的文件
+        if (response.config.responseType === 'blob') {
+            return res
+        }
+        // 兼容服务端返回的字符串数据
+        if (typeof res === 'string') {
+            res = res ? JSON.parse(res) : res
+        }
+        // 验证token
+        if (res.code === '401') {
+            console.error("token过期，重新登录")
+            router.push("/login")
+        }
+        return res;
+    },
+    error => {
+        console.log('err' + error) // for debug
+        return Promise.reject(error)
+    }
+)
+function isEmptyStr(s) {
+    return s === undefined || s === null || s === '';
+}
+
+export default request
+

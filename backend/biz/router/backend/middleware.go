@@ -3,6 +3,7 @@
 package backend
 
 import (
+	"backend/biz/mw"
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -11,7 +12,27 @@ func rootMw() []app.HandlerFunc {
 	return nil
 }
 
-func _hellomethodMw() []app.HandlerFunc {
+func _registerMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _loginMw() []app.HandlerFunc {
+	// your code...
+	return []app.HandlerFunc{mw.JwtMiddleware.LoginHandler}
+}
+
+func __pplistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _apiMw() []app.HandlerFunc {
+	// your code...
+	return []app.HandlerFunc{mw.JwtMiddleware.MiddlewareFunc()}
+}
+
+func __ccountMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
