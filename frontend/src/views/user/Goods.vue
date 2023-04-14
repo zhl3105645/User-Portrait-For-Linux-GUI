@@ -69,36 +69,6 @@
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
       </el-pagination>
-
-<!--      <el-dialog title="提示" v-model="dialogVisible" width="30%">
-        <el-form :model="form" label-width="120px">
-          <el-form-item label="车牌号">
-            <el-input v-model="form.plateNumber" style="width: 80%"></el-input>
-          </el-form-item>
-          <el-form-item label="车型">
-            <el-input v-model="form.type" style="width: 80%"></el-input>
-          </el-form-item>
-          <el-form-item label="载重">
-            <el-input v-model="form.load" style="width: 80%"></el-input>
-          </el-form-item>
-          <el-form-item label="车辆状态">
-            <el-input v-model="form.state" style="width: 80%"></el-input>
-          </el-form-item>
-          <el-form-item label="司机名">
-            <el-input v-model="form.driverName" style="width: 80%"></el-input>
-          </el-form-item>
-          <el-form-item label="保险类型">
-            <el-input v-model="form.insuranceType" style="width: 80%"></el-input>
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <span class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="save">确 定</el-button>
-          </span>
-        </template>
-      </el-dialog>-->
-
     </div>
   </div>
 </template>

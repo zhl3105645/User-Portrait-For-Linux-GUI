@@ -7,6 +7,7 @@ import (
 	"backend/cmd/dal/model"
 	"context"
 	"fmt"
+	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/utils"
 )
@@ -16,5 +17,21 @@ func Ping(ctx context.Context, c *app.RequestContext) {
 	account, _ := c.Get(mw.IdentityKey)
 	c.JSON(200, utils.H{
 		"message": fmt.Sprintf("AccountID:%v", account.(*model.Account).AccountID),
+	})
+}
+
+func Test(ctx context.Context, c *app.RequestContext) {
+	id := c.Param("id")
+	logger.Info("id=", id)
+	c.JSON(200, utils.H{
+		"message": id,
+	})
+}
+
+func Test2(ctx context.Context, c *app.RequestContext) {
+	id := c.Param("id")
+	logger.Info("id=", id)
+	c.JSON(200, utils.H{
+		"message": id,
 	})
 }

@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import request from "@/utils/request";
+
 export default {
   name: "HeaderNew",
   props: ['account'],

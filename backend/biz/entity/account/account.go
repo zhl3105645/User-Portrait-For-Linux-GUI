@@ -5,6 +5,8 @@ import (
 	"backend/cmd/dal/model"
 	"backend/cmd/dal/query"
 	"context"
+	"errors"
+	"gorm.io/gorm"
 )
 
 type Permission int
@@ -35,7 +37,7 @@ type Account struct {
 	// NameQuery
 	// appId       int64
 	// accountName string
-	
+
 	addMo   *model.Account
 	queryMo *model.Account
 }
@@ -54,8 +56,10 @@ func NewAccount(accountId int64, appId int64, accountName, accountPwd string, pe
 func (a *Account) Load(ctx context.Context) error {
 	switch a.role {
 	case Create:
-		ac, err := query.Account.WithContext(ctx).Where(query.Account.AppID.Eq(a.appId), query.Account.AccountName.Eq(a.accountName)).First()
-		if err != nil {
+		ac, err := query.Account.WithContext(ctx).
+			Where(query.Account.AppID.Eq(a.appId), query.Account.AccountName.Eq(a.accountName)).
+			First()
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return microtype.AccountQueryFailed
 		}
 
@@ -77,8 +81,10 @@ func (a *Account) Load(ctx context.Context) error {
 
 		a.addMo = mo
 	case IdQuery:
-		ac, err := query.Account.WithContext(ctx).Where(query.Account.AccountID.Eq(a.accountId)).First()
-		if err != nil {
+		ac, err := query.Account.WithContext(ctx).
+			Where(query.Account.AccountID.Eq(a.accountId)).
+			First()
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return microtype.AccountQueryFailed
 		}
 
@@ -88,8 +94,10 @@ func (a *Account) Load(ctx context.Context) error {
 
 		a.queryMo = ac
 	case NameQuery:
-		ac, err := query.Account.WithContext(ctx).Where(query.Account.AppID.Eq(a.appId), query.Account.AccountName.Eq(a.accountName)).First()
-		if err != nil {
+		ac, err := query.Account.WithContext(ctx).
+			Where(query.Account.AppID.Eq(a.appId), query.Account.AccountName.Eq(a.accountName)).
+			First()
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return microtype.AccountQueryFailed
 		}
 

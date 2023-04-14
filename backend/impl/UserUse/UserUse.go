@@ -16,7 +16,7 @@ type UserBasicBehavior struct {
 
 func Process(paths []string, componentMap map[string]*singleUse.QTComponent, eventRules []*rule.EventRule, behaviorRules []*rule.BehaviorRule) {
 	// 读取已有component
-	comFile, err1 := os.Open("./impl/component.yaml")
+	comFile, err1 := os.Open("./impl/component_gene.yaml")
 	if err1 != nil {
 		return
 	}
@@ -96,7 +96,7 @@ func Process(paths []string, componentMap map[string]*singleUse.QTComponent, eve
 	}
 
 	// ui 组件数据
-	uiComponentFile, err := os.Create("./impl/component.yaml")
+	uiComponentFile, err := os.Create("./impl/component_gene.yaml")
 	if err != nil {
 		println(err.Error())
 		return

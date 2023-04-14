@@ -4,7 +4,16 @@
 
 <script>
 export default {
-  name: "BehaviorRule"
+  name: "BehaviorRule",
+  data() {
+    
+  },
+  created() {
+    
+  },
+  methods: {
+
+  }
 }
 </script>
 

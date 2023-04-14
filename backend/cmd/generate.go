@@ -10,7 +10,7 @@ func main() {
 
 	g := gen.NewGenerator(gen.Config{
 		OutPath:           "./cmd/dal/query",
-		Mode:              gen.WithDefaultQuery,
+		Mode:              gen.WithDefaultQuery | gen.WithQueryInterface,
 		FieldNullable:     true,
 		FieldCoverable:    false,
 		FieldSignable:     false,
@@ -36,6 +36,15 @@ func main() {
 	Test := g.GenerateModel("test")
 	App := g.GenerateModel("app")
 	Account := g.GenerateModel("account")
+	Component := g.GenerateModel("component")
+	DataSource := g.GenerateModel("data_source")
+	Label := g.GenerateModel("label")
+	LabelData := g.GenerateModel("label_data")
+	DataModel := g.GenerateModel("data_model")
+	ModelData := g.GenerateModel("model_data")
+	Rule := g.GenerateModel("rule")
+	RuleElement := g.GenerateModel("rule_element")
+	User := g.GenerateModel("user")
 
 	// 创建有关联关系的模型文件
 	// 可以用于指定外键
@@ -46,10 +55,9 @@ func main() {
 	//		gen.FieldRelate(field.HasMany, "user", User, &field.RelateConfig{GORMTag: "foreignKey:UID"}),
 	//	)...,
 	//)
-	g.ApplyBasic(Test, App, Account)
+	g.ApplyBasic(Test, App, Account, Component, DataSource, Label, LabelData, DataModel, ModelData, Rule, RuleElement, User)
 
 	g.ApplyInterface(func(dal2.QueryAll) {}, Test)
-	g.ApplyInterface(func(app dal2.MethodForApp) {}, App)
 
 	g.Execute()
 }

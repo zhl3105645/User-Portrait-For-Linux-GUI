@@ -1,6 +1,7 @@
 package singleUse
 
 import (
+	"backend/biz/entity/event_data"
 	"backend/impl/rule"
 	"encoding/csv"
 	"fmt"
@@ -96,23 +97,23 @@ func Process(filePath string, componentMap map[string]*QTComponent, eventRules [
 		if err != nil {
 			continue
 		}
-		switch EventType(e[0]) {
-		case MouseClick:
+		switch event_data.EventType(e[0]) {
+		case event_data.MouseClick:
 			// 鼠标双击: 单击 双击 单击
-			if MouseClickType(e[3]) == Two && i+1 < len(events)-1 {
-				if len(events[i-1]) == 11 && EventType(events[i-1][0]) == MouseClick && MouseClickType(events[i-1][3]) == "1" &&
-					len(events[i+1]) == 11 && EventType(events[i+1][0]) == MouseClick && MouseClickType(events[i+1][3]) == "1" {
+			if event_data.MouseClickType(e[3]) == event_data.Two && i+1 < len(events)-1 {
+				if len(events[i-1]) == 11 && event_data.EventType(events[i-1][0]) == event_data.MouseClick && event_data.MouseClickType(events[i-1][3]) == "1" &&
+					len(events[i+1]) == 11 && event_data.EventType(events[i+1][0]) == event_data.MouseClick && event_data.MouseClickType(events[i+1][3]) == "1" {
 					i = i + 1 // 跳过下一次
 					continue
 				}
 			}
 			mouseClickCnt++
-		case MouseMove:
-			typ := MouseMoveType(e[5])
-			if typ == MoveBegin {
+		case event_data.MouseMove:
+			typ := event_data.MouseMoveType(e[5])
+			if typ == event_data.MoveBegin {
 				moving = true
 				beginPos = e[2]
-			} else if typ == MoveEnd && moving {
+			} else if typ == event_data.MoveEnd && moving {
 				moving = false
 				dis := getDistance(beginPos, e[2])
 				if dis > 0 {
@@ -121,9 +122,9 @@ func Process(filePath string, componentMap map[string]*QTComponent, eventRules [
 				}
 				beginPos = ""
 			}
-		case KeyClick:
+		case event_data.KeyClick:
 			keyClickCnt++
-			if EventType(events[i-1][0]) == KeyClick {
+			if event_data.EventType(events[i-1][0]) == event_data.KeyClick {
 				nowTime, err1 := strconv.ParseInt(e[1], 10, 64)
 				lastTime, err2 := strconv.ParseInt(events[i-1][1], 10, 64)
 				if err1 == nil && err2 == nil {
@@ -132,16 +133,16 @@ func Process(filePath string, componentMap map[string]*QTComponent, eventRules [
 				}
 			}
 
-		case MouseWheel:
+		case event_data.MouseWheel:
 			mouseWheelCnt++
-		case Shortcut:
+		case event_data.Shortcut:
 			shortcutCnt++
 		default:
 		}
 
 		// 组件信息
-		if EventType(e[0]) == MouseClick || EventType(e[0]) == MouseMove ||
-			EventType(e[0]) == MouseWheel || EventType(e[0]) == KeyClick || EventType(e[0]) == Shortcut {
+		if event_data.EventType(e[0]) == event_data.MouseClick || event_data.EventType(e[0]) == event_data.MouseMove ||
+			event_data.EventType(e[0]) == event_data.MouseWheel || event_data.EventType(e[0]) == event_data.KeyClick || event_data.EventType(e[0]) == event_data.Shortcut {
 			if _, ok := componentMap[e[8]]; !ok {
 				componentMap[e[8]] = &QTComponent{
 					Name:        e[8],
@@ -151,7 +152,7 @@ func Process(filePath string, componentMap map[string]*QTComponent, eventRules [
 		}
 
 		// 事件数据
-		if eventTimeMs-lastEventTimeMs > MaxNoOperateTimeS*1000 {
+		if eventTimeMs-lastEventTimeMs > event_data.MaxNoOperateTimeS*1000 {
 			eventRuleData = append(eventRuleData, &RuleData{
 				ID:   StopOperate,
 				Time: lastEventTimeMs,
@@ -361,7 +362,7 @@ func getAppUseTime(events [][]string) (int64, error) {
 
 	beginEvent := events[1]
 	endEvent := events[len(events)-1]
-	if len(beginEvent) < 2 || len(endEvent) < 2 || beginEvent[0] != string(AppStart) || endEvent[0] != string(AppQuit) {
+	if len(beginEvent) < 2 || len(endEvent) < 2 || beginEvent[0] != string(event_data.AppStart) || endEvent[0] != string(event_data.AppQuit) {
 		return 0, fmt.Errorf("app start or stop data error")
 	}
 

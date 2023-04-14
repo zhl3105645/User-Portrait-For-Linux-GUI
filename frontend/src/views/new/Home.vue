@@ -4,7 +4,16 @@
 
 <script>
 export default {
-  name: "Home"
+  name: "Home",
+  data() {
+    
+  },
+  created() {
+    
+  },
+  methods: {
+
+  }
 }
 </script>
 

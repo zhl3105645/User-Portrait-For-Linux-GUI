@@ -4,7 +4,16 @@
 
 <script>
 export default {
-  name: "StatisticsModel"
+  name: "StatisticsModel",
+  data() {
+    
+  },
+  created() {
+    
+  },
+  methods: {
+
+  }
 }
 </script>
 

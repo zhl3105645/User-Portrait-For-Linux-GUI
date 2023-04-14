@@ -2,7 +2,7 @@
   <div style="width: 100%; height: 100vh; overflow: hidden"> <!--  :style="bg" 加背景图片-->
     <div style="width: 400px; margin: 100px auto">
       <div style="font-size: 30px; text-align: center; padding: 30px 0">欢迎登录</div>
-      <el-form ref="form" :model="form" size="normal" :rules="rules">
+      <el-form ref="form" :model="form" :rules="rules">
         <el-form-item prop="app_id">
           <el-select v-model="form.app_id" placeholder="请选择应用">
             <el-option v-for="item in options" :key="item.app_id" :label="item.app_name" :value="item.app_id"></el-option>
@@ -109,16 +109,20 @@ export default {
                   message: "登录成功"
               })
               sessionStorage.setItem("token", res.token) // 缓存token
+
               // 账号信息
-              request.get("/api/account").then(res2 => {
-                console.log(res2)
-                if (res2.status_code === 0) {
-                  sessionStorage.setItem("account",res2.account)
+              request.get("/api/account").then(res => {
+                console.log(res)
+                if (res.status_code === 0) {
+                  console.log("set session account")
+                  let accountObj = res.account
+                  let accountStr = JSON.stringify(accountObj)
+                  sessionStorage.setItem("account",accountStr)
                 } else {
-                  console.log("/api/account code != 0, code=",res2.status_code)
+                  console.log("/api/account code != 0, code=",res.status_code)
                 }
               })
-
+    
               this.$router.push("/front/home") // 登录界面跳转
             } else {
               this.$message({

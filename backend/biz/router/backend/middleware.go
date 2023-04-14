@@ -36,3 +36,83 @@ func __ccountMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func __dduserMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userinpageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _uploadMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userdatauploadMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _componentinpageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _genecomponentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _ruleinpageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func __ddruleMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateruleMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _ruleMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _elementinpageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteruleMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _elementMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateelementMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteelementMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

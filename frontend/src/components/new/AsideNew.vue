@@ -57,7 +57,6 @@ export default {
   name: "AsideNew",
   data() {
     return {
-      account: {},
       path: this.$route.path  //设置默认高亮菜单
     }
   },
@@ -65,14 +64,6 @@ export default {
     
   },
   created() {
-    this.account = sessionStorage.getItem("account")
-
-    //请求服务端，确认当前登录用户的合法信息
-    request.get("/api/account").then(res => {
-      if (res.status_code === 0) {
-        this.account = res.account
-      }
-    })
   }
 }
 </script>

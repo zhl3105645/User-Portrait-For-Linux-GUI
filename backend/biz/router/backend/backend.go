@@ -23,5 +23,23 @@ func Register(r *server.Hertz) {
 	{
 		_api := root.Group("/api", _apiMw()...)
 		_api.GET("/account", append(__ccountMw(), backend.Account)...)
+		_api.GET("/components", append(_componentinpageMw(), backend.ComponentInPage)...)
+		_api.POST("/components", append(_genecomponentMw(), backend.GeneComponent)...)
+		_api.POST("/element", append(_elementMw(), backend.AddElement)...)
+		_element := _api.Group("/element", _elementMw()...)
+		_element.PUT("/:id", append(_updateelementMw(), backend.UpdateElement)...)
+		_element.DELETE("/:id", append(_deleteelementMw(), backend.DeleteElement)...)
+		_api.GET("/elements", append(_elementinpageMw(), backend.ElementInPage)...)
+		_api.GET("/users", append(_userinpageMw(), backend.UserInPage)...)
+		_api.POST("/rule", append(_ruleMw(), backend.AddRule)...)
+		_rule := _api.Group("/rule", _ruleMw()...)
+		_rule.PUT("/:id", append(_updateruleMw(), backend.UpdateRule)...)
+		_rule.DELETE("/:id", append(_deleteruleMw(), backend.DeleteRule)...)
+		_api.POST("/user", append(_userMw(), backend.AddUser)...)
+		_user := _api.Group("/user", _userMw()...)
+		{
+			_upload := _user.Group("/upload", _uploadMw()...)
+			_upload.POST("/:id", append(_userdatauploadMw(), backend.UserDataUpload)...)
+		}
 	}
 }

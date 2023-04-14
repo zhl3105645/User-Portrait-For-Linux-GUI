@@ -13,6 +13,8 @@ func customizedRegister(r *server.Hertz) {
 
 	auth := r.Group("/auth", mw.JwtMiddleware.MiddlewareFunc())
 	auth.GET("/ping", handler.Ping)
+	r.GET("/test/:id", handler.Test)
+	r.POST("/test2/:id", handler.Test2)
 
 	// your code ...
 }

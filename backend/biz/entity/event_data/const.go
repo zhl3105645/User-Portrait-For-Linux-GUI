@@ -1,4 +1,4 @@
-package singleUse
+package event_data
 
 // MaxNoOperateTimeS 允许最大不操作时间
 const MaxNoOperateTimeS = 10
@@ -61,4 +61,18 @@ const (
 	Column    ComponentType = "12" // 列视图
 	Action    ComponentType = "13" // 命令
 	Container ComponentType = "14" // 容器
+)
+
+const (
+	EventTypeIndex        = 0
+	EventTimeIndex        = 1
+	MousePos              = 2
+	MouseClickTypeIndex   = 3
+	MouseClickButtonIndex = 4
+	MouseMoveTypeIndex    = 5
+	KeyClickTypeIndex     = 6
+	KeyCodeIndex          = 7
+	ComponentNameIndex    = 8
+	ComponentTypeIndex    = 9
+	ComponentExtraIndex   = 10
 )

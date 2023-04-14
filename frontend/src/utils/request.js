@@ -8,12 +8,19 @@ const request = axios.create({
 
 // 请求白名单，如果请求在白名单里面，将不会被拦截校验权限
 const whiteUrls = ["/login", '/register', "/applist"]
+// 上传文件url
+const uploadUrls = ["/api/user/upload/"]
 
 // request 拦截器
 // 可以自请求发送前对请求做一些处理
 // 比如统一加token，对请求参数统一加密
 request.interceptors.request.use(config => {
-    config.headers['Content-Type'] = 'application/json;charset=utf-8';
+    config.headers['Content-Type'] = 'application/json;charset=utf-8'
+    uploadUrls.forEach((val, index) => {
+        if (config.url.includes(val)) {
+            config.headers['Content-Type'] = 'multipart/form-data'
+        }
+    })
     
     if (!whiteUrls.includes(config.url)) { // 校验请求白名单
         let token = sessionStorage.getItem("token")
@@ -44,7 +51,7 @@ request.interceptors.response.use(
             res = res ? JSON.parse(res) : res
         }
         // 验证token
-        if (res.code === '401') {
+        if (res.status_code === 401) {
             console.error("token过期，重新登录")
             router.push("/login")
         }

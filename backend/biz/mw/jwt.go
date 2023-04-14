@@ -85,6 +85,7 @@ func InitJwt() {
 				"status_code": code,
 				"status_msg":  message,
 			})
+			//c.Redirect(consts.StatusMovedPermanently, []byte("/login"))
 		},
 	})
 	if err != nil {

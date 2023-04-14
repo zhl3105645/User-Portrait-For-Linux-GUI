@@ -4,7 +4,16 @@
 
 <script>
 export default {
-  name: "EventRuleData"
+  name: "EventRuleData",
+  data() {
+    
+  },
+  created() {
+    
+  },
+  methods: {
+
+  }
 }
 </script>
 

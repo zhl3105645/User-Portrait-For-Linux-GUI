@@ -4,7 +4,16 @@
 
 <script>
 export default {
-  name: "Predict"
+  name: "Predict",
+  data() {
+    
+  },
+  created() {
+    
+  },
+  methods: {
+
+  }
 }
 </script>
 

@@ -4,7 +4,16 @@
 
 <script>
 export default {
-  name: "Label"
+  name: "Label",
+  data() {
+    
+  },
+  created() {
+    
+  },
+  methods: {
+
+  }
 }
 </script>
 

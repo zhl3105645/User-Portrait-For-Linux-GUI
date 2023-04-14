@@ -16,44 +16,89 @@ import (
 )
 
 var (
-	Q       = new(Query)
-	Account *account
-	App     *app
-	Test    *test
+	Q           = new(Query)
+	Account     *account
+	App         *app
+	Component   *component
+	DataModel   *dataModel
+	DataSource  *dataSource
+	Label       *label
+	LabelDatum  *labelDatum
+	ModelDatum  *modelDatum
+	Rule        *rule
+	RuleElement *ruleElement
+	Test        *test
+	User        *user
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
 	Account = &Q.Account
 	App = &Q.App
+	Component = &Q.Component
+	DataModel = &Q.DataModel
+	DataSource = &Q.DataSource
+	Label = &Q.Label
+	LabelDatum = &Q.LabelDatum
+	ModelDatum = &Q.ModelDatum
+	Rule = &Q.Rule
+	RuleElement = &Q.RuleElement
 	Test = &Q.Test
+	User = &Q.User
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:      db,
-		Account: newAccount(db, opts...),
-		App:     newApp(db, opts...),
-		Test:    newTest(db, opts...),
+		db:          db,
+		Account:     newAccount(db, opts...),
+		App:         newApp(db, opts...),
+		Component:   newComponent(db, opts...),
+		DataModel:   newDataModel(db, opts...),
+		DataSource:  newDataSource(db, opts...),
+		Label:       newLabel(db, opts...),
+		LabelDatum:  newLabelDatum(db, opts...),
+		ModelDatum:  newModelDatum(db, opts...),
+		Rule:        newRule(db, opts...),
+		RuleElement: newRuleElement(db, opts...),
+		Test:        newTest(db, opts...),
+		User:        newUser(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Account account
-	App     app
-	Test    test
+	Account     account
+	App         app
+	Component   component
+	DataModel   dataModel
+	DataSource  dataSource
+	Label       label
+	LabelDatum  labelDatum
+	ModelDatum  modelDatum
+	Rule        rule
+	RuleElement ruleElement
+	Test        test
+	User        user
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:      db,
-		Account: q.Account.clone(db),
-		App:     q.App.clone(db),
-		Test:    q.Test.clone(db),
+		db:          db,
+		Account:     q.Account.clone(db),
+		App:         q.App.clone(db),
+		Component:   q.Component.clone(db),
+		DataModel:   q.DataModel.clone(db),
+		DataSource:  q.DataSource.clone(db),
+		Label:       q.Label.clone(db),
+		LabelDatum:  q.LabelDatum.clone(db),
+		ModelDatum:  q.ModelDatum.clone(db),
+		Rule:        q.Rule.clone(db),
+		RuleElement: q.RuleElement.clone(db),
+		Test:        q.Test.clone(db),
+		User:        q.User.clone(db),
 	}
 }
 
@@ -67,24 +112,51 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:      db,
-		Account: q.Account.replaceDB(db),
-		App:     q.App.replaceDB(db),
-		Test:    q.Test.replaceDB(db),
+		db:          db,
+		Account:     q.Account.replaceDB(db),
+		App:         q.App.replaceDB(db),
+		Component:   q.Component.replaceDB(db),
+		DataModel:   q.DataModel.replaceDB(db),
+		DataSource:  q.DataSource.replaceDB(db),
+		Label:       q.Label.replaceDB(db),
+		LabelDatum:  q.LabelDatum.replaceDB(db),
+		ModelDatum:  q.ModelDatum.replaceDB(db),
+		Rule:        q.Rule.replaceDB(db),
+		RuleElement: q.RuleElement.replaceDB(db),
+		Test:        q.Test.replaceDB(db),
+		User:        q.User.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Account *accountDo
-	App     *appDo
-	Test    *testDo
+	Account     IAccountDo
+	App         IAppDo
+	Component   IComponentDo
+	DataModel   IDataModelDo
+	DataSource  IDataSourceDo
+	Label       ILabelDo
+	LabelDatum  ILabelDatumDo
+	ModelDatum  IModelDatumDo
+	Rule        IRuleDo
+	RuleElement IRuleElementDo
+	Test        ITestDo
+	User        IUserDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Account: q.Account.WithContext(ctx),
-		App:     q.App.WithContext(ctx),
-		Test:    q.Test.WithContext(ctx),
+		Account:     q.Account.WithContext(ctx),
+		App:         q.App.WithContext(ctx),
+		Component:   q.Component.WithContext(ctx),
+		DataModel:   q.DataModel.WithContext(ctx),
+		DataSource:  q.DataSource.WithContext(ctx),
+		Label:       q.Label.WithContext(ctx),
+		LabelDatum:  q.LabelDatum.WithContext(ctx),
+		ModelDatum:  q.ModelDatum.WithContext(ctx),
+		Rule:        q.Rule.WithContext(ctx),
+		RuleElement: q.RuleElement.WithContext(ctx),
+		Test:        q.Test.WithContext(ctx),
+		User:        q.User.WithContext(ctx),
 	}
 }
 

@@ -8,11 +8,18 @@ import (
 	"backend/biz/mw"
 	"backend/biz/usecase/account"
 	"backend/biz/usecase/applist"
+	"backend/biz/usecase/component"
+	"backend/biz/usecase/element"
 	"backend/biz/usecase/register"
+	"backend/biz/usecase/rule"
+	"backend/biz/usecase/upload"
+	"backend/biz/usecase/user"
 	"backend/cmd/dal/model"
 	"context"
+	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"strconv"
 )
 
 // Register .
@@ -120,6 +127,380 @@ func Account(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// AddUser .
+// @router /api/user [POST]
+func AddUser(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.AddUserReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.AddUserResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := user.NewUser(ac.(*model.Account).AccountID, req.GetUsername())
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// UserInPage .
+// @router /api/users [GET]
+func UserInPage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.UserInPageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.UserInPageResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := user.NewPageUser(ac.(*model.Account).AccountID, req.GetPageNum(), req.GetPageSize(), req.GetSearch())
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// UserDataUpload .
+// @router /api/user/upload/:id [POST]
+func UserDataUpload(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.UserDataUploadReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.UserDataUploadResp)
+
+	userIdStr := c.Param("id")
+	userId, err := strconv.ParseInt(userIdStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "userId=%d", userId)
+
+	// Multipart form
+	form, _ := c.MultipartForm()
+	files := form.File["file"]
+
+	ul := upload.NewFileUpload(userId, files)
+	if err := ul.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = ul.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// ComponentInPage .
+// @router /api/components [GET]
+func ComponentInPage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.ComponentInPageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.ComponentInPageResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := component.NewPageComponent(ac.(*model.Account).AccountID, req.GetPageNum(), req.GetPageSize(), req.GetSearch())
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// GeneComponent .
+// @router /api/components [POST]
+func GeneComponent(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.GeneComponentReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.GeneComponentResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := component.NewGeneComponent(ac.(*model.Account).AccountID)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// ElementInPage .
+// @router /api/elements [GET]
+func ElementInPage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.ElementInPageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.ElementInPageResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := element.NewPageElement(req.RuleType, ac.(*model.Account).AccountID, req.PageNum, req.PageSize, req.GetSearch())
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// AddRule .
+// @router /api/rule [POST]
+func AddRule(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.AddRuleReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.AddRuleResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := rule.NewAddRule(ac.(*model.Account).AccountID, req)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// UpdateRule .
+// @router /api/rule/:id [PUT]
+func UpdateRule(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.UpdateRuleReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	ruleIdStr := c.Param("id")
+	ruleId, err := strconv.ParseInt(ruleIdStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "ruleId=%d", ruleId)
+
+	resp := new(backend.UpdateRuleResp)
+
+	al := rule.NewUpdateRule(ruleId, req.GetRuleDesc())
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// DeleteRule .
+// @router /api/rule/:id [DELETE]
+func DeleteRule(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.DeleteRuleReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	ruleIdStr := c.Param("id")
+	ruleId, err := strconv.ParseInt(ruleIdStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "ruleId=%d", ruleId)
+
+	resp := new(backend.DeleteRuleResp)
+
+	al := rule.NewDeleteRule(ruleId)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// AddElement .
+// @router /api/element [POST]
+func AddElement(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.AddElementReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.AddElementResp)
+
+	al := element.NewAddElement(req)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// UpdateElement .
+// @router /api/element/:id [PUT]
+func UpdateElement(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.UpdateElementReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.UpdateElementResp)
+
+	elementIdStr := c.Param("id")
+	elementId, err := strconv.ParseInt(elementIdStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "elementId=%d", elementId)
+
+	el := element.NewUpdateElement(elementId, req)
+	if err := el.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = el.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// DeleteElement .
+// @router /api/element/:id [DELETE]
+func DeleteElement(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.DeleteElementReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.DeleteElementResp)
+
+	elementIdStr := c.Param("id")
+	elementId, err := strconv.ParseInt(elementIdStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "elementId=%d", elementId)
+
+	el := element.NewDeleteElement(elementId)
+	if err := el.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = el.GetResp()
 
 	c.JSON(consts.StatusOK, resp)
 }

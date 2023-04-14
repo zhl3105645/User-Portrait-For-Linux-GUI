@@ -34,17 +34,25 @@ export default {
   },
   methods: {
     refreshAccount() {
-      let account = sessionStorage.getItem("account");
-      if (account === null) {
-        return
+      let accountStr = sessionStorage.getItem("account")
+      if (isEmptyStr(accountStr)) {
+        // 账号信息
+        request.get("/api/account").then(res => {
+          console.log(res)
+          if (res.status_code === 0) {
+            console.log("set session account")
+            let accountObj = res.account
+            accountStr = JSON.stringify(accountObj)
+            sessionStorage.setItem("account",accountStr)
+          } else {
+            console.log("/api/account code != 0, code=",res.status_code)
+          }
+        })
       }
-      request.get("/api/account").then(res => {
-        this.account = res.account;
-        console.log(this.account)
-      }).catch(err => {
-        console.log("出现错误")
-        console.log(err)
-      })
+      
+      console.log("accountStr=", accountStr)
+      let accountObj = JSON.parse(accountStr)
+      this.account = accountObj
     }
   }
 }
@@ -53,6 +61,7 @@ function isEmptyStr(s) {
   return s === undefined || s == null || s === '';
 
 }
+
 </script>
 
 <style scoped>

@@ -4,7 +4,16 @@
 
 <script>
 export default {
-  name: "LearningModel"
+  name: "LearningModel",
+  data() {
+    
+  },
+  created() {
+    
+  },
+  methods: {
+
+  }
 }
 </script>
 
