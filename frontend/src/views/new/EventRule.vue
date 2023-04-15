@@ -4,7 +4,6 @@
     <el-button type="primary" style="margin-left: 5px" @click="load">查询</el-button>
     <el-button type="primary" style="margin-left: 5px" @click="dialogAddRuleVisible = true">新增规则</el-button>
 
-
     <el-dialog v-model="dialogAddRuleVisible" title="添加规则">
       <el-form :model="addRuleform">
         <el-form-item label="规则描述">
@@ -77,24 +76,24 @@
     </el-dialog>
 
     <el-dialog v-model="dialogUpdateElementVisible" title="更新元素">
-      <el-form :model="addElementForm">
+      <el-form :model="updateElementform">
         <el-form-item label="事件类型">
-          <el-select v-model="updateElementform.event_type">
+          <el-select v-model="updateElementform.event_type" :placeholder="eventTypes[curRow.event_type]">
             <el-option v-for="(name, index) in eventTypes" :key="index" :label="name" :value="index"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="鼠标点击类型">
-          <el-select v-model="updateElementform.mouse_click_type" >
+          <el-select v-model="updateElementform.mouse_click_type" :placeholder="mouseClickTypes[curRow.mouse_click_type]">
             <el-option v-for="(name, index) in mouseClickTypes" :key="index" :label="name" :value="index"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="鼠标点击键">
-          <el-select v-model="updateElementform.mouse_click_button" :placeholder="curRow.mouse_click_button">
+          <el-select v-model="updateElementform.mouse_click_button" :placeholder="mouseClickBtns[curRow.mouse_click_button]">
             <el-option v-for="(name, index) in mouseClickBtns" :key="index" :label="name" :value="index"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="键盘点击类型">
-          <el-select v-model="updateElementform.key_click_type" :placeholder="curRow.key_click_type">
+          <el-select v-model="updateElementform.key_click_type" :placeholder="keyClickTypes[curRow.key_click_type]">
             <el-option v-for="(name, index) in keyClickTypes" :key="index" :label="name" :value="index"></el-option>
           </el-select>
         </el-form-item>
@@ -115,58 +114,63 @@
       </template>
     </el-dialog>
 
-
     <el-table 
       v-loading="loading"
+      :span-method="arraySpanMethod"
       :data="tableData" 
       style="width: 100%"
     >
-      <el-table-column fixed prop="rule_id" label="规则ID" width="80" />
-      <el-table-column prop="rule_desc" label="规则描述" width="100" />
-      <el-table-column prop="element_id" label="规则元素ID" width="100" />
-      <el-table-column prop="event_type" label="事件类型" width="100">
-        <template #default="scope">
-          <div>
-            <span style="margin-left: 10px">{{ eventTypes[scope.row.event_type] }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="mouse_click_type" label="鼠标点击类型" width="100" >
-        <template #default="scope">
-          <div>
-            <span style="margin-left: 10px">{{ mouseClickTypes[scope.row.mouse_click_type] }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="mouse_click_button" label="鼠标点击键" width="100" >
-        <template #default="scope">
-          <div>
-            <span style="margin-left: 10px">{{ mouseClickBtns[scope.row.mouse_click_button] }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="key_click_type" label="键盘点击类型" width="100">
-        <template #default="scope">
-          <div>
-            <span style="margin-left: 10px">{{ keyClickTypes[scope.row.key_click_type] }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="key_value" label="键盘点击值" width="100" />
-      <el-table-column prop="component_name_prefix" label="组件前缀" width="100" />
-      <el-table-column label="" width="200">
-        <template #default="scope">
-          <el-button size="small" @click="handleEditElement(scope.row)">编辑元素</el-button>
-          <el-button size="small"  type="danger"  @click="handleDelete(scope.row)">删除元素</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column label="" width="300">
+      <el-table-column label="规则">
+        <!-- <el-table-column fixed prop="rule_id" label="规则ID" width="80" /> -->
+        <el-table-column prop="rule_desc" label="规则描述" width="100" />
+        <el-table-column label="规则操作" width="300">
         <template #default="scope">
           <el-button size="small" @click="handleAddElement(scope.row)">新增元素</el-button>
           <el-button size="small" @click="handleUpdateRule(scope.row)">修改规则</el-button>
           <el-button size="small" type="danger" @click="handleDeleteRule(scope.row)">删除规则</el-button>
         </template>
       </el-table-column>
+      </el-table-column>
+      <el-table-column label="规则元素">
+        <!-- <el-table-column prop="element_id" label="规则元素ID" width="90" /> -->
+        <el-table-column prop="event_type" label="事件类型" width="80">
+          <template #default="scope">
+            <div>
+              <span style="margin-left: 10px">{{ eventTypes[scope.row.event_type] }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="mouse_click_type" label="鼠标点击类型" width="100" >
+          <template #default="scope">
+            <div>
+              <span style="margin-left: 10px">{{ mouseClickTypes[scope.row.mouse_click_type] }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="mouse_click_button" label="鼠标点击键" width="90" >
+          <template #default="scope">
+            <div>
+              <span style="margin-left: 10px">{{ mouseClickBtns[scope.row.mouse_click_button] }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="key_click_type" label="键盘点击类型" width="100">
+          <template #default="scope">
+            <div>
+              <span style="margin-left: 10px">{{ keyClickTypes[scope.row.key_click_type] }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="key_value" label="键盘点击值" width="90" />
+        <el-table-column prop="component_name_prefix" label="组件前缀" width="200" :show-overflow-tooltip="true"/>
+        <el-table-column fixed="right" label="元素操作" width="200">
+          <template #default="scope">
+            <el-button size="small" @click="handleEditElement(scope.row)">编辑元素</el-button>
+            <el-button size="small"  type="danger"  @click="handleDeleteElement(scope.row)">删除元素</el-button>
+          </template>
+        </el-table-column>
+      </el-table-column>
+      
     </el-table>
     
 
@@ -210,29 +214,31 @@ export default {
       dialogUpdateElementVisible: false,
       updateElementform: {},
       eventTypes: {
-        3: "鼠标点击",
-        4: "鼠标移动",
-        5: "键盘点击",
-        6: "鼠标滚动",
-        7: "快捷键",
+        "3": "鼠标点击",
+        "4": "鼠标移动",
+        "5": "键盘点击",
+        "6": "鼠标滚动",
+        "7": "快捷键",
       },
       mouseClickTypes: {
-        1: "鼠标单击",
-        2: "鼠标双击",
+        "1": "鼠标单击",
+        "2": "鼠标双击",
       },
       mouseClickBtns: {
-        1: "鼠标左键",
-        2: "鼠标右键",
+        "1": "鼠标左键",
+        "2": "鼠标右键",
       },
       keyClickTypes:{
-        1: "单键",
-        2: "组合键",
-      }
+        "1": "单键",
+        "2": "组合键",
+      },
+      mergeIndexMap: {}
     }
     
   },
   created() {
     this.loading = true
+    this.mergeIndexMap = new Map()
     this.load()
   },
   methods: {
@@ -248,6 +254,7 @@ export default {
       }).then(res => {
         console.log(res)
         if (res.status_code === 0) {
+          this.merge(res.event_elements)
           this.tableData = res.event_elements
           this.total = res.total
         } else {
@@ -258,6 +265,21 @@ export default {
         }
       })
       this.loading = false
+    },
+    merge(data) {
+      this.mergeIndexMap = new Map()
+      let curIdx = 0
+      for (var idx = 1; idx < data.length; idx++) {
+        if (data[idx].rule_id === data[idx-1].rule_id) {
+          continue
+        } else {
+          this.mergeIndexMap.set(curIdx, idx-curIdx)
+          curIdx = idx
+        }
+      }
+
+      this.mergeIndexMap.set(curIdx, data.length - curIdx)
+      console.log(this.mergeIndexMap)
     },
     handleSizeChange(pageSize) {  // 改变每页的大小
       this.pageSize = pageSize;
@@ -344,7 +366,11 @@ export default {
       this.dialogAddElementVisible = true
     },
     addElement() {
-      console.log(this.addElementForm)
+      this.addElementForm.event_type = parseInt(this.addElementForm.event_type)
+      this.addElementForm.mouse_click_type = parseInt(this.addElementForm.mouse_click_type)
+      this.addElementForm.mouse_click_button = parseInt(this.addElementForm.mouse_click_button)
+      this.addElementForm.key_click_type = parseInt(this.addElementForm.key_click_type)
+
       request.post("/api/element", this.addElementForm).then(res => {
         console.log(res)
         if (res.status_code === 0) {
@@ -353,6 +379,7 @@ export default {
             message: "添加成功"
           })
           this.dialogAddElementVisible = false
+          this.addElementForm = {}
           this.load()
         } else {
           this.$message({
@@ -364,17 +391,14 @@ export default {
     },
     handleEditElement(row) {
       this.curRow = row
-      this.updateElementform = {
-        "event_type": this.eventTypes[row.event_type],
-        "mouse_click_type": this.mouseClickTypes[row.mouse_click_type],
-        "mouse_click_button": this.mouseClickBtns[row.mouse_click_button],
-        "key_click_type": this.keyClickTypes[row.key_click_type],
-        "key_value": row.key_value,
-        "component_name_prefix": row.component_name_prefix,
-      }
       this.dialogUpdateElementVisible = true
     },
     updateElement() {
+      this.updateElementform.event_type = parseInt(this.updateElementform.event_type)
+      this.updateElementform.mouse_click_type = parseInt(this.updateElementform.mouse_click_type)
+      this.updateElementform.mouse_click_button = parseInt(this.updateElementform.mouse_click_button)
+      this.updateElementform.key_click_type = parseInt(this.updateElementform.key_click_type)
+
       request.put("/api/element/" + this.curRow.element_id, this.updateElementform).then(res => {
         console.log(res)
         if (res.status_code === 0) {
@@ -393,15 +417,48 @@ export default {
         }
       })
     },
-    handleDelete(row) {
-
+    handleDeleteElement(row) {
+      this.curRow = row
+      this.$confirm('确定删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(res => {
+        console.log(res)
+        request.delete("/api/element/" + this.curRow.element_id).then(res => {
+            console.log(res)
+            if (res.status_code === 0) {
+              this.$message({
+                type: "success",
+                message: "删除成功"
+              })
+              this.load()
+            } else {
+              this.$message({
+                type: "error",
+                message: res.status_msg
+              })
+            }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });          
+      })
+    },
+    arraySpanMethod({row,column,rowIndex,columnIndex}) {
+      if (columnIndex === 0 || columnIndex === 1) {
+        let rows = this.mergeIndexMap.get(rowIndex)
+        return [rows, 1]
+      }
     }
   }
 }
-
 
 </script>
 
 <style scoped>
 
 </style>
+ 

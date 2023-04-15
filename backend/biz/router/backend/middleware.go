@@ -116,3 +116,8 @@ func _deleteelementMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _rulesMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

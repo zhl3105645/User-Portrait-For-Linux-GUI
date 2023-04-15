@@ -504,3 +504,31 @@ func DeleteElement(ctx context.Context, c *app.RequestContext) {
 
 	c.JSON(consts.StatusOK, resp)
 }
+
+// Rules .
+// @router /api/rules [GET]
+func Rules(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.RulesReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.RulesResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := rule.NewRules(ac.(*model.Account).AccountID, req.RuleType)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}

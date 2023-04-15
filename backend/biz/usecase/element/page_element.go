@@ -5,8 +5,11 @@ import (
 	"backend/biz/entity/rule"
 	"backend/biz/microtype"
 	"backend/biz/model/backend"
+	"backend/cmd/dal/model"
 	"backend/cmd/dal/query"
 	"context"
+	"errors"
+	"gorm.io/gorm"
 )
 
 type PageElement struct {
@@ -20,6 +23,9 @@ type PageElement struct {
 	appId int64
 	resMo []*result
 	total int64
+	//
+	events    []*backend.EventRuleElement
+	behaviors []*backend.BehaviorRuleElement
 }
 
 func NewPageElement(ruleType int64, accountId int64, pageNum int64, pageSize int64, search string) *PageElement {
@@ -33,12 +39,12 @@ func NewPageElement(ruleType int64, accountId int64, pageNum int64, pageSize int
 }
 
 type result struct {
-	RuleID           int64   `gorm:"column:rule_id;type:bigint;primaryKey;autoIncrement:true" json:"rule_id"` // 规则ID
-	RuleType         int64   `gorm:"column:rule_type;type:int;not null" json:"rule_type"`                     // 规则类型
-	RuleDesc         *string `gorm:"column:rule_desc;type:text" json:"rule_desc"`                             // 规则描述
-	AppID            int64   `gorm:"column:app_id;type:bigint;not null" json:"app_id"`
-	RuleElementID    int64   `gorm:"column:rule_element_id;type:bigint;primaryKey;autoIncrement:true" json:"rule_element_id"` // 规则元素ID
-	RuleElementValue string  `gorm:"column:rule_element_value;type:text;not null" json:"rule_element_value"`                  // 规则元素值
+	RuleID           int64  `gorm:"column:rule_id;type:bigint;primaryKey;autoIncrement:true" json:"rule_id"` // 规则ID
+	RuleType         int64  `gorm:"column:rule_type;type:int;not null" json:"rule_type"`                     // 规则类型
+	RuleDesc         string `gorm:"column:rule_desc;type:text" json:"rule_desc"`                             // 规则描述
+	AppID            int64  `gorm:"column:app_id;type:bigint;not null" json:"app_id"`
+	RuleElementID    int64  `gorm:"column:rule_element_id;type:bigint;primaryKey;autoIncrement:true" json:"rule_element_id"` // 规则元素ID
+	RuleElementValue string `gorm:"column:rule_element_value;type:text;not null" json:"rule_element_value"`                  // 规则元素值
 }
 
 func (p *PageElement) Load(ctx context.Context) error {
@@ -65,12 +71,9 @@ func (p *PageElement) Load(ctx context.Context) error {
 	p.resMo = res
 	p.total = count
 
-	return nil
-}
-
-func (p *PageElement) GetResp() *backend.ElementInPageResp {
-	events := make([]*backend.EventRuleElement, 0)
-	behaviors := make([]*backend.BehaviorRuleElement, 0)
+	//
+	p.events = make([]*backend.EventRuleElement, 0)
+	p.behaviors = make([]*backend.BehaviorRuleElement, 0)
 
 	for _, v := range p.resMo {
 		if v == nil || v.RuleID <= 0 {
@@ -78,52 +81,73 @@ func (p *PageElement) GetResp() *backend.ElementInPageResp {
 		}
 
 		if v.RuleType == int64(rule.EventRule) {
-			res := &backend.EventRuleElement{
+			re := &backend.EventRuleElement{
 				RuleID:    v.RuleID,
 				RuleType:  v.RuleType,
-				RuleDesc:  "",
+				RuleDesc:  v.RuleDesc,
 				ElementID: v.RuleElementID,
-			}
-			if v.RuleDesc != nil {
-				res.RuleDesc = *v.RuleDesc
 			}
 
 			event := rule.ParseEventElement(v.RuleElementValue)
 			if event != nil {
-				res.EventType = event.EventType
-				res.MouseClickType = event.MouseClickType
-				res.MouseClickButton = event.MouseClickButton
-				res.KeyClickType = event.KeyClickType
-				res.KeyValue = event.KeyValue
-				res.ComponentNamePrefix = event.ComponentNamePrefix
+				re.EventType = event.EventType
+				re.MouseClickType = event.MouseClickType
+				re.MouseClickButton = event.MouseClickButton
+				re.KeyClickType = event.KeyClickType
+				re.KeyValue = event.KeyValue
+				re.ComponentNamePrefix = event.ComponentNamePrefix
 			}
 
-			events = append(events, res)
+			p.events = append(p.events, re)
 		} else if v.RuleType == int64(rule.BehaviorRule) {
-			res := &backend.BehaviorRuleElement{
-				RuleID:    v.RuleID,
-				RuleType:  v.RuleType,
-				RuleDesc:  "",
-				ElementID: v.RuleElementID,
-			}
-			if v.RuleDesc != nil {
-				res.RuleDesc = *v.RuleDesc
+			re := &backend.BehaviorRuleElement{
+				RuleID:     v.RuleID,
+				RuleType:   v.RuleType,
+				RuleDesc:   v.RuleDesc,
+				ElementID:  v.RuleElementID,
+				EventRules: make([]*backend.EventRule, 0),
 			}
 
 			behavior := rule.ParseBehaviorElement(v.RuleElementValue)
+
 			if behavior != nil && len(behavior.EventRuleIds) > 0 {
-				res.EventRuleIds = behavior.EventRuleIds
+				rules, err := ruleMO.Where(ruleDO.RuleID.In(behavior.EventRuleIds...)).Find()
+				if err != nil && !errors.Is(err, gorm.ErrEmptySlice) {
+					return microtype.RuleQueryFailed
+				}
+
+				mp := make(map[int64]*model.Rule)
+				for _, r := range rules {
+					if r == nil {
+						continue
+					}
+
+					mp[r.RuleID] = r
+				}
+
+				for _, id := range behavior.EventRuleIds {
+					if r, ok := mp[id]; ok && r != nil {
+						re.EventRules = append(re.EventRules, &backend.EventRule{
+							RuleID:   r.RuleID,
+							RuleDesc: r.RuleDesc,
+						})
+					}
+				}
 			}
 
-			behaviors = append(behaviors, res)
+			p.behaviors = append(p.behaviors, re)
 		}
 	}
 
+	return nil
+}
+
+func (p *PageElement) GetResp() *backend.ElementInPageResp {
 	return &backend.ElementInPageResp{
 		StatusCode:       microtype.SuccessErr.Code,
 		StatusMsg:        microtype.SuccessErr.Msg,
-		EventElements:    events,
-		BehaviorElements: behaviors,
+		EventElements:    p.events,
+		BehaviorElements: p.behaviors,
 		Total:            p.total,
 	}
 }

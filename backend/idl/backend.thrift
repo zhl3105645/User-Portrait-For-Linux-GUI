@@ -126,14 +126,6 @@ struct ElementInPageReq {
     4: i64 rule_type
 }
 
-struct Rule {
-    1: i64 rule_id
-    2: i64 rule_type
-    3: string rule_desc
-    4: list<EventRuleElement> event_rule_elements
-    5: list<BehaviorRuleElement> behavior_rule_elements
-}
-
 struct EventRuleElement {
     1: i64 element_id
     2: i64 rule_id
@@ -152,7 +144,12 @@ struct BehaviorRuleElement {
     2: i64 rule_id
     3: i64 rule_type
     4: string rule_desc
-    5: list<i64> event_rule_ids
+    5: list<EventRule> event_rules
+}
+
+struct EventRule {
+    1: i64 rule_id
+    2: string rule_desc
 }
 
 struct ElementInPageResp {
@@ -232,6 +229,16 @@ struct DeleteElementResp {
     2: string status_msg
 }
 
+struct RulesReq {
+    1: i64 rule_type
+}
+
+struct RulesResp {
+    1: i64 status_code
+    2: string status_msg
+    3: list<EventRule> event_rules
+}
+
 service BackendService {
     // 未登录状态
     // 注册
@@ -264,6 +271,10 @@ service BackendService {
     DeleteRuleResp DeleteRule(1: DeleteRuleReq request) (api.delete="/api/rule/:id");
     // 添加规则元素
     AddElementResp AddElement(1: AddElementReq request) (api.post="/api/element");
+    // 更新规则元素
     UpdateElementResp UpdateElement(1: UpdateElementReq request) (api.put="/api/element/:id");
+    // 删除规则元素
     DeleteElementResp DeleteElement(1: DeleteElementReq request) (api.delete="/api/element/:id");
+    // 获取规则
+    RulesResp Rules(1: RulesReq request) (api.get="/api/rules");
 }

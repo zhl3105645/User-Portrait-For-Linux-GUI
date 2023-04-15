@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"github.com/bytedance/gopkg/util/logger"
-	"github.com/golang/protobuf/proto"
 	"gorm.io/gorm"
 )
 
@@ -32,6 +31,10 @@ func NewAddRule(accountId int64, req backend.AddRuleReq) *AddRule {
 func (r *AddRule) Load(ctx context.Context) error {
 	if r.req.RuleType != int64(rule.EventRule) && r.req.RuleType != int64(rule.BehaviorRule) {
 		return microtype.RuleParamFailed
+	}
+
+	if r.req.RuleDesc == "" {
+		return microtype.ParamCheckFailed
 	}
 
 	ac := account.NewAccount(r.accountId, 0, "", "", 0, account.IdQuery)
@@ -60,7 +63,7 @@ func (r *AddRule) Load(ctx context.Context) error {
 	createMo := &model.Rule{
 		RuleID:   0,
 		RuleType: r.req.RuleType,
-		RuleDesc: proto.String(r.req.RuleDesc),
+		RuleDesc: r.req.RuleDesc,
 		AppID:    r.appId,
 	}
 

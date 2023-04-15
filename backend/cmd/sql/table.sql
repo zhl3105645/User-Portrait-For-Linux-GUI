@@ -39,7 +39,7 @@ create TABLE component(
 create TABLE rule(
     rule_id bigint auto_increment comment '规则ID',
     rule_type int not null comment '规则类型',
-    rule_desc text comment '规则描述',
+    rule_desc text not null comment '规则描述',
     app_id bigint not null comment '应用ID',
     primary key (rule_id),
     CONSTRAINT a_id4 foreign key (app_id) references app(app_id)

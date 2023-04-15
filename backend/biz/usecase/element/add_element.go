@@ -33,6 +33,9 @@ func (a *AddElement) Load(ctx context.Context) error {
 
 	switch queryMo.RuleType {
 	case int64(rule.EventRule):
+		if a.req.EventType == 0 {
+			return microtype.ParamCheckFailed
+		}
 		eventRuleEle := &rule.EventRuleElement{
 			EventType:           a.req.EventType,
 			MouseClickType:      a.req.MouseClickType,
@@ -53,6 +56,9 @@ func (a *AddElement) Load(ctx context.Context) error {
 			return microtype.ElementCreateFailed
 		}
 	case int64(rule.BehaviorRule):
+		if len(a.req.EventRuleIds) == 0 {
+			return microtype.ParamCheckFailed
+		}
 		behaviorRuleEle := &rule.BehaviorRuleElement{
 			EventRuleIds: a.req.EventRuleIds,
 		}
