@@ -121,3 +121,18 @@ func _rulesMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _basicbehaviorinpageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _genebasicbehaviorMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _generuleMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

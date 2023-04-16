@@ -13,6 +13,14 @@ const (
 	BehaviorRule Type = 2
 )
 
+// 特殊事件 停止操作 开始操作
+
+const EventRuleStopOperate = -1
+const EventRuleBeginOperate = -2
+
+// 特殊行为 未操作
+const BehaviorRuleNoOperate = -1
+
 type EventRuleElement struct {
 	EventType           int64
 	MouseClickType      int64

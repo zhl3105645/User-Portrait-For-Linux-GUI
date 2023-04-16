@@ -142,6 +142,7 @@ export default {
             type: "success",
             message: "添加成功"
           })
+          this.load()
           this.dialogFormVisible = false;
         } else {
           this.$message({
@@ -173,6 +174,7 @@ export default {
             type: "success",
             message: "上传成功"
           })
+          this.load()
           this.fileList = []
           this.dialogUploadVisible = false
         } else {

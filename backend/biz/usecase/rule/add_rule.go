@@ -52,7 +52,7 @@ func (r *AddRule) Load(ctx context.Context) error {
 		do.RuleDesc.Eq(r.req.RuleDesc)).
 		First()
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		logger.Error("rule query failed. err=", err.Error())
+		logger.Error("rule_gene query failed. err=", err.Error())
 		return microtype.RuleQueryFailed
 	}
 
@@ -69,7 +69,7 @@ func (r *AddRule) Load(ctx context.Context) error {
 
 	err = query.Rule.WithContext(ctx).Create(createMo)
 	if err != nil {
-		logger.Error("rule create failed. err=", err.Error())
+		logger.Error("rule_gene create failed. err=", err.Error())
 		return microtype.RuleCreateFailed
 	}
 

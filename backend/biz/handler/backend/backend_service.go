@@ -8,6 +8,7 @@ import (
 	"backend/biz/mw"
 	"backend/biz/usecase/account"
 	"backend/biz/usecase/applist"
+	"backend/biz/usecase/basic_behavior"
 	"backend/biz/usecase/component"
 	"backend/biz/usecase/element"
 	"backend/biz/usecase/register"
@@ -258,14 +259,14 @@ func ComponentInPage(ctx context.Context, c *app.RequestContext) {
 // @router /api/components [POST]
 func GeneComponent(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req backend.GeneComponentReq
+	var req backend.GeneReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
-	resp := new(backend.GeneComponentResp)
+	resp := new(backend.GeneResp)
 
 	ac, _ := c.Get(mw.IdentityKey)
 	al := component.NewGeneComponent(ac.(*model.Account).AccountID)
@@ -311,7 +312,7 @@ func ElementInPage(ctx context.Context, c *app.RequestContext) {
 }
 
 // AddRule .
-// @router /api/rule [POST]
+// @router /api/rule_gene [POST]
 func AddRule(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req backend.AddRuleReq
@@ -339,7 +340,7 @@ func AddRule(ctx context.Context, c *app.RequestContext) {
 }
 
 // UpdateRule .
-// @router /api/rule/:id [PUT]
+// @router /api/rule_gene/:id [PUT]
 func UpdateRule(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req backend.UpdateRuleReq
@@ -374,7 +375,7 @@ func UpdateRule(ctx context.Context, c *app.RequestContext) {
 }
 
 // DeleteRule .
-// @router /api/rule/:id [DELETE]
+// @router /api/rule_gene/:id [DELETE]
 func DeleteRule(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req backend.DeleteRuleReq
@@ -520,6 +521,90 @@ func Rules(ctx context.Context, c *app.RequestContext) {
 
 	ac, _ := c.Get(mw.IdentityKey)
 	al := rule.NewRules(ac.(*model.Account).AccountID, req.RuleType)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// GeneBasicBehavior .
+// @router /api/gene_basic_behavior [POST]
+func GeneBasicBehavior(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.GeneReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.GeneResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := basic_behavior.NewGeneBasicBehavior(ac.(*model.Account).AccountID)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// BasicBehaviorInPage .
+// @router /api/basic_behaviors [GET]
+func BasicBehaviorInPage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.BasicBehaviorInPageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.BasicBehaviorInPageResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := basic_behavior.NewPageBasicBehavior(ac.(*model.Account).AccountID, req.GetPageNum(), req.GetPageSize(), req.GetSearch())
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// GeneRule .
+// @router /api/gene_rule [POST]
+func GeneRule(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.GeneReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.GeneResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := rule.NewGeneRule(ac.(*model.Account).AccountID)
 	if err := al.Load(ctx); err != nil {
 		mErr := microtype.Unwrap(err)
 		resp.StatusCode = mErr.Code

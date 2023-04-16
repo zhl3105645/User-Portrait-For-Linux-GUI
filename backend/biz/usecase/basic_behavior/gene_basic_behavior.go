@@ -1,4 +1,4 @@
-package component
+package basic_behavior
 
 import (
 	"backend/biz/entity/account"
@@ -8,20 +8,20 @@ import (
 	"context"
 )
 
-type GeneComponent struct {
+type GeneBasicBehavior struct {
 	accountId int64
 
 	//
 	appId int64
 }
 
-func NewGeneComponent(accountId int64) *GeneComponent {
-	return &GeneComponent{
+func NewGeneBasicBehavior(accountId int64) *GeneBasicBehavior {
+	return &GeneBasicBehavior{
 		accountId: accountId,
 	}
 }
 
-func (p *GeneComponent) Load(ctx context.Context) error {
+func (p *GeneBasicBehavior) Load(ctx context.Context) error {
 	ac := account.NewAccount(p.accountId, 0, "", "", 0, account.IdQuery)
 	if err := ac.Load(ctx); err != nil {
 		return err
@@ -34,7 +34,7 @@ func (p *GeneComponent) Load(ctx context.Context) error {
 		return err
 	}
 
-	// app_id typ=gene_component status=begin
+	// app_id typ=BasicBehaviorGene status=begin
 	if len(conf.AppConfigs) == 0 {
 		conf.AppConfigs = make(map[int64]*config.AppConfig)
 		conf.AppConfigs[p.appId] = &config.AppConfig{}
@@ -46,12 +46,12 @@ func (p *GeneComponent) Load(ctx context.Context) error {
 		}
 	}
 
-	status := conf.AppConfigs[p.appId].Config[config.ComponentGene]
+	status := conf.AppConfigs[p.appId].Config[config.BasicBehaviorGene]
 	if status != config.Stop {
-		return microtype.ComponentInGene
+		return microtype.BasicBehaviorGene
 	}
 
-	conf.AppConfigs[p.appId].Config[config.ComponentGene] = config.Begin
+	conf.AppConfigs[p.appId].Config[config.BasicBehaviorGene] = config.Begin
 
 	err = config.WriteConfig(conf)
 	if err != nil {
@@ -61,7 +61,7 @@ func (p *GeneComponent) Load(ctx context.Context) error {
 	return nil
 }
 
-func (p *GeneComponent) GetResp() *backend.GeneResp {
+func (p *GeneBasicBehavior) GetResp() *backend.GeneResp {
 	return &backend.GeneResp{
 		StatusCode: microtype.SuccessErr.Code,
 		StatusMsg:  microtype.SuccessErr.Msg,

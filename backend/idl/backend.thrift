@@ -110,11 +110,11 @@ struct ComponentInPageResp {
     4: i64 total // 组件总数
 }
 
-struct GeneComponentReq {
+struct GeneReq {
 
 }
 
-struct GeneComponentResp {
+struct GeneResp {
     1: i64 status_code
     2: string status_msg
 }
@@ -239,6 +239,34 @@ struct RulesResp {
     3: list<EventRule> event_rules
 }
 
+struct BasicBehaviorInPageReq {
+    1: i64 page_num
+    2: i64 page_size
+    3: string search
+}
+
+struct BasicBehaviorInPageResp {
+    1: i64 status_code
+    2: string status_msg
+    3: list<BasicBehavior> basic_behaviors
+    4: i64 total
+}
+
+struct BasicBehavior {
+    1: i64 record_id
+    2: i64 user_id
+    3: string user_name
+    4: string begin_time
+    5: string use_time
+    6: i64 mouse_click_cnt
+    7: i64 mouse_move_cnt
+    8: double mouse_move_dis
+    9: i64 mouse_wheel_cnt
+    10: i64 key_click_cnt
+    11: double key_click_speed
+    12: i64 shortcut_cnt
+}
+
 service BackendService {
     // 未登录状态
     // 注册
@@ -260,15 +288,15 @@ service BackendService {
     // 组件信息 分页
     ComponentInPageResp ComponentInPage(1: ComponentInPageReq request) (api.get="/api/components");
     // 生成全部组件信息
-    GeneComponentResp GeneComponent(1: GeneComponentReq request) (api.post="/api/components");
+    GeneResp GeneComponent(1: GeneReq request) (api.post="/api/components");
     // 规则元素信息 分页
     ElementInPageResp ElementInPage(1: ElementInPageReq request) (api.get="/api/elements");
     // 添加规则
-    AddRuleResp AddRule(1: AddRuleReq request) (api.post="/api/rule");
+    AddRuleResp AddRule(1: AddRuleReq request) (api.post="/api/rule_gene");
     // 更新规则
-    UpdateRuleResp UpdateRule(1: UpdateRuleReq request) (api.put="/api/rule/:id");
+    UpdateRuleResp UpdateRule(1: UpdateRuleReq request) (api.put="/api/rule_gene/:id");
     // 删除规则
-    DeleteRuleResp DeleteRule(1: DeleteRuleReq request) (api.delete="/api/rule/:id");
+    DeleteRuleResp DeleteRule(1: DeleteRuleReq request) (api.delete="/api/rule_gene/:id");
     // 添加规则元素
     AddElementResp AddElement(1: AddElementReq request) (api.post="/api/element");
     // 更新规则元素
@@ -277,4 +305,12 @@ service BackendService {
     DeleteElementResp DeleteElement(1: DeleteElementReq request) (api.delete="/api/element/:id");
     // 获取规则
     RulesResp Rules(1: RulesReq request) (api.get="/api/rules");
+    // 生成基础行为数据
+    GeneResp GeneBasicBehavior(1: GeneReq request) (api.post="/api/gene_basic_behavior");
+    // 基础行为数据 分页
+    BasicBehaviorInPageResp BasicBehaviorInPage(1: BasicBehaviorInPageReq request) (api.get="/api/basic_behaviors");
+    // 生成规则数据
+    GeneResp GeneRule(1: GeneReq request) (api.post="/api/gene_rule");
+    // 规则数据 分页
+
 }

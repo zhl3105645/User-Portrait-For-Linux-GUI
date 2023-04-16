@@ -38,6 +38,7 @@ var (
 
 	ComponentQueryFailed  = &Error{Code: 10005001, Msg: "组件查询失败"}
 	ComponentCreateFailed = &Error{Code: 10005002, Msg: "组件插入失败"}
+	ComponentInGene       = &Error{Code: 10005003, Msg: "组件信息生成中"}
 
 	RuleQueryFailed  = &Error{Code: 10006001, Msg: "规则查询失败"}
 	RuleParamFailed  = &Error{Code: 10006002, Msg: "规则参数错误"}
@@ -50,6 +51,11 @@ var (
 	ElementCreateFailed = &Error{Code: 10007002, Msg: "元素添加失败"}
 	ElementUpdateFailed = &Error{Code: 10007003, Msg: "元素更新失败"}
 	ElementDeleteFailed = &Error{Code: 10007004, Msg: "元素删除失败"}
+
+	BasicBehaviorQueryFailed = &Error{Code: 10008001, Msg: "基础行为数据查询失败"}
+	BasicBehaviorGene        = &Error{Code: 10008002, Msg: "基础行为数据生成中"}
+
+	RuleGene = &Error{Code: 10008002, Msg: "规则数据生成中"}
 )
 
 func Unwrap(err error) *Error {

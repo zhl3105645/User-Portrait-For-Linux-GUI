@@ -13,7 +13,9 @@ var StatusChan chan *StatusChange
 type TaskType int
 
 const (
-	ComponentGene TaskType = 1 // 整合组件
+	ComponentGene     TaskType = 1 // 生成组件数据
+	BasicBehaviorGene TaskType = 2 // 生成基础行为数据
+	RuleGene          TaskType = 3 // 生成规则数据
 )
 
 type Status int

@@ -62,7 +62,8 @@ func (p *PageElement) Load(ctx context.Context) error {
 	res := make([]*result, 0)
 
 	offset := (p.pageNum - 1) * p.pageSize
-	count, err := ruleMO.Select(ruleDO.ALL, elementDO.RuleElementID, elementDO.RuleElementValue).LeftJoin(elementDO, ruleDO.RuleID.EqCol(elementDO.RuleID)).
+	count, err := ruleMO.Select(ruleDO.ALL, elementDO.RuleElementID, elementDO.RuleElementValue).
+		LeftJoin(elementDO, ruleDO.RuleID.EqCol(elementDO.RuleID)).
 		Where(ruleDO.AppID.Eq(p.appId), ruleDO.RuleType.Eq(p.ruleType), ruleDO.RuleDesc.Like("%"+p.search+"%")).
 		ScanByPage(&res, int(offset), int(p.pageSize))
 	if err != nil {

@@ -25,6 +25,7 @@ var (
 	Label       *label
 	LabelDatum  *labelDatum
 	ModelDatum  *modelDatum
+	Record      *record
 	Rule        *rule
 	RuleElement *ruleElement
 	Test        *test
@@ -41,6 +42,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	Label = &Q.Label
 	LabelDatum = &Q.LabelDatum
 	ModelDatum = &Q.ModelDatum
+	Record = &Q.Record
 	Rule = &Q.Rule
 	RuleElement = &Q.RuleElement
 	Test = &Q.Test
@@ -58,6 +60,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Label:       newLabel(db, opts...),
 		LabelDatum:  newLabelDatum(db, opts...),
 		ModelDatum:  newModelDatum(db, opts...),
+		Record:      newRecord(db, opts...),
 		Rule:        newRule(db, opts...),
 		RuleElement: newRuleElement(db, opts...),
 		Test:        newTest(db, opts...),
@@ -76,6 +79,7 @@ type Query struct {
 	Label       label
 	LabelDatum  labelDatum
 	ModelDatum  modelDatum
+	Record      record
 	Rule        rule
 	RuleElement ruleElement
 	Test        test
@@ -95,6 +99,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Label:       q.Label.clone(db),
 		LabelDatum:  q.LabelDatum.clone(db),
 		ModelDatum:  q.ModelDatum.clone(db),
+		Record:      q.Record.clone(db),
 		Rule:        q.Rule.clone(db),
 		RuleElement: q.RuleElement.clone(db),
 		Test:        q.Test.clone(db),
@@ -121,6 +126,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Label:       q.Label.replaceDB(db),
 		LabelDatum:  q.LabelDatum.replaceDB(db),
 		ModelDatum:  q.ModelDatum.replaceDB(db),
+		Record:      q.Record.replaceDB(db),
 		Rule:        q.Rule.replaceDB(db),
 		RuleElement: q.RuleElement.replaceDB(db),
 		Test:        q.Test.replaceDB(db),
@@ -137,6 +143,7 @@ type queryCtx struct {
 	Label       ILabelDo
 	LabelDatum  ILabelDatumDo
 	ModelDatum  IModelDatumDo
+	Record      IRecordDo
 	Rule        IRuleDo
 	RuleElement IRuleElementDo
 	Test        ITestDo
@@ -153,6 +160,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Label:       q.Label.WithContext(ctx),
 		LabelDatum:  q.LabelDatum.WithContext(ctx),
 		ModelDatum:  q.ModelDatum.WithContext(ctx),
+		Record:      q.Record.WithContext(ctx),
 		Rule:        q.Rule.WithContext(ctx),
 		RuleElement: q.RuleElement.WithContext(ctx),
 		Test:        q.Test.WithContext(ctx),

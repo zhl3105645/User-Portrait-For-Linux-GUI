@@ -7,13 +7,20 @@
     
     <el-table 
       v-loading="loading"
+      :span-method="arraySpanMethod"
       :data="tableData" 
       style="width: 100%"
     >
-      <el-table-column fixed prop="component_id" label="ComponentId" width="150" />
-      <el-table-column prop="component_name" label="ComponentName" width="320" />
-      <el-table-column prop="component_type" label="ComponentType" width="120" />
-      <el-table-column prop="component_desc" label="ComponentDesc" width="220" />
+      <el-table-column prop="user_name" label="user_name" width="120" />
+      <el-table-column prop="begin_time" label="begin_time" width="180" />
+      <el-table-column prop="use_time" label="use_time" width="120" />
+      <el-table-column prop="mouse_click_cnt" label="mouse_click_cnt" width="130" />
+      <el-table-column prop="mouse_move_cnt" label="mouse_move_cnt" width="130" />
+      <el-table-column prop="mouse_move_dis" label="mouse_move_dis" width="130" />
+      <el-table-column prop="mouse_wheel_cnt" label="mouse_wheel_cnt" width="130" />
+      <el-table-column prop="key_click_cnt" label="key_click_cnt" width="120" />
+      <el-table-column prop="key_click_speed" label="key_click_speed" width="120" />
+      <el-table-column prop="shortcut_cnt" label="shortcut_cnt" width="120" />
     </el-table>
 
     <div style="margin: 10px 0">
@@ -32,6 +39,9 @@
 </template>
 
 <script>
+import request from "@/utils/request";
+
+
 export default {
   name: "BasicBehaviorData",
   data() {
@@ -42,16 +52,58 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: 0,
+      mergeIndexMap: {}
     }
   },
   created() {
     this.load()
+    this.mergeIndexMap = new Map()
   },
   methods: {
     load() {
       this.loading = true
+      request.get("/api/basic_behaviors", {
+        params: {
+          "page_num": this.currentPage,
+          "page_size": this.pageSize,
+          "search": this.search
+        }
+      }).then(res => {
+        console.log(res)
+        if (res.status_code === 0) {
+          this.merge(res.basic_behaviors)
+          this.tableData = res.basic_behaviors
+          this.total = res.total
+        } else {
+          this.$message({
+            type: "error",
+            message: res.status_msg
+          })
+        }
+      })
 
       this.loading = false
+    },
+    merge(data) {
+      this.mergeIndexMap = new Map()
+      let curIdx = 0
+      for (var idx = 1; idx < data.length; idx++) {
+        if (data[idx].user_id === data[idx-1].user_id) {
+          continue
+        } else {
+          this.mergeIndexMap.set(curIdx, idx-curIdx)
+          curIdx = idx
+        }
+      }
+
+      this.mergeIndexMap.set(curIdx, data.length - curIdx)
+      console.log(this.mergeIndexMap)
+    },
+    arraySpanMethod({row,column,rowIndex,columnIndex}) {
+      if (columnIndex === 0) {
+        let rows = this.mergeIndexMap.get(rowIndex)
+        return [rows, 1]
+      }
     },
     handleSizeChange(pageSize) {  // 改变每页的大小
       this.pageSize = pageSize;
@@ -62,7 +114,19 @@ export default {
       this.load()
     },
     updateBasicBehaviorData() {
-
+      request.post("/api/gene_basic_behavior").then(res => {
+        if (res.status_code === 0) {
+          this.$message({
+            type: "success",
+            message: "更新中，请5-10分钟后刷新"
+          })
+        } else {
+          this.$message({
+            type: "error",
+            message: res.status_msg
+          })
+        }
+      })
     }
   }
 }

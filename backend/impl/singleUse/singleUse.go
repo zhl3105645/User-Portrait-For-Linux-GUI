@@ -151,7 +151,7 @@ func Process(filePath string, componentMap map[string]*QTComponent, eventRules [
 			}
 		}
 
-		// 事件数据
+		// 事件规则数据
 		if eventTimeMs-lastEventTimeMs > event_data.MaxNoOperateTimeS*1000 {
 			eventRuleData = append(eventRuleData, &RuleData{
 				ID:   StopOperate,
@@ -172,13 +172,13 @@ func Process(filePath string, componentMap map[string]*QTComponent, eventRules [
 		lastEventTimeMs = eventTimeMs
 	}
 
-	// 事件数据
+	// 事件规则数据
 	eventData := ""
 	for _, ruleData := range eventRuleData {
 		eventData = eventData + fmt.Sprintf("(%d,%d)", ruleData.ID, ruleData.Time)
 	}
 
-	// 行为数据
+	// 行为行为数据
 	behaviorRuleData := getBehaviorRuleIDs(eventRuleData, behaviorRules)
 	behaviorData := ""
 	behaviorTimeMap := make(map[int64]int64)

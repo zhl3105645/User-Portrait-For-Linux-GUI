@@ -2,8 +2,10 @@ package main
 
 import (
 	"backend/cmd/dal"
+	"backend/consumer/basic_behavior_gene"
 	"backend/consumer/component_gene"
 	"backend/consumer/config"
+	"backend/consumer/rule_gene"
 	"encoding/json"
 	"github.com/bytedance/gopkg/util/logger"
 	"time"
@@ -47,6 +49,10 @@ func main() {
 				switch taskTyp {
 				case config.ComponentGene:
 					go component_gene.Gene(appId)
+				case config.BasicBehaviorGene:
+					go basic_behavior_gene.Gene(appId)
+				case config.RuleGene:
+					go rule_gene.Gene(appId)
 				default:
 				}
 			}

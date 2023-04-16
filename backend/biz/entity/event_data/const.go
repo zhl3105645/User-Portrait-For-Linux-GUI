@@ -66,7 +66,7 @@ const (
 const (
 	EventTypeIndex        = 0
 	EventTimeIndex        = 1
-	MousePos              = 2
+	MousePosIndex         = 2
 	MouseClickTypeIndex   = 3
 	MouseClickButtonIndex = 4
 	MouseMoveTypeIndex    = 5

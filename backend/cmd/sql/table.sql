@@ -100,3 +100,24 @@ create Table label_data (
      CONSTRAINT l_id foreign key (label_id) references label(label_id),
      CONSTRAINT u_id2 foreign key (user_id) references user(user_id)
 );
+
+drop table record;
+
+create TABLE record (
+    record_id bigint auto_increment comment '使用记录ID',
+    user_id bigint not null comment '用户ID',
+    begin_time bigint not null comment '开始时间 ms',
+    use_time bigint null comment '使用时长',
+    mouse_click_cnt bigint null comment '鼠标点击次数',
+    mouse_move_cnt bigint null comment '鼠标移动次数',
+    mouse_move_dis double null comment '鼠标移动距离',
+    mouse_wheel_cnt bigint null comment '鼠标滚轮次数',
+    key_click_cnt bigint null comment '键盘点击次数',
+    key_click_speed double null comment '键盘点击速度 字符/min',
+    shortcut_cnt bigint null comment '快捷键次数',
+    event_rule_value text null comment '事件规则数据',
+    behavior_rule_value text null comment '行为规则数据',
+
+    primary key (record_id),
+    constraint u_id3 foreign key (user_id) references user(user_id)
+);

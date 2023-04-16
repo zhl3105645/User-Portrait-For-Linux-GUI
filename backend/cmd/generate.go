@@ -45,6 +45,7 @@ func main() {
 	Rule := g.GenerateModel("rule")
 	RuleElement := g.GenerateModel("rule_element")
 	User := g.GenerateModel("user")
+	Record := g.GenerateModel("record")
 
 	// 创建有关联关系的模型文件
 	// 可以用于指定外键
@@ -55,7 +56,7 @@ func main() {
 	//		gen.FieldRelate(field.HasMany, "user", User, &field.RelateConfig{GORMTag: "foreignKey:UID"}),
 	//	)...,
 	//)
-	g.ApplyBasic(Test, App, Account, Component, DataSource, Label, LabelData, DataModel, ModelData, Rule, RuleElement, User)
+	g.ApplyBasic(Test, App, Account, Component, DataSource, Label, LabelData, DataModel, ModelData, Rule, RuleElement, User, Record)
 
 	g.ApplyInterface(func(dal2.QueryAll) {}, Test)
 
