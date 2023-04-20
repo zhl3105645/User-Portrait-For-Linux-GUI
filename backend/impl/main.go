@@ -1,5 +1,11 @@
 package main
 
+import (
+	"backend/impl/rule"
+	"backend/impl/save"
+	"context"
+)
+
 func main() {
 	//path1 := "D:\\毕设2\\data\\20230405\\1680680589144.csv"
 	//path2 := "D:\\毕设2\\data\\20230405\\1680680832299.csv"
@@ -28,6 +34,20 @@ func main() {
 	//eventRules, behaviorRules := rule.GetRules()
 	//
 	//UserUse.Process(paths, componentMap, eventRules, behaviorRules)
+	//saveData()
+	//Post()
+	//loadDataSource()
+}
 
-	// rule.LoadRuleToDatabase(context.Background())
+func loadRule() {
+	rule.LoadRuleToDatabase(context.Background())
+}
+
+func loadDataSource() {
+	rule.LoadDataSourceToDatabase(context.Background(), 2)
+}
+
+func saveData() {
+	//save.LoadBehaviorDurationData()
+	save.LoadEventSeqData()
 }

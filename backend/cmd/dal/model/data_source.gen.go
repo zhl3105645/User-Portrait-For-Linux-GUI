@@ -8,9 +8,10 @@ const TableNameDataSource = "data_source"
 
 // DataSource mapped from table <data_source>
 type DataSource struct {
-	SourceID    int64 `gorm:"column:source_id;type:bigint;primaryKey;autoIncrement:true" json:"source_id"` // 数据源ID
-	SourceType  int64 `gorm:"column:source_type;type:int;not null" json:"source_type"`                     // 数据源类型
-	SourceValue int64 `gorm:"column:source_value;type:int;not null" json:"source_value"`                   // 类型的具体值
+	SourceID    int64  `gorm:"column:source_id;type:bigint;primaryKey;autoIncrement:true" json:"source_id"` // 数据源ID
+	SourceType  int64  `gorm:"column:source_type;type:int;not null" json:"source_type"`                     // 数据源类型
+	SourceValue *int64 `gorm:"column:source_value;type:int" json:"source_value"`                            // 类型的具体值
+	AppID       int64  `gorm:"column:app_id;type:bigint;not null" json:"app_id"`                            // 应用ID
 }
 
 // TableName DataSource's table name

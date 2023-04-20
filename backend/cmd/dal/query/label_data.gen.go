@@ -28,7 +28,7 @@ func newLabelDatum(db *gorm.DB, opts ...gen.DOOption) labelDatum {
 	tableName := _labelDatum.labelDatumDo.TableName()
 	_labelDatum.ALL = field.NewAsterisk(tableName)
 	_labelDatum.LabelDataID = field.NewInt64(tableName, "label_data_id")
-	_labelDatum.Data = field.NewFloat64(tableName, "data")
+	_labelDatum.Data = field.NewString(tableName, "data")
 	_labelDatum.LabelID = field.NewInt64(tableName, "label_id")
 	_labelDatum.UserID = field.NewInt64(tableName, "user_id")
 
@@ -41,10 +41,10 @@ type labelDatum struct {
 	labelDatumDo labelDatumDo
 
 	ALL         field.Asterisk
-	LabelDataID field.Int64   // 标签数据ID
-	Data        field.Float64 // 标签数据
-	LabelID     field.Int64   // 标签ID
-	UserID      field.Int64   // 用户ID
+	LabelDataID field.Int64  // 标签数据ID
+	Data        field.String // 标签数据
+	LabelID     field.Int64  // 标签ID
+	UserID      field.Int64  // 用户ID
 
 	fieldMap map[string]field.Expr
 }
@@ -62,7 +62,7 @@ func (l labelDatum) As(alias string) *labelDatum {
 func (l *labelDatum) updateTableName(table string) *labelDatum {
 	l.ALL = field.NewAsterisk(table)
 	l.LabelDataID = field.NewInt64(table, "label_data_id")
-	l.Data = field.NewFloat64(table, "data")
+	l.Data = field.NewString(table, "data")
 	l.LabelID = field.NewInt64(table, "label_id")
 	l.UserID = field.NewInt64(table, "user_id")
 

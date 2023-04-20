@@ -34,7 +34,7 @@ type result struct {
 	RecordID          int64    `gorm:"column:record_id;type:bigint;primaryKey;autoIncrement:true" json:"record_id"` // 使用记录ID
 	UserID            int64    `gorm:"column:user_id;type:bigint;not null" json:"user_id"`                          // 用户ID
 	BeginTime         int64    `gorm:"column:begin_time;type:bigint;not null" json:"begin_time"`                    // 开始时间
-	UseTime           *int64   `gorm:"column:use_time;type:bigint" json:"use_time"`                                 // 使用时长
+	UseTime           int64    `gorm:"column:use_time;type:bigint" json:"use_time"`                                 // 使用时长
 	MouseClickCnt     *int64   `gorm:"column:mouse_click_cnt;type:bigint" json:"mouse_click_cnt"`                   // 鼠标点击次数
 	MouseMoveCnt      *int64   `gorm:"column:mouse_move_cnt;type:bigint" json:"mouse_move_cnt"`                     // 鼠标移动次数
 	MouseMoveDis      *float64 `gorm:"column:mouse_move_dis;type:double" json:"mouse_move_dis"`                     // 鼠标移动距离
@@ -95,7 +95,7 @@ func (p *PageBasicBehavior) GetResp() *backend.BasicBehaviorInPageResp {
 			UserID:        v.UserID,
 			UserName:      v.UserName,
 			BeginTime:     util.GeneTimeFromTimestampMs(v.BeginTime),
-			UseTime:       "",
+			UseTime:       util.GeneTimeDurationFromMs(v.UseTime),
 			MouseClickCnt: 0,
 			MouseMoveCnt:  0,
 			MouseMoveDis:  0,
@@ -105,9 +105,6 @@ func (p *PageBasicBehavior) GetResp() *backend.BasicBehaviorInPageResp {
 			ShortcutCnt:   0,
 		}
 
-		if v.UseTime != nil {
-			r.UseTime = util.GeneTimeDurationFromMs(*v.UseTime)
-		}
 		if v.MouseClickCnt != nil {
 			r.MouseClickCnt = *v.MouseClickCnt
 		}

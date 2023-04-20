@@ -33,7 +33,6 @@ func main() {
 
 	// 创建模型的结构体,生成文件在 model 目录; 先创建的结果会被后面创建的覆盖
 	// 这里创建个别模型仅仅是为了拿到`*generate.QueryStructMeta`类型对象用于后面的模型关联操作中
-	Test := g.GenerateModel("test")
 	App := g.GenerateModel("app")
 	Account := g.GenerateModel("account")
 	Component := g.GenerateModel("component")
@@ -56,9 +55,7 @@ func main() {
 	//		gen.FieldRelate(field.HasMany, "user", User, &field.RelateConfig{GORMTag: "foreignKey:UID"}),
 	//	)...,
 	//)
-	g.ApplyBasic(Test, App, Account, Component, DataSource, Label, LabelData, DataModel, ModelData, Rule, RuleElement, User, Record)
-
-	g.ApplyInterface(func(dal2.QueryAll) {}, Test)
+	g.ApplyBasic(App, Account, Component, DataSource, Label, LabelData, DataModel, ModelData, Rule, RuleElement, User, Record)
 
 	g.Execute()
 }

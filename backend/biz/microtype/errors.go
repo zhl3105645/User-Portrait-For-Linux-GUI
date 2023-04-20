@@ -14,8 +14,10 @@ func (e *Error) Error() string {
 var (
 	SuccessErr = &Error{Code: 0, Msg: ""}
 
-	UnknownErr       = &Error{Code: 10000000, Msg: "未知错误"}
-	ParamCheckFailed = &Error{Code: 10000001, Msg: "参数错误"}
+	UnknownErr          = &Error{Code: 10000000, Msg: "未知错误"}
+	ParamCheckFailed    = &Error{Code: 10000001, Msg: "参数错误"}
+	JsonMarshalFailed   = &Error{Code: 10000002, Msg: "json 编码失败"}
+	JsonUnMarshalFailed = &Error{Code: 10000003, Msg: "json 解码失败"}
 
 	AccountExist       = &Error{Code: 10001001, Msg: "账户已存在"}
 	AccountAddFailed   = &Error{Code: 10001002, Msg: "添加账户失败"}
@@ -55,7 +57,28 @@ var (
 	BasicBehaviorQueryFailed = &Error{Code: 10008001, Msg: "基础行为数据查询失败"}
 	BasicBehaviorGene        = &Error{Code: 10008002, Msg: "基础行为数据生成中"}
 
-	RuleGene = &Error{Code: 10008002, Msg: "规则数据生成中"}
+	RuleGene            = &Error{Code: 10009001, Msg: "规则数据生成中"}
+	RuleDataQueryFailed = &Error{Code: 10009002, Msg: "规则数据查询失败"}
+
+	DataSourceCreateFailed = &Error{Code: 10010001, Msg: "数据源创建失败"}
+	DataSourceDeleteFailed = &Error{Code: 10010002, Msg: "数据源删除失败"}
+	DataSourceQueryFailed  = &Error{Code: 10010003, Msg: "数据源查询失败"}
+
+	DataModelCreateFailed = &Error{Code: 10011001, Msg: "模型创建失败"}
+	DataModelQueryFailed  = &Error{Code: 10011002, Msg: "模型查询失败"}
+	DataModelDeleteFailed = &Error{Code: 10011003, Msg: "模型删除失败"}
+
+	ModelDataGeneFailed   = &Error{Code: 10012001, Msg: "模型数据生成失败"}
+	ModelDataQueryFailed  = &Error{Code: 10012002, Msg: "模型数据查询失败"}
+	ModelDataDeleteFailed = &Error{Code: 10012002, Msg: "模型数据删除失败"}
+
+	LabelCreateFailed = &Error{Code: 10013001, Msg: "标签创建失败"}
+	LabelQueryFailed  = &Error{Code: 10013002, Msg: "标签查询失败"}
+	LabelDeleteFailed = &Error{Code: 10013003, Msg: "标签删除失败"}
+
+	LabelDataGeneFailed   = &Error{Code: 10014001, Msg: "标签数据生成失败"}
+	LabelDataQueryFailed  = &Error{Code: 10014002, Msg: "标签数据查询失败"}
+	LabelDataDeleteFailed = &Error{Code: 10014002, Msg: "标签数据删除失败"}
 )
 
 func Unwrap(err error) *Error {

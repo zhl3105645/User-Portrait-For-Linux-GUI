@@ -15,6 +15,7 @@ import (
 )
 
 func Gene(appId int64) {
+	defer geneDone(appId)
 	ctx := context.Background()
 	var (
 		wg sync.WaitGroup
@@ -99,7 +100,6 @@ func Gene(appId int64) {
 
 	wg.Wait()
 	if dbDataErr != nil || fileDataErr != nil {
-		GeneDone(appId)
 		return
 	}
 
@@ -132,7 +132,6 @@ func Gene(appId int64) {
 	})
 	_ = cp.Load(ctx)
 
-	GeneDone(appId)
 	return
 }
 
@@ -153,7 +152,7 @@ func OpenFile(path string) ([][]string, error) {
 	return events, nil
 }
 
-func GeneDone(appId int64) {
+func geneDone(appId int64) {
 	// running -> stop
 	config.StatusChan <- &config.StatusChange{
 		AppId:    appId,

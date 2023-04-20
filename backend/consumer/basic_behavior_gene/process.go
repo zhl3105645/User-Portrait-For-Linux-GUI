@@ -102,7 +102,7 @@ func process(events [][]string) *model.Record {
 	return &model.Record{
 		UserID:        0,
 		BeginTime:     beginTimeMs,
-		UseTime:       proto.Int64(appUseTimeMs),
+		UseTime:       appUseTimeMs,
 		MouseClickCnt: proto.Int64(mouseClickCnt),
 		MouseMoveCnt:  proto.Int64(mouseMoveCnt),
 		MouseMoveDis:  proto.Float64(mouseMoveDis),

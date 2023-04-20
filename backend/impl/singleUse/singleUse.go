@@ -178,7 +178,7 @@ func Process(filePath string, componentMap map[string]*QTComponent, eventRules [
 		eventData = eventData + fmt.Sprintf("(%d,%d)", ruleData.ID, ruleData.Time)
 	}
 
-	// 行为行为数据
+	// 行为规则数据
 	behaviorRuleData := getBehaviorRuleIDs(eventRuleData, behaviorRules)
 	behaviorData := ""
 	behaviorTimeMap := make(map[int64]int64)

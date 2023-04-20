@@ -8,10 +8,10 @@ const TableNameModelDatum = "model_data"
 
 // ModelDatum mapped from table <model_data>
 type ModelDatum struct {
-	ModelDataID int64   `gorm:"column:model_data_id;type:bigint;primaryKey;autoIncrement:true" json:"model_data_id"` // 模型数据ID
-	Data        float64 `gorm:"column:data;type:double;not null" json:"data"`                                        // 模型数据
-	ModelID     int64   `gorm:"column:model_id;type:bigint;not null" json:"model_id"`                                // 模型ID
-	UserID      int64   `gorm:"column:user_id;type:bigint;not null" json:"user_id"`                                  // 用户ID
+	ModelDataID int64  `gorm:"column:model_data_id;type:bigint;primaryKey;autoIncrement:true" json:"model_data_id"` // 模型数据ID
+	Data        string `gorm:"column:data;type:text;not null" json:"data"`                                          // 模型数据
+	ModelID     int64  `gorm:"column:model_id;type:bigint;not null" json:"model_id"`                                // 模型ID
+	UserID      int64  `gorm:"column:user_id;type:bigint;not null" json:"user_id"`                                  // 用户ID
 }
 
 // TableName ModelDatum's table name

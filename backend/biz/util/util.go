@@ -23,10 +23,10 @@ func GeneTimeDurationFromMs(timeMs int64) string {
 		dayStr = fmt.Sprintf("%d天", day)
 	}
 	if hour > 0 {
-		hourStr = fmt.Sprintf("%d小时", hour)
+		hourStr = fmt.Sprintf("%d时", hour)
 	}
 	if min > 0 {
-		minStr = fmt.Sprintf("%d分钟", min)
+		minStr = fmt.Sprintf("%d分", min)
 	}
 	if sec > 0 {
 		secStr = fmt.Sprintf("%d秒", sec)

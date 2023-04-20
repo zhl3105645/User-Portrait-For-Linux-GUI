@@ -1,6 +1,4 @@
 import {createRouter, createWebHistory, createWebHashHistory} from 'vue-router'
-import LayoutAdmin from "@/layout/LayoutAdmin";
-import LayoutUser from "@/layout/LayoutUser";
 import LayoutNew from "@/layout/LayoutNew";
 
 const routes = [
@@ -64,107 +62,6 @@ const routes = [
         ]
     },
     {
-        path: '/admin',
-        // name: 'Admin',
-        component: LayoutAdmin,
-        redirect: "/admin/home",
-        children: [
-            {
-                path: 'home',
-                // name: 'Home',
-                component: () => import("@/views/admin/Home")
-            },
-            {
-                path: 'department',
-                // name: 'Department',
-                component: () => import("@/views/admin/Department")
-            },
-            {
-                path: 'goods',
-                // name: 'Goods',
-                component: () => import("@/views/admin/Goods")
-            },
-            {
-                path: 'insurance',
-                // name: 'Insurance',
-                component: () => import("@/views/admin/Insurance")
-            },
-            {
-                path: 'log',
-                // name: 'Log',
-                component: () => import("@/views/admin/Log")
-            },
-            {
-                path: 'manager',
-                // name: 'Manager',
-                component: () => import("@/views/admin/Manager")
-            },
-            {
-                path: 'order',
-                // name: 'Order',
-                component: () => import("@/views/admin/Order")
-            },
-            {
-                path: 'price',
-                // name: 'Price',
-                component: () => import("@/views/admin/Price")
-            },
-            {
-                path: 'profile',
-                // name: 'Profile',
-                component: () => import("@/views/admin/Profile")
-            },
-            {
-                path: 'staff',
-                // name: 'Staff',
-                component: () => import("@/views/admin/Staff")
-            },
-            {
-                path: 'storehouse',
-                // name: 'Storehouse',
-                component: () => import("@/views/admin/Storehouse")
-            },
-            {
-                path: 'user',
-                // name: 'User',
-                component: () => import("@/views/admin/User")
-            },
-            {
-                path: 'vehicle',
-                // name: 'Vehicle',
-                component: () => import("@/views/admin/Vehicle")
-            }
-        ]
-    },
-    {
-        path: '/user',
-        // name: 'user',
-        component: LayoutUser,
-        redirect: "/user/home",
-        children: [
-            {
-                path: 'home',
-                // name: 'Home',
-                component: () => import("@/views/user/Home")
-            },
-            {
-                path: 'profile',
-                // name: 'Profile',
-                component: () => import("@/views/user/Profile")
-            },
-            {
-                path: 'goods',
-                // name: 'Goods',
-                component: () => import("@/views/user/Goods")
-            },
-            {
-                path: 'order',
-                // name: 'Order',
-                component: () => import("@/views/user/Order")
-            }
-        ]
-    },
-    {
         path: '/login',
         // name: 'Login',
         component: () => import("@/views/Login")
@@ -188,29 +85,5 @@ function isEmptyStr(s) {
     }
     return false
 }
-
-// 限制某些页面禁止未登录访问
-let limitPagePath = ['/about']
-router.beforeEach((to, from, next) => {
-    if (limitPagePath.includes(to.path)) {
-        // 判断sessionStorage是否保存了用户信息
-        let userStr = sessionStorage.getItem("user") || "{}"
-        let user = JSON.parse(userStr)
-        // 判断sessionStorage是否保存了管理员信息
-        let adminStr = sessionStorage.getItem("admin") || "{}"
-        let admin = JSON.parse(adminStr)
-        console.log(adminStr)
-        console.log(admin)
-        if (isEmptyStr(user.username) && isEmptyStr(admin.accountName)) {
-            // 跳转到登录页面
-            next({path: "/login"})
-        } else {
-            next()
-        }
-    } else {
-        next()
-    }
-
-})
 
 export default router

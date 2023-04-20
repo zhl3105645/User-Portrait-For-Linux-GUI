@@ -35,23 +35,23 @@ func (p *GeneComponent) Load(ctx context.Context) error {
 	}
 
 	// app_id typ=gene_component status=begin
-	if len(conf.AppConfigs) == 0 {
-		conf.AppConfigs = make(map[int64]*config.AppConfig)
-		conf.AppConfigs[p.appId] = &config.AppConfig{}
+	if len(conf.Configs) == 0 {
+		conf.Configs = make(map[int64]*config.Config)
+		conf.Configs[p.appId] = &config.Config{}
 	}
 
-	if conf.AppConfigs[p.appId] == nil || len(conf.AppConfigs[p.appId].Config) == 0 {
-		conf.AppConfigs[p.appId] = &config.AppConfig{
+	if conf.Configs[p.appId] == nil || len(conf.Configs[p.appId].Config) == 0 {
+		conf.Configs[p.appId] = &config.Config{
 			Config: make(map[config.TaskType]config.Status),
 		}
 	}
 
-	status := conf.AppConfigs[p.appId].Config[config.ComponentGene]
+	status := conf.Configs[p.appId].Config[config.ComponentGene]
 	if status != config.Stop {
 		return microtype.ComponentInGene
 	}
 
-	conf.AppConfigs[p.appId].Config[config.ComponentGene] = config.Begin
+	conf.Configs[p.appId].Config[config.ComponentGene] = config.Begin
 
 	err = config.WriteConfig(conf)
 	if err != nil {

@@ -1,8 +1,10 @@
 <template>
-  <h1>用户行为记录</h1>
+  <h1>Echarts图表</h1>
+
 </template>
 
 <script>
+
 export default {
   name: "LearningModel",
   data() {
@@ -13,7 +15,7 @@ export default {
   },
   methods: {
 
-  }
+  },
 }
 </script>
 

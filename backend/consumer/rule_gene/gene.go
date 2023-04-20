@@ -2,6 +2,7 @@ package rule_gene
 
 import (
 	"backend/biz/entity/event_data"
+	"backend/biz/entity/rule"
 	"backend/cmd/dal/model"
 	"backend/cmd/dal/query"
 	"backend/consumer/config"
@@ -19,6 +20,8 @@ import (
 )
 
 func Gene(appId int64) {
+	defer geneDone(appId)
+
 	ctx := context.Background()
 	var (
 		wg sync.WaitGroup
@@ -68,7 +71,7 @@ func Gene(appId int64) {
 		fileRecord = make(map[string]*model.Record)
 
 		// 事件规则以及行为规则
-		eventRules, behaviorRules, err := getRules(ctx, appId)
+		eventRules, behaviorRules, err := rule.GetRuleModels(ctx, appId)
 		if err != nil {
 			fileDataErr = err
 			logger.Error("fileDataErr=", fileDataErr.Error())
@@ -112,16 +115,14 @@ func Gene(appId int64) {
 
 	wg.Wait()
 	if dbDataErr != nil || fileDataErr != nil {
-		geneDone(appId)
 		return
 	}
 
 	// 汇总 四类
-	// 文件存在 : db不存在 db存在但无行为数据 db存在也有数据
+	// 文件存在 : db不存在 db存在但无行为数据 db存在也有数据 （后两者都要更新）
 	// 文件不存在 : 删除 （全量更新，这里做增量即可）
 	set1 := make([]*model.Record, 0) // 添加
 	set2 := make([]model.Record, 0)  // 更新
-	set3 := make([]*model.Record, 0) // 不做操作
 
 	for _, fileRec := range fileRecord {
 		if fileRec == nil {
@@ -131,11 +132,7 @@ func Gene(appId int64) {
 		for _, dbRec := range dbRecords {
 			// db存在
 			if dbRec.UserID == fileRec.UserID && dbRec.BeginTime == fileRec.BeginTime {
-				if dbRec.EventRuleValue == nil { // 无数据
-					set2 = append(set2, *fileRec)
-				} else { // 有数据
-					set3 = append(set3, fileRec)
-				}
+				set2 = append(set2, *fileRec)
 				exist = true
 				break
 			}
@@ -162,7 +159,6 @@ func Gene(appId int64) {
 		logger.Error("update record failed. err=", err.Error())
 	}
 
-	geneDone(appId)
 	return
 }
 

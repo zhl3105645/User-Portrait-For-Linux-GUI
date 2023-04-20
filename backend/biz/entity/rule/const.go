@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"backend/biz/model/backend"
 	"fmt"
 	"strconv"
 	"strings"
@@ -19,7 +20,9 @@ const EventRuleStopOperate = -1
 const EventRuleBeginOperate = -2
 
 // 特殊行为 未操作
-const BehaviorRuleNoOperate = -1
+
+const BehaviorRuleNoOperate = -3
+const BehaviorRuleNoOperateDesc = "未操作"
 
 type EventRuleElement struct {
 	EventType           int64
@@ -114,4 +117,67 @@ func ParseBehaviorElement(value string) *BehaviorRuleElement {
 	return &BehaviorRuleElement{
 		EventRuleIds: ids,
 	}
+}
+
+func ParseRuleElements(value string, ruleMap map[int64]string) []*backend.RuleElement {
+	if len(value) < 2 || len(ruleMap) == 0 {
+		return nil
+	}
+
+	eles := strings.Split(value[1:len(value)-1], ")(")
+	if len(eles) == 0 {
+		return nil
+	}
+
+	res := make([]*backend.RuleElement, 0, len(eles))
+	for _, ele := range eles {
+		if ele == "" {
+			continue
+		}
+
+		strs := strings.Split(ele, ",")
+		if len(strs) != 2 {
+			continue
+		}
+
+		ruleIdStr, timeStr := strs[0], strs[1]
+		ruleId, err1 := strconv.ParseInt(ruleIdStr, 10, 64)
+		time, err2 := strconv.ParseInt(timeStr, 10, 64)
+		if err1 != nil || err2 != nil {
+			continue
+		}
+
+		ruleDesc := ""
+		// 未操作
+		if ruleId == BehaviorRuleNoOperate {
+			ruleDesc = BehaviorRuleNoOperateDesc
+		} else if v, ok := ruleMap[ruleId]; ok {
+			ruleDesc = v
+		}
+
+		res = append(res, &backend.RuleElement{
+			RuleID:    ruleId,
+			RuleDesc:  ruleDesc,
+			Timestamp: time,
+		})
+	}
+	return res
+}
+
+func GetBehaviorDuration(elements []*backend.RuleElement) map[int64]int64 {
+	res := make(map[int64]int64)
+	for i := 1; i < len(elements); i++ {
+		last := elements[i-1]
+		cur := elements[i]
+
+		time := cur.Timestamp - last.Timestamp
+
+		if v, ok := res[last.RuleID]; ok {
+			res[last.RuleID] = v + time
+		} else {
+			res[last.RuleID] = time
+		}
+	}
+
+	return res
 }

@@ -8,11 +8,15 @@ const TableNameDataModel = "data_model"
 
 // DataModel mapped from table <data_model>
 type DataModel struct {
-	ModelID      int64   `gorm:"column:model_id;type:bigint;primaryKey;autoIncrement:true" json:"model_id"` // 数据源ID
-	ModelType    int64   `gorm:"column:model_type;type:int;not null" json:"model_type"`                     // 数据源类型
-	SourceID     *int64  `gorm:"column:source_id;type:bigint" json:"source_id"`                             // 统计数据源ID
-	MlParam      *string `gorm:"column:ml_param;type:text" json:"ml_param"`                                 // 机器学习服务参数
-	ModelFeature int64   `gorm:"column:model_feature;type:int;not null" json:"model_feature"`               // 模型用途
+	ModelID       int64   `gorm:"column:model_id;type:bigint;primaryKey;autoIncrement:true" json:"model_id"` // 数据源ID
+	ModelType     int64   `gorm:"column:model_type;type:int;not null" json:"model_type"`                     // 数据源类型
+	SourceID      *int64  `gorm:"column:source_id;type:bigint" json:"source_id"`                             // 统计数据源ID
+	MlParam       *string `gorm:"column:ml_param;type:text" json:"ml_param"`                                 // 机器学习服务参数
+	ModelFeature  int64   `gorm:"column:model_feature;type:int;not null" json:"model_feature"`               // 模型用途
+	CalculateType *int64  `gorm:"column:calculate_type;type:bigint" json:"calculate_type"`                   // 统计计算类型
+	AppID         int64   `gorm:"column:app_id;type:bigint;not null" json:"app_id"`                          // 应用ID
+	ModelName     string  `gorm:"column:model_name;type:varchar(256);not null" json:"model_name"`            // 模型名
+	DataType      int64   `gorm:"column:data_type;type:int;not null" json:"data_type"`                       // 数据类型
 }
 
 // TableName DataModel's table name

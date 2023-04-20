@@ -30,6 +30,7 @@ func newDataSource(db *gorm.DB, opts ...gen.DOOption) dataSource {
 	_dataSource.SourceID = field.NewInt64(tableName, "source_id")
 	_dataSource.SourceType = field.NewInt64(tableName, "source_type")
 	_dataSource.SourceValue = field.NewInt64(tableName, "source_value")
+	_dataSource.AppID = field.NewInt64(tableName, "app_id")
 
 	_dataSource.fillFieldMap()
 
@@ -43,6 +44,7 @@ type dataSource struct {
 	SourceID    field.Int64 // 数据源ID
 	SourceType  field.Int64 // 数据源类型
 	SourceValue field.Int64 // 类型的具体值
+	AppID       field.Int64 // 应用ID
 
 	fieldMap map[string]field.Expr
 }
@@ -62,6 +64,7 @@ func (d *dataSource) updateTableName(table string) *dataSource {
 	d.SourceID = field.NewInt64(table, "source_id")
 	d.SourceType = field.NewInt64(table, "source_type")
 	d.SourceValue = field.NewInt64(table, "source_value")
+	d.AppID = field.NewInt64(table, "app_id")
 
 	d.fillFieldMap()
 
@@ -86,10 +89,11 @@ func (d *dataSource) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (d *dataSource) fillFieldMap() {
-	d.fieldMap = make(map[string]field.Expr, 3)
+	d.fieldMap = make(map[string]field.Expr, 4)
 	d.fieldMap["source_id"] = d.SourceID
 	d.fieldMap["source_type"] = d.SourceType
 	d.fieldMap["source_value"] = d.SourceValue
+	d.fieldMap["app_id"] = d.AppID
 }
 
 func (d dataSource) clone(db *gorm.DB) dataSource {

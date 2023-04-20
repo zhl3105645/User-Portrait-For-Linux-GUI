@@ -16,6 +16,8 @@ const (
 	ComponentGene     TaskType = 1 // 生成组件数据
 	BasicBehaviorGene TaskType = 2 // 生成基础行为数据
 	RuleGene          TaskType = 3 // 生成规则数据
+	ModelGene         TaskType = 4 // 生成模型数据
+	LabelGene         TaskType = 5 // 生成标签数据
 )
 
 type Status int
@@ -30,11 +32,12 @@ const (
 )
 
 type Configs struct {
-	AppConfigs map[int64]*AppConfig `yaml:"AppConfigs"`
+	Configs map[int64]*Config `yaml:"Configs"`
 }
 
-type AppConfig struct {
-	Config map[TaskType]Status `yaml:"Config"`
+type Config struct {
+	Config map[TaskType]Status `yaml:"Config"` // 状态
+	Param  map[TaskType]int64  `yaml:"Param"`  // 参数
 }
 
 func ReadConfig() (*Configs, error) {
@@ -86,12 +89,12 @@ func ReceiveStatusChange() {
 			continue
 		}
 
-		if configs == nil || len(configs.AppConfigs) == 0 ||
-			configs.AppConfigs[change.AppId] == nil || len(configs.AppConfigs[change.AppId].Config) == 0 {
+		if configs == nil || len(configs.Configs) == 0 ||
+			configs.Configs[change.AppId] == nil || len(configs.Configs[change.AppId].Config) == 0 {
 			continue
 		}
 
-		configs.AppConfigs[change.AppId].Config[change.TaskType] = change.Status
+		configs.Configs[change.AppId].Config[change.TaskType] = change.Status
 		err = WriteConfig(configs)
 		if err != nil {
 			logger.Error("write yaml config failed. err=", err.Error())

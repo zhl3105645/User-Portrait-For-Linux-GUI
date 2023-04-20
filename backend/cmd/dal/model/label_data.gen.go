@@ -8,10 +8,10 @@ const TableNameLabelDatum = "label_data"
 
 // LabelDatum mapped from table <label_data>
 type LabelDatum struct {
-	LabelDataID int64   `gorm:"column:label_data_id;type:bigint;primaryKey;autoIncrement:true" json:"label_data_id"` // 标签数据ID
-	Data        float64 `gorm:"column:data;type:double;not null" json:"data"`                                        // 标签数据
-	LabelID     int64   `gorm:"column:label_id;type:bigint;not null" json:"label_id"`                                // 标签ID
-	UserID      int64   `gorm:"column:user_id;type:bigint;not null" json:"user_id"`                                  // 用户ID
+	LabelDataID int64  `gorm:"column:label_data_id;type:bigint;primaryKey;autoIncrement:true" json:"label_data_id"` // 标签数据ID
+	Data        string `gorm:"column:data;type:text;not null" json:"data"`                                          // 标签数据
+	LabelID     int64  `gorm:"column:label_id;type:bigint;not null" json:"label_id"`                                // 标签ID
+	UserID      int64  `gorm:"column:user_id;type:bigint;not null" json:"user_id"`                                  // 用户ID
 }
 
 // TableName LabelDatum's table name

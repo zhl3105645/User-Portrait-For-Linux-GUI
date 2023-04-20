@@ -28,7 +28,7 @@ func newModelDatum(db *gorm.DB, opts ...gen.DOOption) modelDatum {
 	tableName := _modelDatum.modelDatumDo.TableName()
 	_modelDatum.ALL = field.NewAsterisk(tableName)
 	_modelDatum.ModelDataID = field.NewInt64(tableName, "model_data_id")
-	_modelDatum.Data = field.NewFloat64(tableName, "data")
+	_modelDatum.Data = field.NewString(tableName, "data")
 	_modelDatum.ModelID = field.NewInt64(tableName, "model_id")
 	_modelDatum.UserID = field.NewInt64(tableName, "user_id")
 
@@ -41,10 +41,10 @@ type modelDatum struct {
 	modelDatumDo modelDatumDo
 
 	ALL         field.Asterisk
-	ModelDataID field.Int64   // 模型数据ID
-	Data        field.Float64 // 模型数据
-	ModelID     field.Int64   // 模型ID
-	UserID      field.Int64   // 用户ID
+	ModelDataID field.Int64  // 模型数据ID
+	Data        field.String // 模型数据
+	ModelID     field.Int64  // 模型ID
+	UserID      field.Int64  // 用户ID
 
 	fieldMap map[string]field.Expr
 }
@@ -62,7 +62,7 @@ func (m modelDatum) As(alias string) *modelDatum {
 func (m *modelDatum) updateTableName(table string) *modelDatum {
 	m.ALL = field.NewAsterisk(table)
 	m.ModelDataID = field.NewInt64(table, "model_data_id")
-	m.Data = field.NewFloat64(table, "data")
+	m.Data = field.NewString(table, "data")
 	m.ModelID = field.NewInt64(table, "model_id")
 	m.UserID = field.NewInt64(table, "user_id")
 

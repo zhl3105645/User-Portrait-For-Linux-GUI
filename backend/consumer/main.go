@@ -5,6 +5,8 @@ import (
 	"backend/consumer/basic_behavior_gene"
 	"backend/consumer/component_gene"
 	"backend/consumer/config"
+	"backend/consumer/label_gene"
+	"backend/consumer/model_gene"
 	"backend/consumer/rule_gene"
 	"encoding/json"
 	"github.com/bytedance/gopkg/util/logger"
@@ -28,7 +30,7 @@ func main() {
 		s, _ := json.Marshal(configs)
 		logger.Info("Configs=", string(s))
 
-		for appId, appConfig := range configs.AppConfigs {
+		for appId, appConfig := range configs.Configs {
 			if appConfig == nil {
 				continue
 			}
@@ -53,6 +55,12 @@ func main() {
 					go basic_behavior_gene.Gene(appId)
 				case config.RuleGene:
 					go rule_gene.Gene(appId)
+				case config.ModelGene:
+					modelId := appConfig.Param[config.ModelGene]
+					go model_gene.Gene(appId, modelId)
+				case config.LabelGene:
+					labelId := appConfig.Param[config.LabelGene]
+					go label_gene.Gene(appId, labelId)
 				default:
 				}
 			}

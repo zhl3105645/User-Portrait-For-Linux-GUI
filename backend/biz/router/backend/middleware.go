@@ -136,3 +136,63 @@ func _generuleMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _ruledatainpageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _datasourcesMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func __ddmodelMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _modelMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletemodelMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _modelinpageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _genemodelMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func __ddlabelMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _labelMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletelabelMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _labelinpageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _genelabelMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

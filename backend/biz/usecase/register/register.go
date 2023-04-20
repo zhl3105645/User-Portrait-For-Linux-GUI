@@ -3,6 +3,7 @@ package register
 import (
 	"backend/biz/entity/account"
 	"backend/biz/entity/app"
+	"backend/biz/entity/data_source"
 	"backend/biz/microtype"
 	"backend/biz/model/backend"
 	"backend/cmd/dal/model"
@@ -45,6 +46,12 @@ func (r *Register) Load(ctx context.Context) error {
 	)
 
 	if err := ac.Load(ctx); err != nil {
+		return err
+	}
+
+	// 初始化数据源
+	err := data_source.InitDataSource(ctx, r.app.AppID)
+	if err != nil {
 		return err
 	}
 

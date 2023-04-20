@@ -1,5 +1,5 @@
 <template>
-  <h1>欢迎使用</h1>
+  <h1>欢迎使用用户行为画像系统</h1>
 </template>
 
 <script>

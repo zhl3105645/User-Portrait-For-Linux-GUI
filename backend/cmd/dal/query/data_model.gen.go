@@ -32,6 +32,10 @@ func newDataModel(db *gorm.DB, opts ...gen.DOOption) dataModel {
 	_dataModel.SourceID = field.NewInt64(tableName, "source_id")
 	_dataModel.MlParam = field.NewString(tableName, "ml_param")
 	_dataModel.ModelFeature = field.NewInt64(tableName, "model_feature")
+	_dataModel.CalculateType = field.NewInt64(tableName, "calculate_type")
+	_dataModel.AppID = field.NewInt64(tableName, "app_id")
+	_dataModel.ModelName = field.NewString(tableName, "model_name")
+	_dataModel.DataType = field.NewInt64(tableName, "data_type")
 
 	_dataModel.fillFieldMap()
 
@@ -41,12 +45,16 @@ func newDataModel(db *gorm.DB, opts ...gen.DOOption) dataModel {
 type dataModel struct {
 	dataModelDo dataModelDo
 
-	ALL          field.Asterisk
-	ModelID      field.Int64  // 数据源ID
-	ModelType    field.Int64  // 数据源类型
-	SourceID     field.Int64  // 统计数据源ID
-	MlParam      field.String // 机器学习服务参数
-	ModelFeature field.Int64  // 模型用途
+	ALL           field.Asterisk
+	ModelID       field.Int64  // 数据源ID
+	ModelType     field.Int64  // 数据源类型
+	SourceID      field.Int64  // 统计数据源ID
+	MlParam       field.String // 机器学习服务参数
+	ModelFeature  field.Int64  // 模型用途
+	CalculateType field.Int64  // 统计计算类型
+	AppID         field.Int64  // 应用ID
+	ModelName     field.String // 模型名
+	DataType      field.Int64  // 数据类型
 
 	fieldMap map[string]field.Expr
 }
@@ -68,6 +76,10 @@ func (d *dataModel) updateTableName(table string) *dataModel {
 	d.SourceID = field.NewInt64(table, "source_id")
 	d.MlParam = field.NewString(table, "ml_param")
 	d.ModelFeature = field.NewInt64(table, "model_feature")
+	d.CalculateType = field.NewInt64(table, "calculate_type")
+	d.AppID = field.NewInt64(table, "app_id")
+	d.ModelName = field.NewString(table, "model_name")
+	d.DataType = field.NewInt64(table, "data_type")
 
 	d.fillFieldMap()
 
@@ -92,12 +104,16 @@ func (d *dataModel) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (d *dataModel) fillFieldMap() {
-	d.fieldMap = make(map[string]field.Expr, 5)
+	d.fieldMap = make(map[string]field.Expr, 9)
 	d.fieldMap["model_id"] = d.ModelID
 	d.fieldMap["model_type"] = d.ModelType
 	d.fieldMap["source_id"] = d.SourceID
 	d.fieldMap["ml_param"] = d.MlParam
 	d.fieldMap["model_feature"] = d.ModelFeature
+	d.fieldMap["calculate_type"] = d.CalculateType
+	d.fieldMap["app_id"] = d.AppID
+	d.fieldMap["model_name"] = d.ModelName
+	d.fieldMap["data_type"] = d.DataType
 }
 
 func (d dataModel) clone(db *gorm.DB) dataModel {

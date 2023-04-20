@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"backend/biz/entity/data_source"
 	"backend/cmd/dal"
 	"backend/cmd/dal/model"
 	"backend/cmd/dal/query"
@@ -135,4 +136,43 @@ func loadBehaviorRuleDatabase(ctx context.Context) {
 		logger.Error("element err=", err.Error())
 		return
 	}
+}
+
+func LoadDataSourceToDatabase(ctx context.Context, appId int64) {
+	dal.Init()
+	//err := data_source.InitDataSource(ctx, appId)
+	//println(err)
+	//
+	//rules, _ := query.Rule.WithContext(ctx).Where(query.Rule.AppID.Eq(appId)).Find()
+	//mos := make([]*model.DataSource, 0)
+	//for _, r := range rules {
+	//	if r.RuleType == 1 {
+	//		mos = append(mos, &model.DataSource{
+	//			SourceType:  2,
+	//			SourceValue: proto.Int64(r.RuleID),
+	//			AppID:       appId,
+	//		})
+	//	} else if r.RuleType == 2 {
+	//		mos = append(mos, &model.DataSource{
+	//			SourceType:  3,
+	//			SourceValue: proto.Int64(r.RuleID),
+	//			AppID:       appId,
+	//		})
+	//	}
+	//}
+	models, err := query.DataModel.WithContext(ctx).Where(query.DataModel.AppID.Eq(appId)).Find()
+	if err != nil {
+		println(err)
+		return
+	}
+	for _, m := range models {
+		err := data_source.AddModelSource(ctx, m.ModelID, appId)
+		if err != nil {
+			println(err)
+			return
+		}
+	}
+
+	//err = query.DataSource.WithContext(ctx).Create(mos...)
+	//println(err)
 }

@@ -6,8 +6,6 @@ create TABLE app(
     primary key (app_id)
 );
 
-drop TABLE account;
-
 create TABLE account(
     account_id bigint auto_increment comment '账号ID',
     account_name varchar(256) not null comment '账号名',
@@ -56,23 +54,31 @@ create TABLE rule_element(
 create  Table data_source (
     source_id bigint auto_increment comment '数据源ID',
     source_type int not null comment '数据源类型',
-    source_value int not null comment '类型的具体值',
-    primary key (source_id)
+    source_value int null comment '类型的具体值',
+    app_id bigint not null comment '应用ID',
+    primary key (source_id),
+    CONSTRAINT a_id5 foreign key (app_id) references app(app_id)
 );
 
 create  Table data_model (
       model_id bigint auto_increment comment '数据源ID',
+      model_name varchar(256) not null comment '模型名',
       model_type int not null comment '数据源类型',
+      app_id bigint not null comment '应用ID',
+      data_type int not null comment '数据类型',
       source_id bigint comment '统计数据源ID',
+      calculate_type bigint comment '统计计算类型',
       ml_param text comment '机器学习服务参数',
       model_feature int not null comment '模型用途',
       primary key (model_id),
+      CONSTRAINT a_id6 foreign key (app_id) references app(app_id),
       CONSTRAINT s_id foreign key (source_id) references data_source(source_id)
 );
 
 create  Table model_data (
     model_data_id bigint auto_increment comment '模型数据ID',
-    data double not null comment  '模型数据',
+    data text not null comment  '模型数据',
+
     model_id bigint not null comment '模型ID',
     user_id bigint not null comment '用户ID',
     primary key (model_data_id),
@@ -82,18 +88,18 @@ create  Table model_data (
 
 create TABLE label(
     label_id bigint auto_increment comment '标签ID',
-    label_name varchar(256) comment '标签名',
-    source_id bigint not null comment '数据源ID',
-    label_convert_rule varchar(256) not null comment '标签数据转换规则',
-    label_semantic_desc text comment '标签语义化描述',
+    label_name varchar(256) not null comment '标签名',
+    model_id bigint not null comment  '模型ID',
+    label_convert_rule text not null comment '标签数据转换规则',
+    label_semantic_desc text not null comment '标签语义化描述',
 
     primary key (label_id),
-    CONSTRAINT s_id2 foreign key (source_id) references data_source(source_id)
+    CONSTRAINT m_id2 foreign key (model_id) references data_model(model_id)
 );
 
 create Table label_data (
      label_data_id bigint auto_increment comment '标签数据ID',
-     data double not null comment  '标签数据',
+     data text not null comment  '标签数据',
      label_id bigint not null comment '标签ID',
      user_id bigint not null comment '用户ID',
      primary key (label_data_id),
@@ -107,7 +113,7 @@ create TABLE record (
     record_id bigint auto_increment comment '使用记录ID',
     user_id bigint not null comment '用户ID',
     begin_time bigint not null comment '开始时间 ms',
-    use_time bigint null comment '使用时长',
+    use_time bigint not null comment '使用时长',
     mouse_click_cnt bigint null comment '鼠标点击次数',
     mouse_move_cnt bigint null comment '鼠标移动次数',
     mouse_move_dis double null comment '鼠标移动距离',

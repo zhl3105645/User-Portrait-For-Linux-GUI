@@ -29,7 +29,7 @@ func newLabel(db *gorm.DB, opts ...gen.DOOption) label {
 	_label.ALL = field.NewAsterisk(tableName)
 	_label.LabelID = field.NewInt64(tableName, "label_id")
 	_label.LabelName = field.NewString(tableName, "label_name")
-	_label.SourceID = field.NewInt64(tableName, "source_id")
+	_label.ModelID = field.NewInt64(tableName, "model_id")
 	_label.LabelConvertRule = field.NewString(tableName, "label_convert_rule")
 	_label.LabelSemanticDesc = field.NewString(tableName, "label_semantic_desc")
 
@@ -44,7 +44,7 @@ type label struct {
 	ALL               field.Asterisk
 	LabelID           field.Int64  // 标签ID
 	LabelName         field.String // 标签名
-	SourceID          field.Int64  // 数据源ID
+	ModelID           field.Int64  // 模型ID
 	LabelConvertRule  field.String // 标签数据转换规则
 	LabelSemanticDesc field.String // 标签语义化描述
 
@@ -65,7 +65,7 @@ func (l *label) updateTableName(table string) *label {
 	l.ALL = field.NewAsterisk(table)
 	l.LabelID = field.NewInt64(table, "label_id")
 	l.LabelName = field.NewString(table, "label_name")
-	l.SourceID = field.NewInt64(table, "source_id")
+	l.ModelID = field.NewInt64(table, "model_id")
 	l.LabelConvertRule = field.NewString(table, "label_convert_rule")
 	l.LabelSemanticDesc = field.NewString(table, "label_semantic_desc")
 
@@ -93,7 +93,7 @@ func (l *label) fillFieldMap() {
 	l.fieldMap = make(map[string]field.Expr, 5)
 	l.fieldMap["label_id"] = l.LabelID
 	l.fieldMap["label_name"] = l.LabelName
-	l.fieldMap["source_id"] = l.SourceID
+	l.fieldMap["model_id"] = l.ModelID
 	l.fieldMap["label_convert_rule"] = l.LabelConvertRule
 	l.fieldMap["label_semantic_desc"] = l.LabelSemanticDesc
 }

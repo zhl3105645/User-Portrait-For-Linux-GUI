@@ -5,13 +5,7 @@
         :default-active="path"
         router
     >
-      <el-submenu index="1">
-        <template v-slot:title><span>用户</span></template>
-        <el-menu-item-group>
-          <template v-slot:title></template>
-          <el-menu-item index="/front/user_record">用户行为记录</el-menu-item>
-        </el-menu-item-group>
-      </el-submenu>
+      <el-menu-item index="/front/user_record">用户行为数据</el-menu-item>
       <el-submenu index="2">
         <template v-slot:title>规则</template>
         <el-menu-item-group>
@@ -26,26 +20,11 @@
         <el-menu-item-group>
           <template v-slot:title></template>
           <el-menu-item index="/front/basic_behavior_data">基本行为数据</el-menu-item>
-          <el-menu-item index="/front/event_rule_data">事件规则数据</el-menu-item>
-          <el-menu-item index="/front/behavior_rule_data">行为规则数据</el-menu-item>
+          <el-menu-item index="/front/event_rule_data">规则数据</el-menu-item>
         </el-menu-item-group>
       </el-submenu>
-      <el-submenu index="4">
-        <template v-slot:title>模型</template>
-        <el-menu-item-group>
-          <template v-slot:title></template>
-          <el-menu-item index="/front/statistics_model">统计模型</el-menu-item>
-          <el-menu-item index="/front/learning_model">机器模型</el-menu-item>
-        </el-menu-item-group>
-      </el-submenu>
-      <el-submenu index="5">
-        <template v-slot:title>应用</template>
-        <el-menu-item-group>
-          <template v-slot:title></template>
-          <el-menu-item index="/front/label">标签</el-menu-item>
-          <el-menu-item index="/front/predict">事件预测</el-menu-item>
-        </el-menu-item-group>
-      </el-submenu>
+      <el-menu-item index="/front/statistics_model">模型</el-menu-item>
+      <el-menu-item index="/front/label">标签</el-menu-item>
     </el-menu>
   </div>
 </template>

@@ -10,7 +10,10 @@ import (
 	"backend/biz/usecase/applist"
 	"backend/biz/usecase/basic_behavior"
 	"backend/biz/usecase/component"
+	"backend/biz/usecase/data_source"
 	"backend/biz/usecase/element"
+	"backend/biz/usecase/label"
+	model2 "backend/biz/usecase/model"
 	"backend/biz/usecase/register"
 	"backend/biz/usecase/rule"
 	"backend/biz/usecase/upload"
@@ -312,7 +315,7 @@ func ElementInPage(ctx context.Context, c *app.RequestContext) {
 }
 
 // AddRule .
-// @router /api/rule_gene [POST]
+// @router /api/rule [POST]
 func AddRule(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req backend.AddRuleReq
@@ -605,6 +608,314 @@ func GeneRule(ctx context.Context, c *app.RequestContext) {
 
 	ac, _ := c.Get(mw.IdentityKey)
 	al := rule.NewGeneRule(ac.(*model.Account).AccountID)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// RuleDataInPage .
+// @router /api/rule_data [GET]
+func RuleDataInPage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.RuleDataInPageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.RuleDataInPageResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := rule.NewPageRuleData(ac.(*model.Account).AccountID, req.GetPageNum(), req.GetPageSize(), req.GetSearch())
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// DataSources .
+// @router /api/data_sources [GET]
+func DataSources(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.DataSourceReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.DataSourceResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := data_source.NewDataSources(ac.(*model.Account).AccountID)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// AddModel .
+// @router /api/model [POST]
+func AddModel(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.AddModelReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.AddModelResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := model2.NewAddModel(ac.(*model.Account).AccountID, req)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// ModelInPage .
+// @router /api/model [GET]
+func ModelInPage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.ModelInPageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.ModelInPageResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := model2.NewPageModel(ac.(*model.Account).AccountID, req.PageNum, req.PageSize, req.Search)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// DeleteModel .
+// @router /api/model/:id [DELETE]
+func DeleteModel(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.DeleteModelReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "id=%d", id)
+
+	resp := new(backend.DeleteModelResp)
+
+	al := model2.NewDeleteModel(id)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// GeneModel .
+// @router /api/model/:id [POST]
+func GeneModel(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.GeneReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "id=%d", id)
+
+	resp := new(backend.GeneResp)
+
+	al := model2.NewGeneModel(id)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// AddLabel .
+// @router /api/label [POST]
+func AddLabel(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.AddLabelReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.AddLabelResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := label.NewAddLabel(ac.(*model.Account).AccountID, req)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// LabelInPage .
+// @router /api/label [GET]
+func LabelInPage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.LabelInPageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.LabelInPageResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := label.NewPageLabel(ac.(*model.Account).AccountID, req.PageNum, req.PageSize, req.Search)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// DeleteLabel .
+// @router /api/label/:id [DELETE]
+func DeleteLabel(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.DeleteLabelReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "id=%d", id)
+
+	resp := new(backend.DeleteLabelResp)
+
+	al := label.NewDeleteLabel(id)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// GeneLabel .
+// @router /api/label/:id [POST]
+func GeneLabel(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.GeneReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "id=%d", id)
+
+	resp := new(backend.GeneResp)
+
+	al := label.NewGeneLabel(id)
 	if err := al.Load(ctx); err != nil {
 		mErr := microtype.Unwrap(err)
 		resp.StatusCode = mErr.Code

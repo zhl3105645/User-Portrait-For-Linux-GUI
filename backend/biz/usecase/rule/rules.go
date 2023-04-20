@@ -54,13 +54,13 @@ func (r *Rules) Load(ctx context.Context) error {
 }
 
 func (r *Rules) GetResp() *backend.RulesResp {
-	rules := make([]*backend.EventRule, 0, len(r.res))
+	rules := make([]*backend.RuleElement, 0, len(r.res))
 	for _, r := range r.res {
 		if r == nil {
 			continue
 		}
 
-		rules = append(rules, &backend.EventRule{
+		rules = append(rules, &backend.RuleElement{
 			RuleID:   r.RuleID,
 			RuleDesc: r.RuleDesc,
 		})

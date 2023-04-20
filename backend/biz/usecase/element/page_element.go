@@ -106,7 +106,7 @@ func (p *PageElement) Load(ctx context.Context) error {
 				RuleType:   v.RuleType,
 				RuleDesc:   v.RuleDesc,
 				ElementID:  v.RuleElementID,
-				EventRules: make([]*backend.EventRule, 0),
+				EventRules: make([]*backend.RuleElement, 0),
 			}
 
 			behavior := rule.ParseBehaviorElement(v.RuleElementValue)
@@ -128,7 +128,7 @@ func (p *PageElement) Load(ctx context.Context) error {
 
 				for _, id := range behavior.EventRuleIds {
 					if r, ok := mp[id]; ok && r != nil {
-						re.EventRules = append(re.EventRules, &backend.EventRule{
+						re.EventRules = append(re.EventRules, &backend.RuleElement{
 							RuleID:   r.RuleID,
 							RuleDesc: r.RuleDesc,
 						})

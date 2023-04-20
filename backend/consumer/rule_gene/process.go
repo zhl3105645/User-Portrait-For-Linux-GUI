@@ -16,14 +16,16 @@ type RuleData struct {
 	Time int64 // 发生时间
 }
 
-func process(events [][]string, eventRules []*EventRule, behaviorRules []*BehaviorRule) *model.Record {
+func process(events [][]string, eventRules []*rule.EventRuleModel, behaviorRules []*rule.BehaviorRuleModel) *model.Record {
 	beginTimeMs := int64(0)
-	beginTime, _, err := getAppUseTime(events)
+	useTimeMs := int64(0)
+	beginTime, endTime, err := getAppUseTime(events)
 	if err != nil {
 		logger.Error("get app use time failed. err=", err.Error())
 		return nil
 	}
 	beginTimeMs = beginTime
+	useTimeMs = endTime - beginTime
 
 	eventRuleData := make([]*RuleData, 0, len(events))
 	lastEventTimeMs, _ := strconv.ParseInt(events[1][1], 10, 64)
@@ -71,12 +73,12 @@ func process(events [][]string, eventRules []*EventRule, behaviorRules []*Behavi
 	for i := 0; i < len(behaviorRuleData); i++ {
 		ruleData := behaviorRuleData[i]
 		behaviorData = behaviorData + fmt.Sprintf("(%d,%d)", ruleData.ID, ruleData.Time)
-		// TODO 行为时间
 	}
 
 	return &model.Record{
 		UserID:            0,
 		BeginTime:         beginTimeMs,
+		UseTime:           useTimeMs,
 		EventRuleValue:    proto.String(eventData),
 		BehaviorRuleValue: proto.String(behaviorData),
 	}
@@ -84,7 +86,7 @@ func process(events [][]string, eventRules []*EventRule, behaviorRules []*Behavi
 }
 
 // 返回行为ID序列
-func getBehaviorRuleIDs(eventRuleData []*RuleData, behaviorRules []*BehaviorRule) []*RuleData {
+func getBehaviorRuleIDs(eventRuleData []*RuleData, behaviorRules []*rule.BehaviorRuleModel) []*RuleData {
 	if len(eventRuleData) == 0 || len(behaviorRules) == 0 {
 		return nil
 	}
@@ -153,7 +155,7 @@ func getBehaviorRuleIDs(eventRuleData []*RuleData, behaviorRules []*BehaviorRule
 	return res
 }
 
-func getEventRuleID(event []string, eventRules []*EventRule) int64 {
+func getEventRuleID(event []string, eventRules []*rule.EventRuleModel) int64 {
 	if eventRules == nil {
 		return 0
 	}
