@@ -8,11 +8,13 @@ const TableNameLabel = "label"
 
 // Label mapped from table <label>
 type Label struct {
-	LabelID           int64  `gorm:"column:label_id;type:bigint;primaryKey;autoIncrement:true" json:"label_id"` // 标签ID
-	LabelName         string `gorm:"column:label_name;type:varchar(256);not null" json:"label_name"`            // 标签名
-	ModelID           int64  `gorm:"column:model_id;type:bigint;not null" json:"model_id"`                      // 模型ID
-	LabelConvertRule  string `gorm:"column:label_convert_rule;type:text;not null" json:"label_convert_rule"`    // 标签数据转换规则
-	LabelSemanticDesc string `gorm:"column:label_semantic_desc;type:text;not null" json:"label_semantic_desc"`  // 标签语义化描述
+	LabelID           int64   `gorm:"column:label_id;type:bigint;primaryKey;autoIncrement:true" json:"label_id"` // 标签ID
+	LabelName         string  `gorm:"column:label_name;type:varchar(256);not null" json:"label_name"`            // 标签名
+	ModelID           int64   `gorm:"column:model_id;type:bigint;not null" json:"model_id"`                      // 模型ID
+	LabelConvertRule  *string `gorm:"column:label_convert_rule;type:text" json:"label_convert_rule"`             // 标签数据转换规则
+	LabelSemanticDesc string  `gorm:"column:label_semantic_desc;type:text;not null" json:"label_semantic_desc"`  // 标签语义化描述
+	IsConvert         int64   `gorm:"column:is_convert;type:tinyint(1);not null" json:"is_convert"`              // 是否需要转换
+	LabelConvertDesc  *string `gorm:"column:label_convert_desc;type:text" json:"label_convert_desc"`             // 标签转换数组
 }
 
 // TableName Label's table name

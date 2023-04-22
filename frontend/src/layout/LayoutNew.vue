@@ -8,7 +8,7 @@
       <!--      侧边栏-->
       <Aside/>
       <!--      内容区域-->
-      <router-view style="flex: 1" @userInfo="refreshAdmin"/>
+      <router-view style="flex: 1" @userInfo="refreshAccount"/>
     </div>
   </div>
 </template>

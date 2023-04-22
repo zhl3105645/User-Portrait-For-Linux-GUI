@@ -25,12 +25,6 @@
           </el-select>
         </el-form-item>
         <!-- 机器学习 -->
-        <el-form-item v-if="addModelForm.model_type==2" label="模型功能">
-          <el-radio-group v-model="addModelForm.model_feature" class="ml-4">
-            <el-radio label="1" size="large">标签</el-radio>
-            <el-radio label="2" size="large">预测</el-radio>
-          </el-radio-group>
-        </el-form-item>
         <el-form-item v-if="addModelForm.model_type==2" label="请求参数">
           <el-select v-model="http_type" placeholder="请求类型">
             <el-option v-for="item in http_types" :key="item.type" :label="item.desc" :value="item.type"></el-option>
@@ -292,12 +286,20 @@ export default {
           "type": 3,
           "desc": "各类事件次数平均数"
           },
+          {
+          "type": 5,
+          "desc": "Top次数规则"
+          },
         ]
       } else if (value[0] == 5) {
         this.data_calculate_options = [
           {
           "type": 4,
           "desc": "各类行为时长平均数"
+          },
+          {
+          "type": 5,
+          "desc": "Top时长规则"
           },
         ]
       }

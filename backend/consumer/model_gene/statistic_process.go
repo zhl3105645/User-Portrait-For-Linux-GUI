@@ -68,23 +68,54 @@ func statisticsProcess(ctx context.Context, mo *model.DataModel) {
 
 		dataRes = basicProcess(int(*source.SourceValue), data_model.CalculateType(*mo.CalculateType), recordMap)
 	case data_source.EventRule:
-		// TODO
-	case data_source.BehaviorRule:
-		// TODO
-	case data_source.AllEventRule:
-		//if mo.CalculateType == nil || *mo.CalculateType != int64(data_model.RuleCnt) {
-		//	logger.Error("type is wrong")
-		//	return
-		//}
-		// TODO
+		if source.SourceValue == nil || mo.CalculateType == nil {
+			logger.Error("event rule id or calculate type is empty")
+			return
+		}
 
+		dataRes = singleEventProcess(ctx, *source.SourceValue, data_model.CalculateType(*mo.CalculateType), recordMap)
+	case data_source.BehaviorRule:
+		if source.SourceValue == nil || mo.CalculateType == nil {
+			logger.Error("behavior rule id or calculate type is empty")
+			return
+		}
+
+		dataRes = singleBehaviorProcess(ctx, *source.SourceValue, data_model.CalculateType(*mo.CalculateType), recordMap)
+	case data_source.AllEventRule:
+		if mo.CalculateType == nil {
+			logger.Error("param is wrong")
+			return
+		}
+		if *mo.CalculateType != int64(data_model.RuleCnt) && *mo.CalculateType != int64(data_model.TopRule) {
+			return
+		}
+
+		if *mo.CalculateType == int64(data_model.RuleCnt) {
+			dataRes = allEventProcess(ctx, mo.AppID, recordMap)
+		} else if *mo.CalculateType == int64(data_model.TopRule) {
+			dataRes = topEventProcess(ctx, mo.AppID, recordMap)
+		}
 	case data_source.AllBehaviorRule:
-		if mo.CalculateType == nil || *mo.CalculateType != int64(data_model.RuleDuration) {
+		if mo.CalculateType == nil {
 			logger.Error("param is wrong")
 			return
 		}
 
-		dataRes = allBehaviorProcess(ctx, mo.AppID, recordMap)
+		if *mo.CalculateType != int64(data_model.RuleDuration) && *mo.CalculateType != int64(data_model.TopRule) {
+			return
+		}
+
+		if *mo.CalculateType == int64(data_model.RuleDuration) {
+			dataRes = allBehaviorProcess(ctx, mo.AppID, recordMap)
+		} else if *mo.CalculateType == int64(data_model.TopRule) {
+			dataRes = topBehaviorProcess(ctx, mo.AppID, recordMap)
+		}
+	default:
+	}
+
+	if len(dataRes) == 0 {
+		logger.Info("data res is empty")
+		return
 	}
 
 	for uId, value := range dataRes {
@@ -150,13 +181,93 @@ func statisticsProcess(ctx context.Context, mo *model.DataModel) {
 	}
 }
 
+func singleEventProcess(ctx context.Context, eventRuleId int64, calculateTyp data_model.CalculateType, recordMap map[int64][]*model.Record) map[int64]string {
+	res := make(map[int64]string)
+	// uid -> event ave cnt
+	if calculateTyp == data_model.Average {
+		ru, err := query.Rule.WithContext(ctx).Where(query.Rule.RuleID.Eq(eventRuleId)).First()
+		if err != nil {
+			return nil
+		}
+
+		userId2RuleId2Cnt := getEventCntMap(ctx, ru.AppID, recordMap)
+		for userId, ruleId2Cnt := range userId2RuleId2Cnt {
+			if cnt, ok := ruleId2Cnt[ru.RuleID]; ok {
+				res[userId] = fmt.Sprintf("%d", cnt)
+			}
+		}
+
+		return res
+	}
+
+	return nil
+}
+
+func singleBehaviorProcess(ctx context.Context, behaviorRuleId int64, calculateTyp data_model.CalculateType, recordMap map[int64][]*model.Record) map[int64]string {
+	res := make(map[int64]string)
+	// uid -> behavior ave cnt
+	if calculateTyp == data_model.Average {
+		ru, err := query.Rule.WithContext(ctx).Where(query.Rule.RuleID.Eq(behaviorRuleId)).First()
+		if err != nil {
+			return nil
+		}
+
+		userId2RuleId2Duration := getBehaviorDurationMap(ctx, ru.AppID, recordMap)
+		for userId, ruleId2Duration := range userId2RuleId2Duration {
+			if cnt, ok := ruleId2Duration[ru.RuleID]; ok {
+				res[userId] = fmt.Sprintf("%d", cnt)
+			}
+		}
+
+		return res
+	}
+
+	return nil
+}
+
+func topBehaviorProcess(ctx context.Context, appId int64, recordMap map[int64][]*model.Record) map[int64]string {
+	res := make(map[int64]string)
+
+	behaviorDurationMap := getBehaviorDurationMap(ctx, appId, recordMap)
+	for userId, durationMap := range behaviorDurationMap {
+		max := int64(0)
+		maxId := int64(0)
+		for behaviorRuleId, duration := range durationMap {
+			if duration > max {
+				max = duration
+				maxId = behaviorRuleId
+			}
+		}
+
+		res[userId] = fmt.Sprintf("%d", maxId)
+	}
+
+	return res
+}
+
 func allBehaviorProcess(ctx context.Context, appId int64, recordMap map[int64][]*model.Record) map[int64]string {
 	res := make(map[int64]string)
+
+	behaviorDurationMap := getBehaviorDurationMap(ctx, appId, recordMap)
+	for userId, durationMap := range behaviorDurationMap {
+		jsonStr, err := json.Marshal(durationMap)
+		if err != nil {
+			logger.Error("json marshal failed. err=", err.Error())
+		}
+		res[userId] = string(jsonStr)
+	}
+
+	return res
+}
+
+// user_id -> behavior_id -> average_duration
+func getBehaviorDurationMap(ctx context.Context, appId int64, recordMap map[int64][]*model.Record) map[int64]map[int64]int64 {
+	res := make(map[int64]map[int64]int64)
 	// 规则
 	eventRules, behaviorRules, err := rule.GetRuleModels(ctx, appId)
 	if err != nil {
 		logger.Error("err=", err.Error())
-		return res
+		return nil
 	}
 	ruleMap := make(map[int64]string)
 	for _, r := range eventRules {
@@ -203,17 +314,118 @@ func allBehaviorProcess(ctx context.Context, appId int64, recordMap map[int64][]
 		}
 		ave := make(map[int64]int64)
 		for id, duration := range behaviorId2Duraion {
+			if id <= 0 {
+				continue
+			}
 			ave[id] = duration / int64(len(records))
 		}
 		if len(ave) == 0 {
 			continue
 		}
-		// json化
-		jsonStr, err := json.Marshal(ave)
+		res[userId] = ave
+	}
+
+	return res
+}
+
+func topEventProcess(ctx context.Context, appId int64, recordMap map[int64][]*model.Record) map[int64]string {
+	res := make(map[int64]string)
+
+	eventCntMap := getEventCntMap(ctx, appId, recordMap)
+	for userId, cntMap := range eventCntMap {
+		max := int64(0)
+		maxId := int64(0)
+		for eventRuleId, cnt := range cntMap {
+			if cnt > max {
+				max = cnt
+				maxId = eventRuleId
+			}
+		}
+
+		res[userId] = fmt.Sprintf("%d", maxId)
+	}
+
+	return res
+}
+
+func allEventProcess(ctx context.Context, appId int64, recordMap map[int64][]*model.Record) map[int64]string {
+	res := make(map[int64]string)
+
+	EventCntMap := getEventCntMap(ctx, appId, recordMap)
+	for userId, cntMap := range EventCntMap {
+		jsonStr, err := json.Marshal(cntMap)
 		if err != nil {
 			logger.Error("json marshal failed. err=", err.Error())
 		}
 		res[userId] = string(jsonStr)
+	}
+
+	return res
+}
+
+// user_id -> event_rule_id -> cnt
+func getEventCntMap(ctx context.Context, appId int64, recordMap map[int64][]*model.Record) map[int64]map[int64]int64 {
+	res := make(map[int64]map[int64]int64)
+	// 规则
+	eventRules, behaviorRules, err := rule.GetRuleModels(ctx, appId)
+	if err != nil {
+		logger.Error("err=", err.Error())
+		return nil
+	}
+	ruleMap := make(map[int64]string)
+	for _, r := range eventRules {
+		if r == nil {
+			continue
+		}
+
+		ruleMap[r.RuleID] = r.RuleDesc
+	}
+	for _, r := range behaviorRules {
+		if r == nil {
+			continue
+		}
+
+		ruleMap[r.RuleID] = r.RuleDesc
+	}
+
+	// 数据转换
+	for userId, records := range recordMap {
+		// 用户维度
+		eventId2Cnt := make(map[int64]int64) // rule_id -> cnt
+		for _, r := range records {
+			if r == nil {
+				continue
+			}
+
+			if r.BehaviorRuleValue == nil {
+				continue
+			}
+			eles := rule.ParseRuleElements(*r.EventRuleValue, ruleMap)
+			if len(eles) == 0 {
+				continue
+			}
+
+			// 单次记录次数
+			cntMap := rule.GetEventCnt(eles)
+			for id, duration := range cntMap {
+				if v, ok := eventId2Cnt[id]; ok {
+					eventId2Cnt[id] = v + duration
+				} else {
+					eventId2Cnt[id] = duration
+				}
+			}
+		}
+		ave := make(map[int64]int64)
+		for id, cnt := range eventId2Cnt {
+			if id <= 0 {
+				continue
+			}
+			ave[id] = cnt / int64(len(records))
+		}
+		if len(ave) == 0 {
+			continue
+		}
+		res[userId] = ave
 	}
 
 	return res
@@ -295,15 +507,15 @@ func basicProcess(basicTyp int, calculateTyp data_model.CalculateType, recordMap
 				continue
 			}
 
-			cntMap := make(map[float64]int)
+			cntMap := make(map[int64]int)
 			for _, d := range data {
-				if v, ok := cntMap[d]; ok {
-					cntMap[d] = v + 1
+				if v, ok := cntMap[int64(d)]; ok {
+					cntMap[int64(d)] = v + 1
 				} else {
-					cntMap[d] = 1
+					cntMap[int64(d)] = 1
 				}
 			}
-			maxValue := data[0]
+			maxValue := int64(data[0])
 			maxCnt := cntMap[maxValue]
 			for value, cnt := range cntMap {
 				if cnt > maxCnt {
@@ -311,7 +523,7 @@ func basicProcess(basicTyp int, calculateTyp data_model.CalculateType, recordMap
 					maxValue = value
 				}
 			}
-			res[uId] = fmt.Sprintf("%.1f", maxValue)
+			res[uId] = fmt.Sprintf("%d", maxValue)
 		}
 	}
 

@@ -14,6 +14,12 @@
             <el-option v-for="item in model_source_options" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="是否需要数据转换">
+          <el-radio-group v-model="addLabelForm.is_convert" class="ml-4">
+            <el-radio label="1" size="large">否</el-radio>
+            <el-radio label="2" size="large">是</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="标签转换规则">
           <div v-for="(rule, index) in convertRules" :key="index">
             <el-button>模型数据</el-button>
@@ -224,9 +230,9 @@ export default {
     addConvertRule() {
       this.convertRules.push({
         operator: null,
-        x_value: 0.0,
-        y_value: 0,
-        y_desc: "",
+        x_value: null,
+        y_value: null,
+        y_desc: null,
       })
     },
     initCharts() {

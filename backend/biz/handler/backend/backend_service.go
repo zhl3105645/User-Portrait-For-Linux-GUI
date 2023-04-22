@@ -816,17 +816,17 @@ func AddLabel(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(backend.AddLabelResp)
 
-	ac, _ := c.Get(mw.IdentityKey)
-	al := label.NewAddLabel(ac.(*model.Account).AccountID, req)
-	if err := al.Load(ctx); err != nil {
-		mErr := microtype.Unwrap(err)
-		resp.StatusCode = mErr.Code
-		resp.StatusMsg = mErr.Msg
-		c.JSON(consts.StatusOK, resp)
-		return
-	}
-
-	resp = al.GetResp()
+	//ac, _ := c.Get(mw.IdentityKey)
+	//al := label.NewAddLabel(ac.(*model.Account).AccountID, req)
+	//if err := al.Load(ctx); err != nil {
+	//	mErr := microtype.Unwrap(err)
+	//	resp.StatusCode = mErr.Code
+	//	resp.StatusMsg = mErr.Msg
+	//	c.JSON(consts.StatusOK, resp)
+	//	return
+	//}
+	//
+	//resp = al.GetResp()
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -916,6 +916,34 @@ func GeneLabel(ctx context.Context, c *app.RequestContext) {
 	resp := new(backend.GeneResp)
 
 	al := label.NewGeneLabel(id)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// Users .
+// @router /api/all_user [GET]
+func Users(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.UsersReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.UsersResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := user.NewUsers(ac.(*model.Account).AccountID)
 	if err := al.Load(ctx); err != nil {
 		mErr := microtype.Unwrap(err)
 		resp.StatusCode = mErr.Code

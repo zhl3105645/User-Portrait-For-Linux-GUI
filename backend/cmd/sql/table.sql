@@ -90,7 +90,9 @@ create TABLE label(
     label_id bigint auto_increment comment '标签ID',
     label_name varchar(256) not null comment '标签名',
     model_id bigint not null comment  '模型ID',
-    label_convert_rule text not null comment '标签数据转换规则',
+    is_convert bool not null default true comment '是否需要转换',
+    label_convert_rule text null comment '标签数据转换规则',
+    label_convert_desc text null comment '标签转换的文本',
     label_semantic_desc text not null comment '标签语义化描述',
 
     primary key (label_id),

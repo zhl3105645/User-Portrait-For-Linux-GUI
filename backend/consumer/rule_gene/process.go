@@ -152,7 +152,26 @@ func getBehaviorRuleIDs(eventRuleData []*RuleData, behaviorRules []*rule.Behavio
 		eventIndex++
 	}
 
-	return res
+	if len(res) <= 2 {
+		return res
+	}
+
+	// 合并中间相同的行为，保留头尾
+	newRes := make([]*RuleData, 0, len(res))
+
+	preData := res[0]
+	newRes = append(newRes, preData)
+	for i := 1; i < len(res)-1; i++ {
+		curData := res[i]
+		if curData.ID != preData.ID {
+			preData = curData
+			newRes = append(newRes, preData)
+		}
+	}
+
+	newRes = append(newRes, res[len(res)-1])
+
+	return newRes
 }
 
 func getEventRuleID(event []string, eventRules []*rule.EventRuleModel) int64 {

@@ -32,6 +32,8 @@ func newLabel(db *gorm.DB, opts ...gen.DOOption) label {
 	_label.ModelID = field.NewInt64(tableName, "model_id")
 	_label.LabelConvertRule = field.NewString(tableName, "label_convert_rule")
 	_label.LabelSemanticDesc = field.NewString(tableName, "label_semantic_desc")
+	_label.IsConvert = field.NewInt64(tableName, "is_convert")
+	_label.LabelConvertDesc = field.NewString(tableName, "label_convert_desc")
 
 	_label.fillFieldMap()
 
@@ -47,6 +49,8 @@ type label struct {
 	ModelID           field.Int64  // 模型ID
 	LabelConvertRule  field.String // 标签数据转换规则
 	LabelSemanticDesc field.String // 标签语义化描述
+	IsConvert         field.Int64  // 是否需要转换
+	LabelConvertDesc  field.String // 标签转换数组
 
 	fieldMap map[string]field.Expr
 }
@@ -68,6 +72,8 @@ func (l *label) updateTableName(table string) *label {
 	l.ModelID = field.NewInt64(table, "model_id")
 	l.LabelConvertRule = field.NewString(table, "label_convert_rule")
 	l.LabelSemanticDesc = field.NewString(table, "label_semantic_desc")
+	l.IsConvert = field.NewInt64(table, "is_convert")
+	l.LabelConvertDesc = field.NewString(table, "label_convert_desc")
 
 	l.fillFieldMap()
 
@@ -90,12 +96,14 @@ func (l *label) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (l *label) fillFieldMap() {
-	l.fieldMap = make(map[string]field.Expr, 5)
+	l.fieldMap = make(map[string]field.Expr, 7)
 	l.fieldMap["label_id"] = l.LabelID
 	l.fieldMap["label_name"] = l.LabelName
 	l.fieldMap["model_id"] = l.ModelID
 	l.fieldMap["label_convert_rule"] = l.LabelConvertRule
 	l.fieldMap["label_semantic_desc"] = l.LabelSemanticDesc
+	l.fieldMap["is_convert"] = l.IsConvert
+	l.fieldMap["label_convert_desc"] = l.LabelConvertDesc
 }
 
 func (l label) clone(db *gorm.DB) label {

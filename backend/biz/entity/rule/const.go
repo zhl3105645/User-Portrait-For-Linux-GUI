@@ -181,3 +181,19 @@ func GetBehaviorDuration(elements []*backend.RuleElement) map[int64]int64 {
 
 	return res
 }
+
+func GetEventCnt(elements []*backend.RuleElement) map[int64]int64 {
+	res := make(map[int64]int64)
+	for _, ele := range elements {
+		if ele == nil {
+			continue
+		}
+		if cnt, ok := res[ele.RuleID]; ok {
+			res[ele.RuleID] = cnt + 1
+		} else {
+			res[ele.RuleID] = 1
+		}
+	}
+
+	return res
+}

@@ -48,16 +48,16 @@ const routes = [
                 component: () => import("@/views/new/LearningModel")
             },
             {
-                path: 'predict',
-                component: () => import("@/views/new/Predict")
-            },
-            {
                 path: 'statistics_model',
                 component: () => import("@/views/new/StatisticsModel")
             },
             {
                 path: 'user_record',
                 component: () => import("@/views/new/UserRecord")
+            },
+            {
+                path: 'profile',
+                component: () => import("@/views/new/Profile")
             }
         ]
     },

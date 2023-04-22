@@ -16,10 +16,9 @@ type Biz int
 const (
 	CntFloat  Biz = 1 // eg. 次数平均数
 	TimeFloat Biz = 2 // eg. 时长平均数
-	Enum      Biz = 3 // eg. 聚类
-	All       Biz = 4 // eg. 行为时长 求总的比例
-
-	Label Biz = 5 // eg. 标签
+	Enum      Biz = 3 // eg. 用户聚类，Top规则, 时间段
+	RuleAll   Biz = 4 // eg. 行为时长 求总的比例
+	Label     Biz = 5 // eg. 标签
 )
 
 func GetLabelOption(biz Biz, data []*model.LabelDatum, labelDescMap map[int64]string) *backend.ChartOption {
@@ -146,16 +145,27 @@ func GetModelOption(biz Biz, data []*model.ModelDatum, ruleDescMap map[int64]str
 			},
 		}
 	case Enum:
-		ds := getString(data)
+		ds := getEnumData(data)
 		if len(ds) == 0 {
 			return nil
 		}
-		m := make(map[string]int64)
+		enum2Cnt := make(map[int64]int64)
 		for _, d := range ds {
-			if v, ok := m[d]; ok {
-				m[d] = v + 1
+			if v, ok := enum2Cnt[d]; ok {
+				enum2Cnt[d] = v + 1
 			} else {
-				m[d] = 1
+				enum2Cnt[d] = 1
+			}
+		}
+
+		desc2Cnt := make(map[string]int64)
+		if ruleDescMap == nil {
+			for k, cnt := range enum2Cnt {
+				desc2Cnt[fmt.Sprintf("%d", k)] = cnt
+			}
+		} else {
+			for k, cnt := range enum2Cnt {
+				desc2Cnt[ruleDescMap[k]] = cnt
 			}
 		}
 
@@ -163,9 +173,9 @@ func GetModelOption(biz Biz, data []*model.ModelDatum, ruleDescMap map[int64]str
 			Trigger:   "item",
 			Formatter: "{c} ({d}%)",
 		}
-		option.Series = []*backend.Series{pie(m)}
-	case All:
-		maps := getMap(data)
+		option.Series = []*backend.Series{pie(desc2Cnt)}
+	case RuleAll:
+		maps := getMap(data) // [] rule_id  -> data
 		allMap := make(map[int64]int64)
 		for _, m := range maps {
 			for k, v := range m {
@@ -180,9 +190,9 @@ func GetModelOption(biz Biz, data []*model.ModelDatum, ruleDescMap map[int64]str
 		m := make(map[string]int64)
 		for ruleId, cnt := range allMap {
 			if v, ok := ruleDescMap[ruleId]; ok && v != "" {
-				m[v] = cnt
+				m[v] = cnt / int64(len(maps))
 			} else {
-				m[fmt.Sprintf("规则%d", ruleId)] = cnt
+				m[fmt.Sprintf("规则%d", ruleId)] = cnt / int64(len(maps))
 			}
 		}
 
@@ -191,6 +201,7 @@ func GetModelOption(biz Biz, data []*model.ModelDatum, ruleDescMap map[int64]str
 			Formatter: "{c} ({d}%)",
 		}
 		option.Series = []*backend.Series{pie(m)}
+
 	}
 
 	return option
@@ -240,8 +251,8 @@ func getFloat(data []*model.ModelDatum) []float64 {
 	return ds
 }
 
-func getString(data []*model.ModelDatum) []string {
-	ds := make([]string, 0, len(data))
+func getEnumData(data []*model.ModelDatum) []int64 {
+	ds := make([]int64, 0, len(data))
 	for _, d := range data {
 		if d == nil {
 			continue
@@ -249,7 +260,13 @@ func getString(data []*model.ModelDatum) []string {
 		if d.Data == "" {
 			continue
 		}
-		ds = append(ds, d.Data)
+		i, err := strconv.ParseInt(d.Data, 10, 64)
+		if err != nil {
+			logger.Error("strconv parse int failed. err=", err.Error())
+			return nil
+		}
+
+		ds = append(ds, i)
 	}
 
 	return ds

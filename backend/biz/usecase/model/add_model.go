@@ -19,15 +19,13 @@ type AddModel struct {
 	req       backend.AddModelReq
 
 	//
-	appId   int64
-	feature int64
+	appId int64
 }
 
 func NewAddModel(accountId int64, req backend.AddModelReq) *AddModel {
 	return &AddModel{
 		accountId: accountId,
 		req:       req,
-		feature:   int64(data_model.Label), // 默认标签
 	}
 }
 
@@ -53,9 +51,8 @@ func (a *AddModel) Load(ctx context.Context) error {
 		ModelID:       0,
 		ModelType:     typ,
 		AppID:         a.appId,
-		DataType:      int64(data_model.GetDataType(typ, a.req.SourceType, a.req.SourceValue, httpDataType)),
+		DataType:      int64(data_model.GetDataType(typ, a.req.SourceType, a.req.SourceValue, a.req.CalculateType, httpDataType)),
 		ModelName:     a.req.ModelName,
-		ModelFeature:  a.feature,
 		SourceID:      nil,
 		CalculateType: proto.Int64(a.req.CalculateType),
 		MlParam:       nil,
@@ -126,15 +123,6 @@ func (a *AddModel) check() bool {
 	}
 	if a.req.ModelType != strconv.FormatInt(int64(data_model.Statistics), 10) && a.req.ModelType != strconv.FormatInt(int64(data_model.Learning), 10) {
 		return false
-	}
-
-	if a.req.ModelFeature != "" {
-		feature, err := strconv.ParseInt(a.req.ModelFeature, 10, 64)
-		if err != nil {
-			return false
-		}
-
-		a.feature = feature // 以请求为准
 	}
 
 	if a.req.ModelType == strconv.FormatInt(int64(data_model.Learning), 10) {

@@ -25,6 +25,7 @@
       </el-submenu>
       <el-menu-item index="/front/statistics_model">模型</el-menu-item>
       <el-menu-item index="/front/label">标签</el-menu-item>
+      <el-menu-item index="/front/profile">画像</el-menu-item>
     </el-menu>
   </div>
 </template>

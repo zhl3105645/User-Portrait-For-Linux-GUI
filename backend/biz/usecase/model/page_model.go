@@ -9,12 +9,9 @@ import (
 	"backend/cmd/dal/model"
 	"backend/cmd/dal/query"
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
 	"gorm.io/gorm"
-	"strconv"
 )
 
 type PageModel struct {
@@ -145,46 +142,15 @@ func getOption(dataType int64, data []*model.ModelDatum, ruleDescMap map[int64]s
 	} else if dataType == int64(data_model.TimeDuration) {
 		return chart.GetModelOption(chart.TimeFloat, data, nil)
 	} else if dataType == int64(data_model.TimePeriod) {
-		enumMap := make(map[int64]int64)
-		for _, d := range data {
-			if d == nil {
-				continue
-			}
-			numF, _ := strconv.ParseFloat(d.Data, 64)
-			num := int64(numF)
-			if v, ok := enumMap[num]; ok {
-				enumMap[num] = v + 1
-			} else {
-				enumMap[num] = 1
-			}
-		}
-		yData := make([]string, 0, len(enumMap))
-		for num, cnt := range enumMap {
-			s := struct {
-				Value int64  `json:"value"`
-				Name  string `json:"name"`
-			}{
-				Value: cnt,
-				Name:  fmt.Sprintf("%d~%d点", num, (num+2)%24),
-			}
-
-			str, _ := json.Marshal(s)
-			yData = append(yData, string(str))
-		}
-
-		toolTip := &backend.ToolTip{
-			Trigger: "item",
-		}
-		series := &backend.Series{
-			Type: "pie",
-			Data: yData,
-		}
-		option.Tooltip = toolTip
-		option.Series = []*backend.Series{series}
-	} else if dataType == int64(data_model.MultiTimeDuration) {
-		return chart.GetModelOption(chart.All, data, ruleDescMap)
+		return chart.GetModelOption(chart.Enum, data, nil)
+	} else if dataType == int64(data_model.Rule2Duration) {
+		return chart.GetModelOption(chart.RuleAll, data, ruleDescMap)
 	} else if dataType == int64(data_model.Enum) {
 		return chart.GetModelOption(chart.Enum, data, nil)
+	} else if dataType == int64(data_model.Rule2Int) {
+		return chart.GetModelOption(chart.RuleAll, data, ruleDescMap)
+	} else if dataType == int64(data_model.RuleId) {
+		return chart.GetModelOption(chart.Enum, data, ruleDescMap)
 	}
 
 	return option

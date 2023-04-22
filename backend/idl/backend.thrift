@@ -334,7 +334,6 @@ struct AddModelReq {
     3: i64 calculate_type (api.body="calculate_type")// 统计计算方式：平均数、众数等
     4: i64 source_type (api.body="source_type")// 数据源类型
     5: i64 source_value (api.body="source_value")// 数据源ID
-    6: string model_feature (api.body="model_feature") // 模型功能 默认为 label
     7: LearningParam learning_param (api.body="learning_param") // 机器学习服务参数
 }
 
@@ -469,6 +468,16 @@ struct DeleteLabelResp {
     2: string status_msg
 }
 
+struct UsersReq {
+
+}
+
+struct UsersResp {
+    1: i64 status_code
+    2: string status_msg
+    3: list<User> users
+}
+
 service BackendService {
     // 未登录状态
     // 注册
@@ -533,4 +542,6 @@ service BackendService {
     DeleteLabelResp DeleteLabel(1: DeleteLabelReq request) (api.delete="/api/label/:id");
     // 生成模型数据
     GeneResp GeneLabel(1: GeneReq request) (api.post="/api/label/:id");
+    // 全部用户信息
+    UsersResp Users(1: UsersReq request) (api.get="/api/all_user");
 }
