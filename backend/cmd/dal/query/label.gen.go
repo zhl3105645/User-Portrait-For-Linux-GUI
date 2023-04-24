@@ -29,11 +29,11 @@ func newLabel(db *gorm.DB, opts ...gen.DOOption) label {
 	_label.ALL = field.NewAsterisk(tableName)
 	_label.LabelID = field.NewInt64(tableName, "label_id")
 	_label.LabelName = field.NewString(tableName, "label_name")
-	_label.ModelID = field.NewInt64(tableName, "model_id")
-	_label.LabelConvertRule = field.NewString(tableName, "label_convert_rule")
+	_label.IsLeaf = field.NewInt64(tableName, "is_leaf")
+	_label.DataType = field.NewInt64(tableName, "data_type")
+	_label.ParentLabelID = field.NewInt64(tableName, "parent_label_id")
 	_label.LabelSemanticDesc = field.NewString(tableName, "label_semantic_desc")
-	_label.IsConvert = field.NewInt64(tableName, "is_convert")
-	_label.LabelConvertDesc = field.NewString(tableName, "label_convert_desc")
+	_label.AppID = field.NewInt64(tableName, "app_id")
 
 	_label.fillFieldMap()
 
@@ -46,11 +46,11 @@ type label struct {
 	ALL               field.Asterisk
 	LabelID           field.Int64  // 标签ID
 	LabelName         field.String // 标签名
-	ModelID           field.Int64  // 模型ID
-	LabelConvertRule  field.String // 标签数据转换规则
+	IsLeaf            field.Int64  // 是否是叶子标签
+	DataType          field.Int64  // 数据类型
+	ParentLabelID     field.Int64  // 父标签ID
 	LabelSemanticDesc field.String // 标签语义化描述
-	IsConvert         field.Int64  // 是否需要转换
-	LabelConvertDesc  field.String // 标签转换数组
+	AppID             field.Int64  // 应用ID
 
 	fieldMap map[string]field.Expr
 }
@@ -69,11 +69,11 @@ func (l *label) updateTableName(table string) *label {
 	l.ALL = field.NewAsterisk(table)
 	l.LabelID = field.NewInt64(table, "label_id")
 	l.LabelName = field.NewString(table, "label_name")
-	l.ModelID = field.NewInt64(table, "model_id")
-	l.LabelConvertRule = field.NewString(table, "label_convert_rule")
+	l.IsLeaf = field.NewInt64(table, "is_leaf")
+	l.DataType = field.NewInt64(table, "data_type")
+	l.ParentLabelID = field.NewInt64(table, "parent_label_id")
 	l.LabelSemanticDesc = field.NewString(table, "label_semantic_desc")
-	l.IsConvert = field.NewInt64(table, "is_convert")
-	l.LabelConvertDesc = field.NewString(table, "label_convert_desc")
+	l.AppID = field.NewInt64(table, "app_id")
 
 	l.fillFieldMap()
 
@@ -99,11 +99,11 @@ func (l *label) fillFieldMap() {
 	l.fieldMap = make(map[string]field.Expr, 7)
 	l.fieldMap["label_id"] = l.LabelID
 	l.fieldMap["label_name"] = l.LabelName
-	l.fieldMap["model_id"] = l.ModelID
-	l.fieldMap["label_convert_rule"] = l.LabelConvertRule
+	l.fieldMap["is_leaf"] = l.IsLeaf
+	l.fieldMap["data_type"] = l.DataType
+	l.fieldMap["parent_label_id"] = l.ParentLabelID
 	l.fieldMap["label_semantic_desc"] = l.LabelSemanticDesc
-	l.fieldMap["is_convert"] = l.IsConvert
-	l.fieldMap["label_convert_desc"] = l.LabelConvertDesc
+	l.fieldMap["app_id"] = l.AppID
 }
 
 func (l label) clone(db *gorm.DB) label {

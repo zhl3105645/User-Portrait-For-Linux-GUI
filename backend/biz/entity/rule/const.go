@@ -1,6 +1,7 @@
 package rule
 
 import (
+	"backend/biz/entity/event_data"
 	"backend/biz/model/backend"
 	"fmt"
 	"strconv"
@@ -196,4 +197,53 @@ func GetEventCnt(elements []*backend.RuleElement) map[int64]int64 {
 	}
 
 	return res
+}
+
+// 判断是否符合规则
+func MatchEvent(event []string, value []string) bool {
+	if event_data.ComponentNameIndex >= len(event) {
+		return false
+	}
+	eventTyp := event[event_data.EventTypeIndex]
+	mouseClickTyp := event[event_data.MouseClickTypeIndex]
+	mouseClickButton := event[event_data.MouseClickButtonIndex]
+	keyClickTyp := event[event_data.KeyClickTypeIndex]
+	keyValue := event[event_data.KeyCodeIndex]
+	comName := event[event_data.ComponentNameIndex]
+
+	for _, v := range value {
+		ele := ParseEventElement(v)
+		if ele == nil {
+			return false
+		}
+
+		eventTypV := ""
+		mouseClickTypV := ""
+		mouseClickButtonV := ""
+		keyClickTypV := ""
+
+		if ele.EventType != 0 {
+			eventTypV = strconv.FormatInt(ele.EventType, 10)
+		}
+		if ele.MouseClickType != 0 {
+			mouseClickTypV = strconv.FormatInt(ele.MouseClickType, 10)
+		}
+		if ele.MouseClickButton != 0 {
+			mouseClickButtonV = strconv.FormatInt(ele.MouseClickButton, 10)
+		}
+		if ele.KeyClickType != 0 {
+			keyClickTypV = strconv.FormatInt(ele.KeyClickType, 10)
+		}
+
+		if eventTyp == eventTypV &&
+			mouseClickTyp == mouseClickTypV &&
+			mouseClickButton == mouseClickButtonV &&
+			keyClickTyp == keyClickTypV &&
+			keyValue == ele.KeyValue &&
+			strings.HasPrefix(comName, ele.ComponentNamePrefix) {
+			return true
+		}
+	}
+
+	return false
 }

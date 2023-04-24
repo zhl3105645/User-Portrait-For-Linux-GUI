@@ -1,17 +1,13 @@
 package label_gene
 
 import (
-	"backend/biz/usecase/label"
 	"backend/cmd/dal/model"
 	"backend/cmd/dal/query"
 	"backend/consumer/config"
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
 	"gorm.io/gorm"
-	"strconv"
 )
 
 func Gene(appId int64, labelId int64) {
@@ -27,35 +23,15 @@ func Gene(appId int64, labelId int64) {
 		logger.Error("query label failed. err=", err.Error())
 		return
 	}
-	convertRules := make([]*label.ConvertRule, 0)
-	err = json.Unmarshal([]byte(lab.LabelConvertRule), &convertRules)
-	if err != nil {
-		logger.Error("json unmarshal failed. err=", err.Error())
-		return
-	}
 
-	// 模型数据
-	modelDO := query.ModelDatum
-	modelMO := modelDO.WithContext(ctx)
-	modelData, err := modelMO.Where(modelDO.ModelID.Eq(lab.ModelID)).Find()
-	if err != nil {
-		logger.Error("query model data failed. err=", err.Error())
-		return
-	}
-
-	// 数据转换
-	labelDataMap := convert(modelData, convertRules)
-	if len(labelDataMap) == 0 {
-		logger.Info("new data is empty. err=", err.Error())
-		return
-	}
+	labelDataMap := process(ctx, appId, labelId)
 
 	// 写入标签数据
 	newMOs := make([]*model.LabelDatum, 0, len(labelDataMap))
 	for userId, data := range labelDataMap {
 		newMOs = append(newMOs, &model.LabelDatum{
 			LabelDataID: 0,
-			Data:        fmt.Sprintf("%d", data),
+			Data:        data,
 			LabelID:     lab.LabelID,
 			UserID:      userId,
 		})
@@ -116,28 +92,6 @@ func Gene(appId int64, labelId int64) {
 	}
 
 	return
-}
-
-func convert(data []*model.ModelDatum, rules []*label.ConvertRule) map[int64]int64 {
-	res := make(map[int64]int64)
-	for _, d := range data {
-		if d == nil {
-			continue
-		}
-		modelValue, err := strconv.ParseFloat(d.Data, 64)
-		if err != nil {
-			logger.Error("parse float failed. err=", err.Error())
-			continue
-		}
-		for _, rule := range rules {
-			if rule.Match(modelValue) {
-				res[d.UserID] = rule.YValue
-				break
-			}
-		}
-	}
-
-	return res
 }
 
 func geneDone(appId int64) {

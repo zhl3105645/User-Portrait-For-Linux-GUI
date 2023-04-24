@@ -5,25 +5,17 @@
         :default-active="path"
         router
     >
-      <el-menu-item index="/front/user_record">用户行为数据</el-menu-item>
+      <el-menu-item index="/front/user_record">用户</el-menu-item>
       <el-submenu index="2">
         <template v-slot:title>规则</template>
         <el-menu-item-group>
           <template v-slot:title></template>
-          <el-menu-item index="/front/data_mean">数据含义</el-menu-item>
+          <el-menu-item index="/front/seq_mining">序列模式挖掘</el-menu-item>
           <el-menu-item index="/front/event_rule">事件规则</el-menu-item>
           <el-menu-item index="/front/behavior_rule">行为规则</el-menu-item>
-        </el-menu-item-group>
-      </el-submenu>
-      <el-submenu index="3">
-        <template v-slot:title>数据</template>
-        <el-menu-item-group>
-          <template v-slot:title></template>
-          <el-menu-item index="/front/basic_behavior_data">基本行为数据</el-menu-item>
           <el-menu-item index="/front/event_rule_data">规则数据</el-menu-item>
         </el-menu-item-group>
       </el-submenu>
-      <el-menu-item index="/front/statistics_model">模型</el-menu-item>
       <el-menu-item index="/front/label">标签</el-menu-item>
       <el-menu-item index="/front/profile">画像</el-menu-item>
     </el-menu>

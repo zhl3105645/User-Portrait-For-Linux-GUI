@@ -21,6 +21,9 @@ func main() {
 	// 开始
 	go config.ReceiveStatusChange()
 
+	// 测试写入
+	test()
+
 	for {
 		configs, err := config.ReadConfig()
 		if err != nil {
@@ -69,4 +72,8 @@ func main() {
 		// 10s 读取一次
 		time.Sleep(time.Second * 10)
 	}
+}
+
+func test() {
+	label_gene.Gene(2, label_gene.GitFre)
 }

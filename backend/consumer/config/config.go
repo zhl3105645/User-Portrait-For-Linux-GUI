@@ -41,7 +41,7 @@ type Config struct {
 }
 
 func ReadConfig() (*Configs, error) {
-	configFile, err := os.Open("D:\\毕设2\\code\\backend\\consumer\\task.yaml")
+	configFile, err := os.Open("D:\\graudation2\\code\\backend\\consumer\\task.yaml")
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func ReadConfig() (*Configs, error) {
 }
 
 func WriteConfig(configs *Configs) error {
-	configFile, err := os.Create("D:\\毕设2\\code\\backend\\consumer\\task.yaml")
+	configFile, err := os.Create("D:\\graudation2\\code\\backend\\consumer\\task.yaml")
 	if err != nil {
 		return err
 	}

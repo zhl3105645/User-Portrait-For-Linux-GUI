@@ -54,6 +54,6 @@ func (u *Users) GetResp() *backend.UsersResp {
 	return &backend.UsersResp{
 		StatusCode: microtype.SuccessErr.Code,
 		StatusMsg:  microtype.SuccessErr.Msg,
-		Users:      nil,
+		Users:      u.res,
 	}
 }

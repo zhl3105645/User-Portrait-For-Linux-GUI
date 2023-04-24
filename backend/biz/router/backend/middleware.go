@@ -201,3 +201,28 @@ func _usersMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _deleteuserMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _labelsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _treelabelsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _profileMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _profile0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

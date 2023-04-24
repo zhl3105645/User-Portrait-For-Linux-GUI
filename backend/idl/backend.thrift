@@ -55,9 +55,21 @@ struct AccountResp {
 
 struct AddUserReq {
     1: string username (api.body="username");
+    2: string user_gender (api.body="user_gender");
+    3: string user_age (api.body="user_age");
+    4: string user_career (api.body="user_career");
 }
 
 struct AddUserResp {
+    1: i64 status_code
+    2: string status_msg
+}
+
+struct DeleteUserReq {
+
+}
+
+struct DeleteUserResp {
     1: i64 status_code
     2: string status_msg
 }
@@ -72,6 +84,9 @@ struct User {
     1: i64 user_id
     2: string user_name
     3: i64 record_num
+    4: string user_gender
+    5: i64 user_age
+    6: string user_career
 }
 
 struct UserInPageResp {
@@ -288,7 +303,8 @@ struct RuleData {
     2: i64 user_id
     3: string user_name
     4: string begin_time
-    5: EventRuleData event_rule_data
+    5: string use_time
+    //5: EventRuleData event_rule_data
     6: BehaviorRuleData behavior_rule_data
 }
 
@@ -423,21 +439,46 @@ struct DeleteModelResp {
 }
 
 struct ConvertRule {
-    1: string operator
-    2: string x_value
-    3: string y_value
-    4: string y_desc
+    1: string data
+    2: string desc
 }
 
 struct AddLabelReq {
     1: string label_name
-    2: i64 model_id // 模型ID
+    2: string data_type
     3: list<ConvertRule> convert_rules // 规则
+    4: i64 parent_label_id // 父id
 }
 
 struct AddLabelResp {
     1: i64 status_code
     2: string status_msg
+}
+
+struct TreeLabelReq {
+
+}
+
+struct TreeLabel {
+    1: string name
+    2: i64 value
+    3: list<TreeLabel> children
+}
+
+struct TreeLabelResp {
+    1: i64 status_code
+    2: string status_msg
+    3: TreeLabel data
+}
+
+struct LabelsReq {
+
+}
+
+struct LabelsResp {
+    1: i64 status_code
+    2: string status_msg
+    3: list<Label> labels
 }
 
 struct LabelInPageReq {
@@ -478,6 +519,16 @@ struct UsersResp {
     3: list<User> users
 }
 
+struct ProfileReq {
+
+}
+
+struct ProfileResp {
+    1: i64 status_code
+    2: string status_msg
+    3: TreeLabel label
+}
+
 service BackendService {
     // 未登录状态
     // 注册
@@ -492,6 +543,8 @@ service BackendService {
     AccountResp Account(1: AccountReq request) (api.get="/api/account");
     // 添加用户
     AddUserResp AddUser(1: AddUserReq request) (api.post="/api/user");
+    // 删除用户
+    DeleteUserResp DeleteUser(1: DeleteUserReq request) (api.delete="/api/user/:id");
     // 获取用户信息 分页
     UserInPageResp UserInPage(1: UserInPageReq request) (api.get="/api/users");
     // 导入某一用户数据 上传文件
@@ -536,6 +589,10 @@ service BackendService {
     GeneResp GeneModel(1: GeneReq request) (api.post="/api/model/:id");
     // 添加标签
     AddLabelResp AddLabel(1: AddLabelReq request) (api.post="/api/label");
+    // 全部标签
+    LabelsResp Labels(1: LabelsReq request) (api.get="/api/labels");
+    // 树状标签信息
+    TreeLabelResp TreeLabels(1: TreeLabelReq request) (api.get="/api/tree_label");
     // 标签 分页
     LabelInPageResp LabelInPage(1: LabelInPageReq request) (api.get="/api/label");
     // 删除标签
@@ -544,4 +601,6 @@ service BackendService {
     GeneResp GeneLabel(1: GeneReq request) (api.post="/api/label/:id");
     // 全部用户信息
     UsersResp Users(1: UsersReq request) (api.get="/api/all_user");
+    // 获取画像
+    ProfileResp Profile(1: ProfileReq request) (api.get="/api/profile/:id");
 }

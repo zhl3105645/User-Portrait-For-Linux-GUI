@@ -30,10 +30,11 @@ var (
 	AppAddFailed        = &Error{Code: 10002003, Msg: "添加应用失败"}
 	AppFindAllFailed    = &Error{Code: 10002004, Msg: "查询全部应用失败"}
 
-	UserQueryFailed = &Error{Code: 10003001, Msg: "用户查询失败"}
-	UserExist       = &Error{Code: 10003002, Msg: "用户已存在"}
-	UserAddFailed   = &Error{Code: 10003003, Msg: "添加用户失败"}
-	UserNameEmpty   = &Error{Code: 10003004, Msg: "用户名为空"}
+	UserQueryFailed  = &Error{Code: 10003001, Msg: "用户查询失败"}
+	UserExist        = &Error{Code: 10003002, Msg: "用户已存在"}
+	UserAddFailed    = &Error{Code: 10003003, Msg: "添加用户失败"}
+	UserNameEmpty    = &Error{Code: 10003004, Msg: "用户名为空"}
+	UserDeleteFailed = &Error{Code: 10003005, Msg: "用户删除失败"}
 
 	DirOpenFailed = &Error{Code: 10004001, Msg: "打开目录失败"}
 	DirReadFailed = &Error{Code: 10004002, Msg: "读取目录文件失败"}
@@ -75,6 +76,7 @@ var (
 	LabelCreateFailed = &Error{Code: 10013001, Msg: "标签创建失败"}
 	LabelQueryFailed  = &Error{Code: 10013002, Msg: "标签查询失败"}
 	LabelDeleteFailed = &Error{Code: 10013003, Msg: "标签删除失败"}
+	LabelUpdateFailed = &Error{Code: 10013004, Msg: "标签更新失败"}
 
 	LabelDataGeneFailed   = &Error{Code: 10014001, Msg: "标签数据生成失败"}
 	LabelDataQueryFailed  = &Error{Code: 10014002, Msg: "标签数据查询失败"}

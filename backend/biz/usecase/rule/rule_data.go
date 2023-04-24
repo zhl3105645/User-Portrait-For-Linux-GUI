@@ -98,22 +98,22 @@ func (p *PageRuleData) Load(ctx context.Context) error {
 			UserID:           r.UserID,
 			UserName:         r.UserName,
 			BeginTime:        util.GeneTimeFromTimestampMs(r.BeginTime),
-			EventRuleData:    nil,
+			UseTime:          util.GeneTimeDurationFromMs(r.UseTime),
 			BehaviorRuleData: nil,
 		}
 
-		if r.EventRuleValue != nil {
-			eles := make([]*backend.RuleElement, 0)
-			for _, ele := range rule.ParseRuleElements(*r.EventRuleValue, ruleMap) {
-				if ele == nil || ele.RuleID <= 0 {
-					continue
-				}
-				eles = append(eles, ele)
-			}
-			d.EventRuleData = &backend.EventRuleData{
-				RuleElements: eles,
-			}
-		}
+		//if r.EventRuleValue != nil {
+		//	eles := make([]*backend.RuleElement, 0)
+		//	for _, ele := range rule.ParseRuleElements(*r.EventRuleValue, ruleMap) {
+		//		if ele == nil || ele.RuleID <= 0 {
+		//			continue
+		//		}
+		//		eles = append(eles, ele)
+		//	}
+		//	d.EventRuleData = &backend.EventRuleData{
+		//		RuleElements: eles,
+		//	}
+		//}
 		if r.BehaviorRuleValue != nil {
 			eles := rule.ParseRuleElements(*r.BehaviorRuleValue, ruleMap)
 			d.BehaviorRuleData = &backend.BehaviorRuleData{

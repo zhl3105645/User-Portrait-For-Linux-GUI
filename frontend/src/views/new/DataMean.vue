@@ -9,10 +9,10 @@
       :data="tableData" 
       style="width: 100%"
     >
-      <el-table-column fixed prop="component_id" label="ComponentId" width="150" />
-      <el-table-column prop="component_name" label="ComponentName" width="320" />
-      <el-table-column prop="component_type" label="ComponentType" width="120" />
-      <el-table-column prop="component_desc" label="ComponentDesc" width="220" />
+      <el-table-column fixed prop="component_id" label="ID" width="150" />
+      <el-table-column prop="component_name" label="组件名" width="320" />
+      <el-table-column prop="component_type" label="组件类型" width="120" />
+      <el-table-column prop="component_desc" label="组件描述" width="220" />
     </el-table>
 
     <div style="margin: 10px 0">

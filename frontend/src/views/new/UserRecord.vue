@@ -12,6 +12,18 @@
         <el-form-item label="用户名">
           <el-input v-model="form.username"/>
         </el-form-item>
+        <el-form-item label="性别">
+          <el-radio-group v-model="form.user_gender" class="ml-4">
+            <el-radio label="1" size="large">男</el-radio>
+            <el-radio label="2" size="large">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="年龄">
+          <el-input v-model="form.user_age"/>
+        </el-form-item>
+        <el-form-item label="职业">
+          <el-input v-model="form.user_career"/>
+        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -28,15 +40,21 @@
       :data="tableData" 
       style="width: 100%"
     >
-      <el-table-column fixed prop="user_name" label="Username" width="150" />
-      <el-table-column prop="record_num" label="RecordNum" width="120" />
-      <el-table-column fixed="right" label="Operations" width="240">
+      <el-table-column fixed prop="user_name" label="用户名" width="150" />
+      <el-table-column fixed prop="user_gender" label="性别" width="150" />
+      <el-table-column fixed prop="user_age" label="年龄" width="150" />
+      <el-table-column fixed prop="user_career" label="职业" width="150" />
+      <el-table-column prop="record_num" label="使用记录数" width="150" />
+      <el-table-column label="操作" width="300">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click="handleClickView(scope.$index)"
-            >查看数据</el-button
+          <el-button link type="primary" size="small" @click="handleDownload(scope.$index)"
+            >下载数据</el-button
           >
           <el-button link type="primary" size="small" @click="handleClickOpenDialog(scope.$index)"
             >导入数据</el-button
+          >
+          <el-button link type="danger" size="small" @click="handleDeleteUser(scope.row.user_id)"
+            >删除用户</el-button
           >
           <el-dialog v-model="dialogUploadVisible" title="导入数据">
             <el-upload
@@ -152,12 +170,40 @@ export default {
         }
       })
     },
-    handleClickView(index) {
-      console.log("查看数据",index)
+    handleDownload(index) {
+      console.log("下载数据",index)
     },
     handleClickOpenDialog(index) {
       this.rowIndex = index
       this.dialogUploadVisible = true
+    },
+    handleDeleteUser(user_id) {
+      this.$confirm('确定删除？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(res => {
+        request.delete("/api/user/" + user_id).then(res => {
+            console.log(res)
+            if (res.status_code === 0) {
+              this.$message({
+                type: "success",
+                message: "删除成功"
+              })
+              this.load()
+            } else {
+              this.$message({
+                type: "error",
+                message: res.status_msg
+              })
+            }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });          
+      })
     },
     handleFileChange(file, fileList) { // 文件数量改变
       this.fileList = fileList

@@ -10,11 +10,11 @@ const TableNameLabel = "label"
 type Label struct {
 	LabelID           int64   `gorm:"column:label_id;type:bigint;primaryKey;autoIncrement:true" json:"label_id"` // 标签ID
 	LabelName         string  `gorm:"column:label_name;type:varchar(256);not null" json:"label_name"`            // 标签名
-	ModelID           int64   `gorm:"column:model_id;type:bigint;not null" json:"model_id"`                      // 模型ID
-	LabelConvertRule  *string `gorm:"column:label_convert_rule;type:text" json:"label_convert_rule"`             // 标签数据转换规则
-	LabelSemanticDesc string  `gorm:"column:label_semantic_desc;type:text;not null" json:"label_semantic_desc"`  // 标签语义化描述
-	IsConvert         int64   `gorm:"column:is_convert;type:tinyint(1);not null" json:"is_convert"`              // 是否需要转换
-	LabelConvertDesc  *string `gorm:"column:label_convert_desc;type:text" json:"label_convert_desc"`             // 标签转换数组
+	IsLeaf            int64   `gorm:"column:is_leaf;type:tinyint(1);not null" json:"is_leaf"`                    // 是否是叶子标签
+	DataType          int64   `gorm:"column:data_type;type:int;not null" json:"data_type"`                       // 数据类型
+	ParentLabelID     *int64  `gorm:"column:parent_label_id;type:bigint" json:"parent_label_id"`                 // 父标签ID
+	LabelSemanticDesc *string `gorm:"column:label_semantic_desc;type:text" json:"label_semantic_desc"`           // 标签语义化描述
+	AppID             int64   `gorm:"column:app_id;type:bigint;not null" json:"app_id"`                          // 应用ID
 }
 
 // TableName Label's table name

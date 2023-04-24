@@ -85,7 +85,6 @@ func process(events [][]string) *model.Record {
 					keyContinueClickTimeMs += nowTime - lastTime
 				}
 			}
-
 		case event_data.MouseWheel:
 			mouseWheelCnt++
 		case event_data.Shortcut:

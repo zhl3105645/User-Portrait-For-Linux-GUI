@@ -9,21 +9,21 @@ import (
 	"strings"
 )
 
-const EventDataDirPath = "D:\\hadoop_data\\event_data"
-
 type Event struct {
 	appId int64
 
 	// 数据
-	count    map[int64]int64 // uId -> event_record
-	filePath []string        // 文件名
+	count         map[int64]int64    // uId -> event_record
+	filePath      []string           // 文件名
+	uId2FilePaths map[int64][]string // uid -> []path
 }
 
 func NewEvent(appId int64) *Event {
 	return &Event{
-		appId:    appId,
-		count:    make(map[int64]int64),
-		filePath: make([]string, 0),
+		appId:         appId,
+		count:         make(map[int64]int64),
+		filePath:      make([]string, 0),
+		uId2FilePaths: make(map[int64][]string),
 	}
 }
 
@@ -56,7 +56,13 @@ func (e *Event) Load(ctx context.Context) error {
 			e.count[uId] = 1
 		}
 
-		e.filePath = append(e.filePath, fmt.Sprintf(fmt.Sprintf("%s\\%d\\%s", EventDataDirPath, e.appId, fileName)))
+		path := fmt.Sprintf("%s\\%d\\%s", EventDataDirPath, e.appId, fileName)
+		e.filePath = append(e.filePath, path)
+		if v, ok := e.uId2FilePaths[uId]; ok && len(v) > 0 {
+			e.uId2FilePaths[uId] = append(e.uId2FilePaths[uId], path)
+		} else {
+			e.uId2FilePaths[uId] = []string{path}
+		}
 	}
 
 	return nil
@@ -85,4 +91,8 @@ func (e *Event) GetEventsRecordNum() map[int64]int64 {
 
 func (e *Event) GetFilePath() []string {
 	return e.filePath
+}
+
+func (e *Event) GetUId2FilePath() map[int64][]string {
+	return e.uId2FilePaths
 }

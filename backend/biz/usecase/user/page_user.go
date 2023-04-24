@@ -107,10 +107,18 @@ func (p *PageUser) GetResp() *backend.UserInPageResp {
 			continue
 		}
 
+		career := ""
+		if v.UserCareer != nil {
+			career = *v.UserCareer
+		}
+
 		users = append(users, &backend.User{
-			UserID:    v.UserID,
-			UserName:  v.UserName,
-			RecordNum: p.recordNum[v.UserID],
+			UserID:     v.UserID,
+			UserName:   v.UserName,
+			UserAge:    v.UserAge,
+			UserGender: Gender2Desc[Gender(v.UserGender)],
+			UserCareer: career,
+			RecordNum:  p.recordNum[v.UserID],
 		})
 	}
 

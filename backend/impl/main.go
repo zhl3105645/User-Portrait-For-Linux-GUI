@@ -4,6 +4,7 @@ import (
 	"backend/impl/rule"
 	"backend/impl/save"
 	"context"
+	"time"
 )
 
 func main() {
@@ -37,6 +38,9 @@ func main() {
 	//saveData()
 	//Post()
 	//loadDataSource()
+
+	t := time.Now()
+	println(t.Day(), t.Format("2006-01-02"))
 }
 
 func loadRule() {

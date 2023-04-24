@@ -28,6 +28,10 @@ const routes = [
                 component: () => import("@/views/new/DataMean")
             },
             {
+                path: 'seq_mining',
+                component: () => import("@/views/new/SeqMining")
+            },
+            {
                 path: 'event_rule',
                 component: () => import("@/views/new/EventRule")
             },

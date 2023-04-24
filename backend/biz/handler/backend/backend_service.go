@@ -14,6 +14,7 @@ import (
 	"backend/biz/usecase/element"
 	"backend/biz/usecase/label"
 	model2 "backend/biz/usecase/model"
+	"backend/biz/usecase/profile"
 	"backend/biz/usecase/register"
 	"backend/biz/usecase/rule"
 	"backend/biz/usecase/upload"
@@ -149,7 +150,7 @@ func AddUser(ctx context.Context, c *app.RequestContext) {
 	resp := new(backend.AddUserResp)
 
 	ac, _ := c.Get(mw.IdentityKey)
-	al := user.NewUser(ac.(*model.Account).AccountID, req.GetUsername())
+	al := user.NewUser(ac.(*model.Account).AccountID, req)
 	if err := al.Load(ctx); err != nil {
 		mErr := microtype.Unwrap(err)
 		resp.StatusCode = mErr.Code
@@ -816,17 +817,17 @@ func AddLabel(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(backend.AddLabelResp)
 
-	//ac, _ := c.Get(mw.IdentityKey)
-	//al := label.NewAddLabel(ac.(*model.Account).AccountID, req)
-	//if err := al.Load(ctx); err != nil {
-	//	mErr := microtype.Unwrap(err)
-	//	resp.StatusCode = mErr.Code
-	//	resp.StatusMsg = mErr.Msg
-	//	c.JSON(consts.StatusOK, resp)
-	//	return
-	//}
-	//
-	//resp = al.GetResp()
+	ac, _ := c.Get(mw.IdentityKey)
+	al := label.NewAddLabel(ac.(*model.Account).AccountID, req)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -952,6 +953,129 @@ func Users(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// DeleteUser .
+// @router /api/user/:id [DELETE]
+func DeleteUser(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.DeleteUserReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.DeleteUserResp)
+
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "id=%d", id)
+
+	al := user.NewDeleteUser(id)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// Labels .
+// @router /api/labels [GET]
+func Labels(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.LabelsReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.LabelsResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := label.NewLabels(ac.(*model.Account).AccountID)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// TreeLabels .
+// @router /api/tree_label [GET]
+func TreeLabels(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.TreeLabelReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.TreeLabelResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := label.NewTreeLabels(ac.(*model.Account).AccountID, 0, true)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// Profile .
+// @router /api/profile/:id [GET]
+func Profile(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.ProfileReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.ProfileResp)
+
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "id=%d", id)
+
+	al := profile.NewProfile(id)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
 	resp = al.GetResp()
 
 	c.JSON(consts.StatusOK, resp)
