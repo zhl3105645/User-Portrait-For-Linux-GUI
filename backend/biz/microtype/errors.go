@@ -81,6 +81,8 @@ var (
 	LabelDataGeneFailed   = &Error{Code: 10014001, Msg: "标签数据生成失败"}
 	LabelDataQueryFailed  = &Error{Code: 10014002, Msg: "标签数据查询失败"}
 	LabelDataDeleteFailed = &Error{Code: 10014002, Msg: "标签数据删除失败"}
+
+	MQSendFailed = &Error{Code: 10015001, Msg: "消息发送失败"}
 )
 
 func Unwrap(err error) *Error {

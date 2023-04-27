@@ -2,7 +2,7 @@ package event_data
 
 const EventDataDirPath = "D:\\hadoop_data\\event_data"
 
-// MaxNoOperateTimeS 允许最大不操作时间
+// MaxNoOperateTimeS 允许最大不操作时间 五分钟
 const MaxNoOperateTimeS = 60 * 5
 
 type EventType string

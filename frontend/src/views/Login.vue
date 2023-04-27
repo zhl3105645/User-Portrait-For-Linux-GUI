@@ -123,7 +123,7 @@ export default {
                 }
               })
     
-              this.$router.push("/front/home") // 登录界面跳转
+              this.$router.push("/front/label") // 登录界面跳转
             } else {
               this.$message({
                 type: "error",

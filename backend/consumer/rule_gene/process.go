@@ -186,6 +186,36 @@ func getEventRuleID(event []string, eventRules []*rule.EventRuleModel) int64 {
 	keyValue := event[event_data.KeyCodeIndex]
 	comName := event[event_data.ComponentNameIndex]
 
+	eventTypV := int64(0)
+	mouseClickTypV := int64(0)
+	mouseClickButtonV := int64(0)
+	keyClickTypV := int64(0)
+
+	if eventTyp != "" {
+		v, err := strconv.ParseFloat(eventTyp, 64)
+		if err == nil {
+			eventTypV = int64(v)
+		}
+	}
+	if mouseClickTyp != "" {
+		v, err := strconv.ParseFloat(mouseClickTyp, 64)
+		if err == nil {
+			mouseClickTypV = int64(v)
+		}
+	}
+	if mouseClickButton != "" {
+		v, err := strconv.ParseFloat(mouseClickButton, 64)
+		if err == nil {
+			mouseClickButtonV = int64(v)
+		}
+	}
+	if keyClickTyp != "" {
+		v, err := strconv.ParseFloat(keyClickTyp, 64)
+		if err == nil {
+			keyClickTypV = int64(v)
+		}
+	}
+
 	for _, eventRule := range eventRules {
 		if eventRule == nil {
 			continue
@@ -196,33 +226,14 @@ func getEventRuleID(event []string, eventRules []*rule.EventRuleModel) int64 {
 				continue
 			}
 
-			eventTypV := ""
-			mouseClickTypV := ""
-			mouseClickButtonV := ""
-			keyClickTypV := ""
-
-			if ele.EventType != 0 {
-				eventTypV = strconv.FormatInt(ele.EventType, 10)
-			}
-			if ele.MouseClickType != 0 {
-				mouseClickTypV = strconv.FormatInt(ele.MouseClickType, 10)
-			}
-			if ele.MouseClickButton != 0 {
-				mouseClickButtonV = strconv.FormatInt(ele.MouseClickButton, 10)
-			}
-			if ele.KeyClickType != 0 {
-				keyClickTypV = strconv.FormatInt(ele.KeyClickType, 10)
-			}
-
-			if eventTyp == eventTypV &&
-				mouseClickTyp == mouseClickTypV &&
-				mouseClickButton == mouseClickButtonV &&
-				keyClickTyp == keyClickTypV &&
-				keyValue == ele.KeyValue &&
+			if ele.EventType == eventTypV &&
+				ele.MouseClickType == mouseClickTypV &&
+				ele.MouseClickButton == mouseClickButtonV &&
+				ele.KeyClickType == keyClickTypV &&
+				strings.HasPrefix(keyValue, ele.KeyValue) &&
 				strings.HasPrefix(comName, ele.ComponentNamePrefix) {
 				return eventRule.RuleID
 			}
-
 		}
 	}
 

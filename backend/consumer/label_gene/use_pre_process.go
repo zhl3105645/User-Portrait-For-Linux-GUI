@@ -3,6 +3,7 @@ package label_gene
 import (
 	"backend/biz/entity/event_data"
 	"backend/biz/util"
+	"backend/consumer/common"
 	"context"
 	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
@@ -14,7 +15,7 @@ import (
 func processUsePreLabel(ctx context.Context, appId int64, labelId int64) map[int64]string {
 	res := make(map[int64]string)
 	// 数据文件路径
-	userEventPath := getUserEventPath(ctx, appId)
+	userEventPath := common.GetUserEventPath(ctx, appId)
 	if len(userEventPath) == 0 {
 		return res
 	}
@@ -25,7 +26,7 @@ func processUsePreLabel(ctx context.Context, appId int64, labelId int64) map[int
 		beginTimeMap[userId] = make([]int64, 0, len(paths))
 		endTimeMap[userId] = make([]int64, 0, len(paths))
 		for _, path := range paths {
-			events, err := openFile(path)
+			events, err := common.OpenFile(path)
 			if err != nil {
 				logger.Error("open file failed. err=", err.Error())
 				continue

@@ -220,7 +220,7 @@ Rules:
 - Id: 29
   Name: 运行
   Events:
-  - (3|1|1|||MainWindow.menubar.menuExecute.actionCompile)
+  - (3|1|1|||MainWindow.menubar.menuExecute.actionRun)
   - (3|1|1|||MainWindow.toolbarCompile.<class_name=QToolButton,1>)
   - (3|1|1|||MainWindow.<class_name=QMenu>.actionRun)
   - (7|||1|F10|)

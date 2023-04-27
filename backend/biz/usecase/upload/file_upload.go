@@ -81,6 +81,7 @@ func readFile(file *multipart.FileHeader) ([][]string, error) {
 	defer filePtr.Close()
 
 	reader := csv.NewReader(filePtr)
+
 	reader.FieldsPerRecord = -1
 	events, err := reader.ReadAll()
 	if err != nil {
@@ -97,7 +98,6 @@ func writeFile(filePath string, fileName string, events [][]string) error {
 		if err != nil {
 			return err
 		}
-
 	} else if err != nil {
 		return microtype.DirOpenFailed
 	}

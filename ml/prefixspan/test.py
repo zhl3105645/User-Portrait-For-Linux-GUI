@@ -15,8 +15,11 @@ max_seq_length = 200
 
 ################## 函数
 def prefixDemo(db, fre):
-    ps = PrefixSpan(db)
-    print(ps.frequent(fre))
+    ps = PrefixSpan(db) 
+    res = ps.frequent(fre)
+    print(res)
+    with open('./prefixspan/res.txt', 'w') as file:
+        file.write(str(res))
     # print(ps.frequent(2, closed=True))
     # print(ps.topk(5, closed=True))
     # print(ps.frequent(2, generator=True))
@@ -40,6 +43,9 @@ def load_data():
 # 将单条记录转换成可区分event
 def get_custom_event(event):
     custom_event = ""
+    if str(event[0]) == "4":
+        return "" # 去除鼠标移动事件
+
     for idx in range(len(event_indexs)):
         event_idx = event_indexs[idx]
         custom_event = custom_event +"|"+ str(event[event_idx])
@@ -57,6 +63,8 @@ def number_event(data):
         for idx in range(len(events)):
             event = events[idx]
             custom_event = get_custom_event(event)
+            if custom_event == "":
+                continue
             if custom_event in res.keys():
                 continue
             res[custom_event] = number
@@ -73,6 +81,8 @@ def get_number_data(event_data, event2number):
         for idx in range(len(events)):
             event = events[idx]
             custom_event = get_custom_event(event)
+            if custom_event == "":
+                continue
             if custom_event in event2number.keys():
                 number = event2number[custom_event]
                 single_res.append(number)
@@ -110,9 +120,9 @@ json_str = json.dumps(event2number, indent=4)
 with open('./prefixspan/event2number.json', 'w') as json_file:
     json_file.write(json_str)
 numbers = get_number_data(event_data, event2number)
-#print(numbers)
+print(numbers)
 
 db = split_number(numbers)
 print(db)
 print(len(db))
-#prefixDemo(db, int(len(db) * 0.1))
+prefixDemo(db, int(len(db) * 0.3))

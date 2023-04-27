@@ -17,9 +17,10 @@ const (
 	// 技能
 	ProgramLanguage = 12 // C C++
 	CodeSpeed       = 13 // 慢 中 快 TODO
+	CodeAbility     = 19 // 弱 中 强
 	// 行为偏好
 	ShortcutFre = 15 // 偶尔 适中 经常
-	GitFre      = 16 // 未使用 偶尔 适中 经常
+	GitFre      = 16 // 偶尔 适中 经常
 	GitNorm     = 17 // 不规范 一般规范 规范
 )
 
@@ -34,6 +35,14 @@ func process(ctx context.Context, appId int64, labelId int64) map[int64]string {
 
 	if labelId == ProgramLanguage || labelId == CodeSpeed || labelId == ShortcutFre || labelId == GitFre {
 		return processEventCntLabel(ctx, appId, labelId)
+	}
+
+	if labelId == CodeAbility {
+		return ProcessCompileInfo(ctx, appId)
+	}
+
+	if labelId == GitNorm {
+		return ProcessGitDesc(ctx, appId)
 	}
 
 	return nil

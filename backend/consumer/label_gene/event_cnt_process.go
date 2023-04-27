@@ -4,6 +4,7 @@ import (
 	"backend/biz/entity/event_data"
 	"backend/biz/entity/rule"
 	"backend/biz/util"
+	"backend/consumer/common"
 	"context"
 	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
@@ -14,7 +15,7 @@ import (
 func processEventCntLabel(ctx context.Context, appId int64, labelId int64) map[int64]string {
 	res := make(map[int64]string)
 	// 数据文件路径
-	userEventPath := getUserEventPath(ctx, appId)
+	userEventPath := common.GetUserEventPath(ctx, appId)
 	if len(userEventPath) == 0 {
 		return res
 	}
@@ -32,7 +33,7 @@ func processEventCntLabel(ctx context.Context, appId int64, labelId int64) map[i
 		shortcutCnt := int64(0)
 		gitCnt := int64(0)
 		for _, path := range paths {
-			events, err := openFile(path)
+			events, err := common.OpenFile(path)
 			if err != nil {
 				logger.Error("open file failed. err=", err.Error())
 				continue
@@ -65,9 +66,7 @@ func processEventCntLabel(ctx context.Context, appId int64, labelId int64) map[i
 		case ShortcutFre:
 			shortcutCntMap[userId] = shortcutCnt
 		case GitFre:
-			if gitCnt > 0 {
-				gitCntMap[userId] = gitCnt
-			}
+			gitCntMap[userId] = gitCnt
 		default:
 
 		}
@@ -89,12 +88,8 @@ func processEventCntLabel(ctx context.Context, appId int64, labelId int64) map[i
 		}
 	case GitFre:
 		gradeMap := util.GradeByPercent(util.ConvertIntMap2Float(gitCntMap), []float64{0.3, 0.7})
-		for _, userId := range userIds {
-			if v, ok := gitCntMap[userId]; !ok || v == 0 {
-				res[userId] = "1"
-			} else if grade, ok := gradeMap[userId]; ok {
-				res[userId] = fmt.Sprintf("%d", grade+1)
-			}
+		for userId, grade := range gradeMap {
+			res[userId] = fmt.Sprintf("%d", grade)
 		}
 	default:
 	}

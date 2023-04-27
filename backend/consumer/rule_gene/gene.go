@@ -20,7 +20,7 @@ import (
 )
 
 func Gene(appId int64) {
-	defer geneDone(appId)
+	//defer geneDone(appId)
 
 	ctx := context.Background()
 	var (

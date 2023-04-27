@@ -1,0 +1,7 @@
+user_id,msg,cnt
+9,[错误] expected ')' before ';' token,1
+9,[错误] 'c' undeclared (first use in this function),1
+9,[错误] redeclaration of 'a' with no linkage,1
+9,[错误] expected ';' before 'return',2
+9,[错误] subscripted value is neither array nor pointer nor vector,1
+9,[错误] assignment to expression with array type,1

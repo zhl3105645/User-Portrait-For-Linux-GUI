@@ -2,10 +2,11 @@ package util
 
 import (
 	"fmt"
-	"math"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
+	"unicode"
 )
 
 func GeneTimeFromTimestampMs(timestampMs int64) string {
@@ -42,40 +43,37 @@ func Decimal(value float64, p int) float64 {
 	return value
 }
 
-// GradeByPercent 按百分比分级, 返回等级从1开始
+// GradeByPercent 按值域百分比分级, 返回等级从1开始
 func GradeByPercent(data map[int64]float64, percents []float64) map[int64]int64 {
+	if len(data) == 0 {
+		return nil
+	}
+
 	floatData := make([]float64, 0, len(data))
 	for _, d := range data {
 		floatData = append(floatData, d)
 	}
 	sort.Float64s(floatData)
 
-	indexs := make([]int, 0, len(percents))
-	for _, p := range percents {
-		idx := int(math.Round(float64(len(data)) * p))
-		if idx >= len(floatData) {
-			idx = len(floatData) - 1
-		}
-		indexs = append(indexs, idx)
+	min := floatData[0]
+	max := floatData[len(floatData)-1]
+	// n个等级，n+1个分界线
+	grades := make([]float64, 0, len(percents)+1)
+	grades = append(grades, min)
+	for _, per := range percents {
+		grades = append(grades, min+per*(max-min))
 	}
 
 	res := make(map[int64]int64, len(data))
 	for userId, d := range data {
-		grade := 1 //默认最低等级
-		if d < floatData[indexs[0]] {
-			grade = 1
-		} else if d >= floatData[indexs[len(percents)-1]] {
-			grade = len(percents) + 1
-		} else {
-			for g, idx := range indexs {
-				if d >= floatData[idx] {
-					grade = g + 2
-				} else {
-					break
-				}
+		grade := 0
+		for grade < len(grades) {
+			if d >= grades[grade] {
+				grade++
+			} else {
+				break
 			}
 		}
-
 		res[userId] = int64(grade)
 	}
 
@@ -92,4 +90,27 @@ func ConvertIntMap2Float(value map[int64]int64) map[int64]float64 {
 	}
 
 	return res
+}
+
+// GetCharNumberOfString 获取字符串的权重
+func GetCharNumberOfString(s string) int {
+	chCnt := 0
+	enStr := ""
+	for _, v := range s {
+		if unicode.Is(unicode.Han, v) {
+			chCnt++
+		} else {
+			enStr = enStr + string(v)
+		}
+	}
+
+	enCnt := 0
+	ens := strings.Split(enStr, " ")
+	for _, en := range ens {
+		if en != "" {
+			enCnt++
+		}
+	}
+
+	return chCnt/2 + enCnt // 汉字权重为英文一半
 }

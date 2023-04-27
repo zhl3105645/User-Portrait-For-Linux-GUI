@@ -7,6 +7,7 @@ import (
 	"backend/cmd/dal/model"
 	"backend/cmd/dal/query"
 	"context"
+	"github.com/golang/protobuf/proto"
 	"strconv"
 )
 
@@ -18,6 +19,7 @@ type AddUser struct {
 	userName   string
 	userGender Gender
 	userAge    int64
+	userCareer string
 }
 
 func NewUser(accountId int64, req backend.AddUserReq) *AddUser {
@@ -47,6 +49,7 @@ func (u *AddUser) Load(ctx context.Context) error {
 		AppID:      u.appId,
 		UserGender: int64(u.userGender),
 		UserAge:    u.userAge,
+		UserCareer: proto.String(u.userCareer),
 	}
 
 	err := userMO.Create(mo)
@@ -81,6 +84,7 @@ func (u *AddUser) check() bool {
 		return false
 	}
 	u.userAge = age
+	u.userCareer = u.req.UserCareer
 
 	return true
 }
