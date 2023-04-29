@@ -1,4 +1,0 @@
-user_id,msg,cnt
-9,[警告] suggest parentheses around assignment used as truth value [-Wparentheses],1
-9,[警告] division by zero [-Wdiv-by-zero],1
-9,[警告] unused variable 'b' [-Wunused-variable],1

@@ -23,6 +23,8 @@ create TABLE user(
     user_age int not null comment '用户年龄',
     user_career varchar(256) null comment '用户职业',
     app_id bigint not null comment '应用ID',
+    behavior_duration_map text null comment '行为时长map',
+
     primary key (user_id),
     CONSTRAINT a_id2 foreign key (app_id) references app(app_id)
 );
@@ -88,6 +90,7 @@ create TABLE rule_element(
 #     CONSTRAINT m_id foreign key (model_id) references data_model(model_id),
 #     CONSTRAINT u_id foreign key (user_id) references user(user_id)
 # );
+truncate table model_data;
 
 drop table label_data;
 drop table  label;
@@ -116,8 +119,29 @@ create Table label_data (
      CONSTRAINT u_id2 foreign key (user_id) references user(user_id)
 );
 
-drop table record;
+create Table crowd (
+    crowd_id bigint auto_increment comment '人群ID',
+    crowd_name varchar(256) not null comment '人群名',
+    crowd_desc varchar(256) not null comment '人群描述',
+    crowd_divide_rule text not null comment '人群划分规则',
+    app_id bigint not null comment '应用ID',
 
+    primary key (crowd_id),
+    CONSTRAINT a_id8 foreign key (app_id) references app(app_id)
+);
+
+create Table crowd_relation (
+  crowd_relation_id bigint auto_increment comment '人群关系ID',
+  user_id bigint not null comment '用户ID',
+  crowd_id bigint not null comment '人群ID',
+
+  primary key (crowd_relation_id),
+  CONSTRAINT u_id4 foreign key (user_id) references user(user_id),
+  CONSTRAINT c_id foreign key (crowd_id) references crowd(crowd_id)
+);
+
+drop table record;
+# hive
 create TABLE record (
     record_id bigint auto_increment comment '使用记录ID',
     user_id bigint not null comment '用户ID',
@@ -130,8 +154,8 @@ create TABLE record (
     key_click_cnt bigint null comment '键盘点击次数',
     key_click_speed double null comment '键盘点击速度 字符/min',
     shortcut_cnt bigint null comment '快捷键次数',
-    event_rule_value text null comment '事件规则数据',
-    behavior_rule_value text null comment '行为规则数据',
+    event_rule_value longtext null comment '事件规则数据',
+    behavior_rule_value longtext null comment '行为规则数据',
 
     primary key (record_id),
     constraint u_id3 foreign key (user_id) references user(user_id)

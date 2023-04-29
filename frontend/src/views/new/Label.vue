@@ -228,7 +228,7 @@ export default {
           }
         ]
       }
-      console.log("option",option)
+      //console.log("option",option)
       this.tree_label_chart.setOption(option)
     }
 

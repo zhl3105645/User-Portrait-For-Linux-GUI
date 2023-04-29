@@ -16,19 +16,21 @@ import (
 )
 
 var (
-	Q           = new(Query)
-	Account     *account
-	App         *app
-	Component   *component
-	DataModel   *dataModel
-	DataSource  *dataSource
-	Label       *label
-	LabelDatum  *labelDatum
-	ModelDatum  *modelDatum
-	Record      *record
-	Rule        *rule
-	RuleElement *ruleElement
-	User        *user
+	Q             = new(Query)
+	Account       *account
+	App           *app
+	Component     *component
+	Crowd         *crowd
+	CrowdRelation *crowdRelation
+	DataModel     *dataModel
+	DataSource    *dataSource
+	Label         *label
+	LabelDatum    *labelDatum
+	ModelDatum    *modelDatum
+	Record        *record
+	Rule          *rule
+	RuleElement   *ruleElement
+	User          *user
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
@@ -36,6 +38,8 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	Account = &Q.Account
 	App = &Q.App
 	Component = &Q.Component
+	Crowd = &Q.Crowd
+	CrowdRelation = &Q.CrowdRelation
 	DataModel = &Q.DataModel
 	DataSource = &Q.DataSource
 	Label = &Q.Label
@@ -49,56 +53,62 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:          db,
-		Account:     newAccount(db, opts...),
-		App:         newApp(db, opts...),
-		Component:   newComponent(db, opts...),
-		DataModel:   newDataModel(db, opts...),
-		DataSource:  newDataSource(db, opts...),
-		Label:       newLabel(db, opts...),
-		LabelDatum:  newLabelDatum(db, opts...),
-		ModelDatum:  newModelDatum(db, opts...),
-		Record:      newRecord(db, opts...),
-		Rule:        newRule(db, opts...),
-		RuleElement: newRuleElement(db, opts...),
-		User:        newUser(db, opts...),
+		db:            db,
+		Account:       newAccount(db, opts...),
+		App:           newApp(db, opts...),
+		Component:     newComponent(db, opts...),
+		Crowd:         newCrowd(db, opts...),
+		CrowdRelation: newCrowdRelation(db, opts...),
+		DataModel:     newDataModel(db, opts...),
+		DataSource:    newDataSource(db, opts...),
+		Label:         newLabel(db, opts...),
+		LabelDatum:    newLabelDatum(db, opts...),
+		ModelDatum:    newModelDatum(db, opts...),
+		Record:        newRecord(db, opts...),
+		Rule:          newRule(db, opts...),
+		RuleElement:   newRuleElement(db, opts...),
+		User:          newUser(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Account     account
-	App         app
-	Component   component
-	DataModel   dataModel
-	DataSource  dataSource
-	Label       label
-	LabelDatum  labelDatum
-	ModelDatum  modelDatum
-	Record      record
-	Rule        rule
-	RuleElement ruleElement
-	User        user
+	Account       account
+	App           app
+	Component     component
+	Crowd         crowd
+	CrowdRelation crowdRelation
+	DataModel     dataModel
+	DataSource    dataSource
+	Label         label
+	LabelDatum    labelDatum
+	ModelDatum    modelDatum
+	Record        record
+	Rule          rule
+	RuleElement   ruleElement
+	User          user
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:          db,
-		Account:     q.Account.clone(db),
-		App:         q.App.clone(db),
-		Component:   q.Component.clone(db),
-		DataModel:   q.DataModel.clone(db),
-		DataSource:  q.DataSource.clone(db),
-		Label:       q.Label.clone(db),
-		LabelDatum:  q.LabelDatum.clone(db),
-		ModelDatum:  q.ModelDatum.clone(db),
-		Record:      q.Record.clone(db),
-		Rule:        q.Rule.clone(db),
-		RuleElement: q.RuleElement.clone(db),
-		User:        q.User.clone(db),
+		db:            db,
+		Account:       q.Account.clone(db),
+		App:           q.App.clone(db),
+		Component:     q.Component.clone(db),
+		Crowd:         q.Crowd.clone(db),
+		CrowdRelation: q.CrowdRelation.clone(db),
+		DataModel:     q.DataModel.clone(db),
+		DataSource:    q.DataSource.clone(db),
+		Label:         q.Label.clone(db),
+		LabelDatum:    q.LabelDatum.clone(db),
+		ModelDatum:    q.ModelDatum.clone(db),
+		Record:        q.Record.clone(db),
+		Rule:          q.Rule.clone(db),
+		RuleElement:   q.RuleElement.clone(db),
+		User:          q.User.clone(db),
 	}
 }
 
@@ -112,51 +122,57 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:          db,
-		Account:     q.Account.replaceDB(db),
-		App:         q.App.replaceDB(db),
-		Component:   q.Component.replaceDB(db),
-		DataModel:   q.DataModel.replaceDB(db),
-		DataSource:  q.DataSource.replaceDB(db),
-		Label:       q.Label.replaceDB(db),
-		LabelDatum:  q.LabelDatum.replaceDB(db),
-		ModelDatum:  q.ModelDatum.replaceDB(db),
-		Record:      q.Record.replaceDB(db),
-		Rule:        q.Rule.replaceDB(db),
-		RuleElement: q.RuleElement.replaceDB(db),
-		User:        q.User.replaceDB(db),
+		db:            db,
+		Account:       q.Account.replaceDB(db),
+		App:           q.App.replaceDB(db),
+		Component:     q.Component.replaceDB(db),
+		Crowd:         q.Crowd.replaceDB(db),
+		CrowdRelation: q.CrowdRelation.replaceDB(db),
+		DataModel:     q.DataModel.replaceDB(db),
+		DataSource:    q.DataSource.replaceDB(db),
+		Label:         q.Label.replaceDB(db),
+		LabelDatum:    q.LabelDatum.replaceDB(db),
+		ModelDatum:    q.ModelDatum.replaceDB(db),
+		Record:        q.Record.replaceDB(db),
+		Rule:          q.Rule.replaceDB(db),
+		RuleElement:   q.RuleElement.replaceDB(db),
+		User:          q.User.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Account     IAccountDo
-	App         IAppDo
-	Component   IComponentDo
-	DataModel   IDataModelDo
-	DataSource  IDataSourceDo
-	Label       ILabelDo
-	LabelDatum  ILabelDatumDo
-	ModelDatum  IModelDatumDo
-	Record      IRecordDo
-	Rule        IRuleDo
-	RuleElement IRuleElementDo
-	User        IUserDo
+	Account       IAccountDo
+	App           IAppDo
+	Component     IComponentDo
+	Crowd         ICrowdDo
+	CrowdRelation ICrowdRelationDo
+	DataModel     IDataModelDo
+	DataSource    IDataSourceDo
+	Label         ILabelDo
+	LabelDatum    ILabelDatumDo
+	ModelDatum    IModelDatumDo
+	Record        IRecordDo
+	Rule          IRuleDo
+	RuleElement   IRuleElementDo
+	User          IUserDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Account:     q.Account.WithContext(ctx),
-		App:         q.App.WithContext(ctx),
-		Component:   q.Component.WithContext(ctx),
-		DataModel:   q.DataModel.WithContext(ctx),
-		DataSource:  q.DataSource.WithContext(ctx),
-		Label:       q.Label.WithContext(ctx),
-		LabelDatum:  q.LabelDatum.WithContext(ctx),
-		ModelDatum:  q.ModelDatum.WithContext(ctx),
-		Record:      q.Record.WithContext(ctx),
-		Rule:        q.Rule.WithContext(ctx),
-		RuleElement: q.RuleElement.WithContext(ctx),
-		User:        q.User.WithContext(ctx),
+		Account:       q.Account.WithContext(ctx),
+		App:           q.App.WithContext(ctx),
+		Component:     q.Component.WithContext(ctx),
+		Crowd:         q.Crowd.WithContext(ctx),
+		CrowdRelation: q.CrowdRelation.WithContext(ctx),
+		DataModel:     q.DataModel.WithContext(ctx),
+		DataSource:    q.DataSource.WithContext(ctx),
+		Label:         q.Label.WithContext(ctx),
+		LabelDatum:    q.LabelDatum.WithContext(ctx),
+		ModelDatum:    q.ModelDatum.WithContext(ctx),
+		Record:        q.Record.WithContext(ctx),
+		Rule:          q.Rule.WithContext(ctx),
+		RuleElement:   q.RuleElement.WithContext(ctx),
+		User:          q.User.WithContext(ctx),
 	}
 }
 

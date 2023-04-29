@@ -44,6 +44,8 @@ func main() {
 	Rule := g.GenerateModel("rule")
 	RuleElement := g.GenerateModel("rule_element")
 	User := g.GenerateModel("user")
+	Crowd := g.GenerateModel("crowd")
+	CrowdRelation := g.GenerateModel("crowd_relation")
 	Record := g.GenerateModel("record")
 
 	// 创建有关联关系的模型文件
@@ -55,7 +57,12 @@ func main() {
 	//		gen.FieldRelate(field.HasMany, "user", User, &field.RelateConfig{GORMTag: "foreignKey:UID"}),
 	//	)...,
 	//)
-	g.ApplyBasic(App, Account, Component, DataSource, Label, LabelData, DataModel, ModelData, Rule, RuleElement, User, Record)
+	g.ApplyBasic(
+		App, Account, Component, DataSource,
+		Label, LabelData, DataModel, ModelData,
+		Rule, RuleElement, User, Record,
+		Crowd, CrowdRelation,
+	)
 
 	g.Execute()
 }

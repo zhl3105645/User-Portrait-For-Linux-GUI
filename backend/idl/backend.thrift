@@ -491,6 +491,13 @@ struct Label {
     1: string label_name
     2: i64 label_id
     3: ChartOption option
+    4: i64 label_data_type // 标签数据类型
+    5: list<LabelEnumData> data // 标签数据枚举值
+}
+
+struct LabelEnumData {
+    1: string data
+    2: string desc
 }
 
 struct LabelInPageResp {
@@ -527,6 +534,53 @@ struct ProfileResp {
     1: i64 status_code
     2: string status_msg
     3: TreeLabel label
+}
+
+struct AddCrowdReq {
+    1: string crowd_name  (api.body="crowd_name")
+    2: string crowd_desc  (api.body="crowd_desc")
+    3: list<DivideRule> divide_rules  (api.body="divide_rules")
+}
+struct DivideRule {
+    1: i64 divide_operate  (api.body="divide_operate")
+    2: string label_data  (api.body="label_data")
+    3: i64 label_id  (api.body="label_id")
+    4: i64 union_operate  (api.body="union_operate")
+}
+
+struct AddCrowdResp {
+    1: i64 status_code
+    2: string status_msg
+}
+
+struct CrowdInPageReq {
+    1: i64 page_num
+    2: i64 page_size
+    3: string search
+}
+
+struct Crowd {
+    1: string crowd_name
+    2: string crowd_desc
+    3: list<DivideRule> divide_rules
+    4: i64 user_num
+    5: i64 crowd_id
+}
+
+struct CrowdInPageResp {
+    1: i64 status_code
+    2: string status_msg
+    3: i64 total
+    4: list<Crowd> crowds
+}
+
+struct DeleteCrowdReq {
+
+}
+
+struct DeleteCrowdResp {
+    1: i64 status_code
+    2: string status_msg
 }
 
 service BackendService {
@@ -603,4 +657,12 @@ service BackendService {
     UsersResp Users(1: UsersReq request) (api.get="/api/all_user");
     // 获取画像
     ProfileResp Profile(1: ProfileReq request) (api.get="/api/profile/:id");
+    // 添加人群
+    AddCrowdResp AddCrowd(1: AddCrowdReq request) (api.post="/api/crowd");
+    // 人群分页
+    CrowdInPageResp CrowdInPage(1: CrowdInPageReq request) (api.get="/api/crowd");
+    // 生成人群数据
+    GeneResp GeneCrowd(1: GeneReq request) (api.post="/api/crowd/:id");
+    // 删除人群
+    DeleteCrowdResp DeleteCrowd(1: DeleteCrowdReq request) (api.delete="/api/crowd/:id");
 }

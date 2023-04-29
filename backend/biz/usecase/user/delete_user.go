@@ -18,9 +18,22 @@ func NewDeleteUser(userId int64) *DeleteUser {
 }
 
 func (d *DeleteUser) Load(ctx context.Context) error {
+	// 删除用户数据
+	_, err := query.LabelDatum.WithContext(ctx).Where(query.LabelDatum.UserID.Eq(d.userId)).Delete()
+	if err != nil {
+		return err
+	}
+	_, err = query.CrowdRelation.WithContext(ctx).Where(query.CrowdRelation.UserID.Eq(d.userId)).Delete()
+	if err != nil {
+		return err
+	}
+	_, err = query.Record.WithContext(ctx).Where(query.Record.UserID.Eq(d.userId)).Delete()
+	if err != nil {
+		return err
+	}
 
 	// 删除用户
-	_, err := query.User.WithContext(ctx).Where(query.User.UserID.Eq(d.userId)).Delete()
+	_, err = query.User.WithContext(ctx).Where(query.User.UserID.Eq(d.userId)).Delete()
 	if err != nil {
 		return microtype.UserQueryFailed
 	}

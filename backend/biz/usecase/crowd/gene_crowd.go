@@ -1,39 +1,39 @@
-package rule
+package crowd
 
 import (
-	"backend/biz/entity/account"
 	"backend/biz/microtype"
 	"backend/biz/model/backend"
 	"backend/biz/mq"
+	"backend/cmd/dal/query"
 	"context"
 	"encoding/json"
 )
 
-type GeneRule struct {
-	accountId int64
+type GeneCrowd struct {
+	crowdId int64
 
 	//
 	appId int64
 }
 
-func NewGeneRule(accountId int64) *GeneRule {
-	return &GeneRule{
-		accountId: accountId,
+func NewGeneCrowd(crowdId int64) *GeneCrowd {
+	return &GeneCrowd{
+		crowdId: crowdId,
 	}
 }
 
-func (p *GeneRule) Load(ctx context.Context) error {
-	ac := account.NewAccount(p.accountId, 0, "", "", 0, account.IdQuery)
-	if err := ac.Load(ctx); err != nil {
+func (g *GeneCrowd) Load(ctx context.Context) error {
+	crowd, err := query.Crowd.WithContext(ctx).Where(query.Crowd.CrowdID.Eq(g.crowdId)).First()
+	if err != nil {
 		return err
 	}
 
-	p.appId = ac.GetQueryAccount().AppID
+	g.appId = crowd.AppID
 
 	msg := &mq.GeneMsg{
-		AppId: p.appId,
-		Type:  mq.RuleGene,
-		Param: 0,
+		AppId: g.appId,
+		Type:  mq.CrowdGene,
+		Param: g.crowdId,
 	}
 	msgJson, err := json.Marshal(msg)
 	if err != nil {
@@ -48,7 +48,7 @@ func (p *GeneRule) Load(ctx context.Context) error {
 	return nil
 }
 
-func (p *GeneRule) GetResp() *backend.GeneResp {
+func (g *GeneCrowd) GetResp() *backend.GeneResp {
 	return &backend.GeneResp{
 		StatusCode: microtype.SuccessErr.Code,
 		StatusMsg:  microtype.SuccessErr.Msg,

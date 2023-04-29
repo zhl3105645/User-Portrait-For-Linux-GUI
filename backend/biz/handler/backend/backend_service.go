@@ -10,6 +10,7 @@ import (
 	"backend/biz/usecase/applist"
 	"backend/biz/usecase/basic_behavior"
 	"backend/biz/usecase/component"
+	"backend/biz/usecase/crowd"
 	"backend/biz/usecase/data_source"
 	"backend/biz/usecase/element"
 	"backend/biz/usecase/label"
@@ -1076,6 +1077,132 @@ func Profile(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusOK, resp)
 		return
 	}
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// AddCrowd .
+// @router /api/crowd [POST]
+func AddCrowd(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.AddCrowdReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.AddCrowdResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := crowd.NewAddCrowd(ac.(*model.Account).AccountID, req)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// CrowdInPage .
+// @router /api/crowd [GET]
+func CrowdInPage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.CrowdInPageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.CrowdInPageResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := crowd.NewPageInCrowd(ac.(*model.Account).AccountID, req.PageNum, req.PageSize, req.Search)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// GeneCrowd .
+// @router /api/crowd/:id [POST]
+func GeneCrowd(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.GeneReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.GeneResp)
+
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "id=%d", id)
+
+	al := crowd.NewGeneCrowd(id)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// DeleteCrowd .
+// @router /api/crowd/:id [DELETE]
+func DeleteCrowd(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.DeleteCrowdReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.DeleteCrowdResp)
+
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "id=%d", id)
+
+	al := crowd.NewDeleteCrowd(id)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
 	resp = al.GetResp()
 
 	c.JSON(consts.StatusOK, resp)

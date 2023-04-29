@@ -19,8 +19,8 @@ type Record struct {
 	KeyClickCnt       *int64   `gorm:"column:key_click_cnt;type:bigint" json:"key_click_cnt"`                       // 键盘点击次数
 	KeyClickSpeed     *float64 `gorm:"column:key_click_speed;type:double" json:"key_click_speed"`                   // 键盘点击速度 字符/min
 	ShortcutCnt       *int64   `gorm:"column:shortcut_cnt;type:bigint" json:"shortcut_cnt"`                         // 快捷键次数
-	EventRuleValue    *string  `gorm:"column:event_rule_value;type:text" json:"event_rule_value"`                   // 事件规则数据
-	BehaviorRuleValue *string  `gorm:"column:behavior_rule_value;type:text" json:"behavior_rule_value"`             // 行为规则数据
+	EventRuleValue    *string  `gorm:"column:event_rule_value;type:longtext" json:"event_rule_value"`               // 事件规则数据
+	BehaviorRuleValue *string  `gorm:"column:behavior_rule_value;type:longtext" json:"behavior_rule_value"`         // 行为规则数据
 }
 
 // TableName Record's table name

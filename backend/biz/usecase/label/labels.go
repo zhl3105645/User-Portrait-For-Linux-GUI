@@ -6,6 +6,7 @@ import (
 	"backend/biz/model/backend"
 	"backend/cmd/dal/query"
 	"context"
+	"encoding/json"
 	"errors"
 	"gorm.io/gorm"
 )
@@ -43,9 +44,25 @@ func (l *Labels) Load(ctx context.Context) error {
 			continue
 		}
 
+		data := make([]*backend.LabelEnumData, 0)
+		if lab.LabelSemanticDesc != nil {
+			descMap := make(map[string]string)
+			err := json.Unmarshal([]byte(*lab.LabelSemanticDesc), &descMap)
+			if err == nil {
+				for d, desc := range descMap {
+					data = append(data, &backend.LabelEnumData{
+						Data: d,
+						Desc: desc,
+					})
+				}
+			}
+		}
+
 		l.res = append(l.res, &backend.Label{
-			LabelName: lab.LabelName,
-			LabelID:   lab.LabelID,
+			LabelName:     lab.LabelName,
+			LabelID:       lab.LabelID,
+			LabelDataType: lab.DataType,
+			Data:          data,
 		})
 	}
 

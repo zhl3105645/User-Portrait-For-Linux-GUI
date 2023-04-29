@@ -138,7 +138,8 @@ func processCodeSpeed(events [][]string) (keyClickCnt int64, duration int64) {
 
 	match := false // 上次事件是否为键盘输入
 	lastTime := int64(0)
-	for _, event := range events {
+	for i := 1; i < len(events); i++ {
+		event := events[i]
 		timeStr := event[event_data.EventTimeIndex]
 		timeStamp, err := strconv.ParseInt(timeStr, 10, 64)
 		if err != nil {

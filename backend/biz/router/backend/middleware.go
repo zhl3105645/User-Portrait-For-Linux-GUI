@@ -226,3 +226,28 @@ func _profile0Mw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func __ddcrowdMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _crowdinpageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _crowdMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _genecrowdMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletecrowdMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -3,7 +3,10 @@ package label
 import (
 	"backend/biz/microtype"
 	"backend/biz/model/backend"
+	"backend/biz/mq"
+	"backend/cmd/dal/query"
 	"context"
+	"encoding/json"
 )
 
 type GeneLabel struct {
@@ -20,56 +23,28 @@ func NewGeneLabel(labelId int64) *GeneLabel {
 }
 
 func (g *GeneLabel) Load(ctx context.Context) error {
-	//if g.labelId <= 0 {
-	//	return microtype.ParamCheckFailed
-	//}
-	//
-	//label, err := query.Label.WithContext(ctx).Where(query.Label.LabelID.Eq(g.labelId)).First()
-	//if err != nil {
-	//	return microtype.LabelQueryFailed
-	//}
-	//model, err := query.DataModel.WithContext(ctx).Where(query.DataModel.ModelID.Eq(label.ModelID)).First()
-	//if err != nil {
-	//	return microtype.DataModelQueryFailed
-	//}
-	//g.appId = model.AppID
-	//
-	//conf, err := config.ReadConfig()
-	//if err != nil {
-	//	return err
-	//}
-	//
-	//// app_id typ=LabelGene status=begin
-	//if len(conf.Configs) == 0 {
-	//	conf.Configs = make(map[int64]*config.Config)
-	//	conf.Configs[g.appId] = &config.Config{}
-	//}
-	//
-	//if conf.Configs[g.appId] == nil {
-	//	conf.Configs[g.appId] = &config.Config{}
-	//}
-	//
-	//if len(conf.Configs[g.appId].Config) == 0 {
-	//	conf.Configs[g.appId].Config = make(map[config.TaskType]config.Status)
-	//}
-	//
-	//if len(conf.Configs[g.appId].Param) == 0 {
-	//	conf.Configs[g.appId].Param = make(map[config.TaskType]int64)
-	//}
-	//
-	//status := conf.Configs[g.appId].Config[config.LabelGene]
-	//if status != config.Stop {
-	//	return microtype.ModelDataGeneFailed
-	//}
-	//
-	//conf.Configs[g.appId].Param[config.LabelGene] = label.LabelID
-	//conf.Configs[g.appId].Config[config.LabelGene] = config.Begin
-	//
-	//err = config.WriteConfig(conf)
-	//if err != nil {
-	//	return err
-	//}
-	//
+	label, err := query.Label.WithContext(ctx).Where(query.Label.LabelID.Eq(g.labelId)).First()
+	if err != nil {
+		return err
+	}
+
+	g.appId = label.AppID
+
+	msg := &mq.GeneMsg{
+		AppId: g.appId,
+		Type:  mq.CrowdGene,
+		Param: g.labelId,
+	}
+	msgJson, err := json.Marshal(msg)
+	if err != nil {
+		return microtype.JsonMarshalFailed
+	}
+
+	err = mq.SendSyncMessage(string(msgJson))
+	if err != nil {
+		return microtype.MQSendFailed
+	}
+
 	return nil
 }
 

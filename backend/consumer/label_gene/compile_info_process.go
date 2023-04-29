@@ -57,8 +57,8 @@ func ProcessCompileInfo(ctx context.Context, appId int64) map[int64]string {
 	}
 
 	// 写入文件，作为记录
-	common.WriteToDataToPath(warningCntMap, "D:\\graudation2\\code\\backend\\consumer\\label_gene\\data\\compile_warning.csv", []string{"user_id", "msg", "cnt"})
-	common.WriteToDataToPath(errorCntMap, "D:\\graudation2\\code\\backend\\consumer\\label_gene\\data\\compile_error.csv", []string{"user_id", "msg", "cnt"})
+	// common.WriteToDataToPath(warningCntMap, "D:\\graudation2\\code\\backend\\consumer\\label_gene\\data\\compile_warning.csv", []string{"user_id", "msg", "cnt"})
+	// common.WriteToDataToPath(errorCntMap, "D:\\graudation2\\code\\backend\\consumer\\label_gene\\data\\compile_error.csv", []string{"user_id", "msg", "cnt"})
 
 	// 错误权重累计
 	warningWeight := int64(1)

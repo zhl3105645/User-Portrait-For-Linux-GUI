@@ -8,7 +8,7 @@ from sklearn.metrics import silhouette_score
 import joblib
 
 # 读取数据
-df = pd.read_csv('./cluster/data/test_data.csv')
+df = pd.read_csv('./cluster/data/test_data2.csv')
 data = df.values
 print('data')
 print(data)
@@ -49,6 +49,6 @@ plt.show()
 
 # 保存模型
 
-joblib.dump(dbscan, './cluster/model/dbscan_model.pkl')
-joblib.dump(scaler, './cluster/model/dbscan_scaler.pkl')
-joblib.dump(pca, './cluster/model/dbscan_pca.pkl') 
+# joblib.dump(dbscan, './cluster/model/dbscan_model.pkl')
+# joblib.dump(scaler, './cluster/model/dbscan_scaler.pkl')
+# joblib.dump(pca, './cluster/model/dbscan_pca.pkl') 

@@ -8,12 +8,13 @@ const TableNameUser = "user"
 
 // User mapped from table <user>
 type User struct {
-	UserID     int64   `gorm:"column:user_id;type:bigint;primaryKey;autoIncrement:true" json:"user_id"` // 用户ID
-	UserName   string  `gorm:"column:user_name;type:varchar(256);not null" json:"user_name"`            // 用户名
-	AppID      int64   `gorm:"column:app_id;type:bigint;not null" json:"app_id"`                        // 应用ID
-	UserGender int64   `gorm:"column:user_gender;type:int;not null" json:"user_gender"`                 // 性别
-	UserAge    int64   `gorm:"column:user_age;type:int;not null" json:"user_age"`                       // 年龄
-	UserCareer *string `gorm:"column:user_career;type:varchar(256)" json:"user_career"`                 // 职业
+	UserID              int64   `gorm:"column:user_id;type:bigint;primaryKey;autoIncrement:true" json:"user_id"` // 用户ID
+	UserName            string  `gorm:"column:user_name;type:varchar(256);not null" json:"user_name"`            // 用户名
+	AppID               int64   `gorm:"column:app_id;type:bigint;not null" json:"app_id"`                        // 应用ID
+	UserGender          int64   `gorm:"column:user_gender;type:int;not null" json:"user_gender"`                 // 性别
+	UserAge             int64   `gorm:"column:user_age;type:int;not null" json:"user_age"`                       // 年龄
+	UserCareer          *string `gorm:"column:user_career;type:varchar(256)" json:"user_career"`                 // 职业
+	BehaviorDurationMap *string `gorm:"column:behavior_duration_map;type:text" json:"behavior_duration_map"`     // 行为时长map
 }
 
 // TableName User's table name

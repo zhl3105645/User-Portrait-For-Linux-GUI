@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/biz/mq"
+	"backend/consumer/crowd_gene"
 	"backend/consumer/label_gene"
 	"backend/consumer/rule_gene"
 	"encoding/json"
@@ -28,6 +29,8 @@ func handleMsg(msg *primitive.MessageExt) {
 		go rule_gene.Gene(param.AppId)
 	case mq.LabelGene:
 		go label_gene.Gene(param.AppId, param.Param)
+	case mq.CrowdGene:
+		go crowd_gene.Gene(param.AppId, param.Param)
 	default:
 	}
 

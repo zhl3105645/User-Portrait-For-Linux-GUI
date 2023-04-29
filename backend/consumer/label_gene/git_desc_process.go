@@ -42,7 +42,7 @@ func ProcessGitDesc(ctx context.Context, appId int64) map[int64]string {
 	}
 
 	// 写入文件，作为记录
-	common.WriteToDataToPath(gitMsgCntMap, "D:\\graudation2\\code\\backend\\consumer\\label_gene\\data\\git_msg.csv", []string{"user_id", "git_msg", "msg_cnt"})
+	// common.WriteToDataToPath(gitMsgCntMap, "D:\\graudation2\\code\\backend\\consumer\\label_gene\\data\\git_msg.csv", []string{"user_id", "git_msg", "msg_cnt"})
 
 	// 规则匹配
 	aveScoreMap := make(map[int64]float64)

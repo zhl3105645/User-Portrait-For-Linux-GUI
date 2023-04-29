@@ -16,13 +16,13 @@ type RuleData struct {
 	Time int64 // 发生时间
 }
 
-func process(events [][]string, eventRules []*rule.EventRuleModel, behaviorRules []*rule.BehaviorRuleModel) *model.Record {
+func process(events [][]string, eventRules []*rule.EventRuleModel, behaviorRules []*rule.BehaviorRuleModel, ruleDescMap map[int64]string) (*model.Record, map[int64]int64) {
 	beginTimeMs := int64(0)
 	useTimeMs := int64(0)
 	beginTime, endTime, err := getAppUseTime(events)
 	if err != nil {
 		logger.Error("get app use time failed. err=", err.Error())
-		return nil
+		return nil, nil
 	}
 	beginTimeMs = beginTime
 	useTimeMs = endTime - beginTime
@@ -75,14 +75,17 @@ func process(events [][]string, eventRules []*rule.EventRuleModel, behaviorRules
 		behaviorData = behaviorData + fmt.Sprintf("(%d,%d)", ruleData.ID, ruleData.Time)
 	}
 
+	eles := rule.ParseRuleElements(behaviorData, ruleDescMap)
+	// 行为时长map
+	durationMap := rule.GetBehaviorDuration(eles)
+
 	return &model.Record{
 		UserID:            0,
 		BeginTime:         beginTimeMs,
 		UseTime:           useTimeMs,
 		EventRuleValue:    proto.String(eventData),
 		BehaviorRuleValue: proto.String(behaviorData),
-	}
-
+	}, durationMap
 }
 
 // 返回行为ID序列

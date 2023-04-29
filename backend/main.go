@@ -7,6 +7,7 @@ import (
 	"backend/biz/mw"
 	"backend/cmd/dal"
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/common/config"
 )
 
 func main() {
@@ -14,7 +15,11 @@ func main() {
 	mw.InitJwt()
 	mq.Init()
 
-	h := server.Default()
+	h := server.Default(config.Option{
+		F: func(o *config.Options) {
+			o.MaxRequestBodySize = 50 * 1024 * 1024
+		},
+	})
 
 	register(h)
 	h.Spin()

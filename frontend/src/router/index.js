@@ -48,6 +48,10 @@ const routes = [
                 component: () => import("@/views/new/Label")
             },
             {
+                path: 'crowd',
+                component: () => import("@/views/new/Crowd")
+            },
+            {
                 path: 'learning_model',
                 component: () => import("@/views/new/LearningModel")
             },

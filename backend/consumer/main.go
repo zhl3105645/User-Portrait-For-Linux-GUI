@@ -20,19 +20,14 @@ import (
 
 func main() {
 	// init
-	dal.Init() // sql 初始化
-	// InitConsumer() // consumer 初始化
+	dal.Init()     // sql 初始化
+	InitConsumer() // consumer 初始化
 	// oldSolution() // 简单办法:使用文件通信
 
-	// testDataCollect()
-	// testLabelGene()
-	testRuleGene()
-	// geneAllLabel()
-
 	// 空转
-	//for {
-	//	time.Sleep(time.Second * 60)
-	//}
+	for {
+		time.Sleep(time.Second * 60)
+	}
 }
 
 func InitConsumer() {
@@ -64,33 +59,6 @@ func InitConsumer() {
 		logger.Error("consumer start error: ", err.Error())
 		//panic(any("init mq consumer failed."))
 	}
-}
-
-func testDataCollect() {
-	//label_gene.ProcessGitDesc(context.Background(), 2)
-	//label_gene.ProcessCompileInfo(context.Background(), 2)
-}
-
-func testLabelGene() {
-	label_gene.Gene(2, label_gene.GitNorm)
-}
-
-func testRuleGene() {
-	rule_gene.Gene(2)
-}
-
-func geneAllLabel() {
-	label_gene.Gene(2, label_gene.Gender)
-	label_gene.Gene(2, label_gene.Age)
-	label_gene.Gene(2, label_gene.Career)
-	label_gene.Gene(2, label_gene.UseTime)
-	label_gene.Gene(2, label_gene.UsePeriod)
-	label_gene.Gene(2, label_gene.UseActivity)
-	label_gene.Gene(2, label_gene.ProgramLanguage)
-	label_gene.Gene(2, label_gene.CodeSpeed)
-	label_gene.Gene(2, label_gene.CodeAbility)
-	label_gene.Gene(2, label_gene.ShortcutFre)
-	label_gene.Gene(2, label_gene.GitFre)
 }
 
 func oldSolution() {
