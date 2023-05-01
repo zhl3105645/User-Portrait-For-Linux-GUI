@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/bytedance/gopkg/util/logger"
+	"github.com/golang/protobuf/proto"
 )
 
 func Gene(appId int64, crowdId int64) {
@@ -90,6 +91,54 @@ func Gene(appId int64, crowdId int64) {
 	})
 
 	if err != nil {
+		return
+	}
+
+	// 行为数据更新
+	users, err := query.User.WithContext(ctx).Where(query.User.UserID.In(userIds...)).Find()
+	if err != nil {
+		logger.Error("query user data failed. err=", err.Error())
+		return
+	}
+	aveDurationMap := make(map[int64]int64)
+	total := int64(0)
+	for _, u := range users {
+		if u == nil || u.BehaviorDurationMap == nil {
+			continue
+		}
+
+		durationMap := make(map[int64]int64)
+		err = json.Unmarshal([]byte(*u.BehaviorDurationMap), &durationMap)
+		if err != nil {
+			logger.Error("json unmarshal failed. err=", err.Error())
+			continue
+		}
+
+		total++
+		for id, duration := range durationMap {
+			if cnt, ok := aveDurationMap[id]; ok {
+				aveDurationMap[id] = cnt + duration
+			} else {
+				aveDurationMap[id] = duration
+			}
+		}
+	}
+	for id, duration := range aveDurationMap {
+		aveDurationMap[id] = duration / total
+	}
+
+	bs, err := json.Marshal(aveDurationMap)
+	if err != nil {
+		logger.Error("json marshal failed. err=", err.Error())
+		return
+	}
+
+	mo := model.Crowd{
+		BehaviorDurationMap: proto.String(string(bs)),
+	}
+	_, err = query.Crowd.WithContext(ctx).Where(query.Crowd.CrowdID.Eq(crowdId)).Updates(mo)
+	if err != nil {
+		logger.Error("update crowd failed. err=", err.Error())
 		return
 	}
 

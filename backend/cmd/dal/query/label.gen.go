@@ -34,6 +34,7 @@ func newLabel(db *gorm.DB, opts ...gen.DOOption) label {
 	_label.ParentLabelID = field.NewInt64(tableName, "parent_label_id")
 	_label.LabelSemanticDesc = field.NewString(tableName, "label_semantic_desc")
 	_label.AppID = field.NewInt64(tableName, "app_id")
+	_label.FixType = field.NewInt64(tableName, "fix_type")
 
 	_label.fillFieldMap()
 
@@ -51,6 +52,7 @@ type label struct {
 	ParentLabelID     field.Int64  // 父标签ID
 	LabelSemanticDesc field.String // 标签语义化描述
 	AppID             field.Int64  // 应用ID
+	FixType           field.Int64  // 固定的标签类型
 
 	fieldMap map[string]field.Expr
 }
@@ -74,6 +76,7 @@ func (l *label) updateTableName(table string) *label {
 	l.ParentLabelID = field.NewInt64(table, "parent_label_id")
 	l.LabelSemanticDesc = field.NewString(table, "label_semantic_desc")
 	l.AppID = field.NewInt64(table, "app_id")
+	l.FixType = field.NewInt64(table, "fix_type")
 
 	l.fillFieldMap()
 
@@ -96,7 +99,7 @@ func (l *label) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (l *label) fillFieldMap() {
-	l.fieldMap = make(map[string]field.Expr, 7)
+	l.fieldMap = make(map[string]field.Expr, 8)
 	l.fieldMap["label_id"] = l.LabelID
 	l.fieldMap["label_name"] = l.LabelName
 	l.fieldMap["is_leaf"] = l.IsLeaf
@@ -104,6 +107,7 @@ func (l *label) fillFieldMap() {
 	l.fieldMap["parent_label_id"] = l.ParentLabelID
 	l.fieldMap["label_semantic_desc"] = l.LabelSemanticDesc
 	l.fieldMap["app_id"] = l.AppID
+	l.fieldMap["fix_type"] = l.FixType
 }
 
 func (l label) clone(db *gorm.DB) label {

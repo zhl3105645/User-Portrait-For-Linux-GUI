@@ -3,6 +3,8 @@ drop Table app;
 create TABLE app(
     app_id bigint auto_increment comment '应用ID',
     app_name varchar(256) unique comment '应用名',
+    ave_behavior_duration_map text null comment '平均行为时长map',
+    max_behavior_duration_map text null comment '最大行为时长map',
     primary key (app_id)
 );
 
@@ -98,6 +100,7 @@ drop table  label;
 create TABLE label(
     label_id bigint auto_increment comment '标签ID',
     label_name varchar(256) not null comment '标签名',
+    fix_type int not null comment '固定的标签类型',
     is_leaf bool not null comment '是否是叶子标签',
     data_type int not null comment '数据类型', # 枚举，连续
     parent_label_id bigint null comment '父标签ID',
@@ -125,6 +128,7 @@ create Table crowd (
     crowd_desc varchar(256) not null comment '人群描述',
     crowd_divide_rule text not null comment '人群划分规则',
     app_id bigint not null comment '应用ID',
+    behavior_duration_map text null comment '行为时长map',
 
     primary key (crowd_id),
     CONSTRAINT a_id8 foreign key (app_id) references app(app_id)

@@ -15,6 +15,7 @@ type Label struct {
 	ParentLabelID     *int64  `gorm:"column:parent_label_id;type:bigint" json:"parent_label_id"`                 // 父标签ID
 	LabelSemanticDesc *string `gorm:"column:label_semantic_desc;type:text" json:"label_semantic_desc"`           // 标签语义化描述
 	AppID             int64   `gorm:"column:app_id;type:bigint;not null" json:"app_id"`                          // 应用ID
+	FixType           int64   `gorm:"column:fix_type;type:int;not null" json:"fix_type"`                         // 固定的标签类型
 }
 
 // TableName Label's table name

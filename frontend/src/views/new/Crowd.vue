@@ -57,13 +57,13 @@
         <el-table-column  prop="user_num" label="用户数量" width="150" />
         <el-table-column label="操作" width="400">
             <template #default="scope">
-                <el-button link type="primary" size="small" @click="handel_update_crowd(scope.$index)"
+                <el-button type="primary" size="small" @click="handel_update_crowd(scope.$index)"
                     >修改人群</el-button
                 >
-                <el-button link type="primary" size="small" @click="gene_crowd(scope.row.crowd_id)"
+                <el-button type="primary" size="small" @click="gene_crowd(scope.row.crowd_id)"
                     >更新人群数据</el-button
                 >
-                <el-button link type="primary" size="small" @click="handle_delete_crowd(scope.row.crowd_id)"
+                <el-button type="danger" size="small" @click="handle_delete_crowd(scope.row.crowd_id)"
                     >删除人群</el-button
                 >
             </template>

@@ -185,7 +185,11 @@ func Gene(appId int64) {
 		logger.Error("create record failed. err=", err.Error())
 	}
 
-	// 更新用户的平均时长
+	// 更新用户的平均时长 && 更新应用的平均使用时长和用户最长使用时长
+	aveBehaviorDurationMap := make(map[int64]int64)
+	maxBehaviorDurationMap := make(map[int64]int64)
+	userNum := int64(0)
+
 	for uId, durationMaps := range userId2BehaviorDurationMap {
 		aveDurationMap := make(map[int64]int64)
 		for _, durationMap := range durationMaps {
@@ -217,6 +221,51 @@ func Gene(appId int64) {
 		if err != nil {
 			logger.Error("update user behavior duration failed. err=", err.Error())
 		}
+
+		// 应用平均时长 & 用户最长
+		userNum++
+		for id, duration := range aveDurationMap {
+			// 平均
+			if cnt, ok := aveBehaviorDurationMap[id]; ok {
+				aveBehaviorDurationMap[id] = cnt + duration
+			} else {
+				aveBehaviorDurationMap[id] = duration
+			}
+
+			if cnt, ok := maxBehaviorDurationMap[id]; ok {
+				if cnt < duration {
+					maxBehaviorDurationMap[id] = duration
+				}
+			} else {
+				maxBehaviorDurationMap[id] = duration
+			}
+		}
+	}
+
+	// 应用平均
+	for id, duration := range aveBehaviorDurationMap {
+		aveBehaviorDurationMap[id] = duration / userNum
+	}
+
+	aveBs, err := json.Marshal(aveBehaviorDurationMap)
+	if err != nil {
+		logger.Error("json marshal app ave duration map failed. err=", err.Error())
+		return
+	}
+	maxBs, err := json.Marshal(maxBehaviorDurationMap)
+	if err != nil {
+		logger.Error("json marshal max ave duration map failed. err=", err.Error())
+		return
+	}
+	mo := model.App{
+		AveBehaviorDurationMap: proto.String(string(aveBs)),
+		MaxBehaviorDurationMap: proto.String(string(maxBs)),
+	}
+
+	_, err = query.App.WithContext(ctx).Where(query.App.AppID.Eq(appId)).Updates(mo)
+	if err != nil {
+		logger.Error("update app behavior failed. err=", err.Error())
+		return
 	}
 
 	return

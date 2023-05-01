@@ -8,5 +8,5 @@ import (
 func TestGene(t *testing.T) {
 	dal.Init()
 
-	Gene(2, 1)
+	Gene(2, 4)
 }

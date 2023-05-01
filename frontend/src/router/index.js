@@ -66,6 +66,10 @@ const routes = [
             {
                 path: 'profile',
                 component: () => import("@/views/new/Profile")
+            },
+            {
+                path: 'group_profile',
+                component: () => import("@/views/new/GroupProfile")
             }
         ]
     },

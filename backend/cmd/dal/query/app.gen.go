@@ -29,6 +29,8 @@ func newApp(db *gorm.DB, opts ...gen.DOOption) app {
 	_app.ALL = field.NewAsterisk(tableName)
 	_app.AppID = field.NewInt64(tableName, "app_id")
 	_app.AppName = field.NewString(tableName, "app_name")
+	_app.AveBehaviorDurationMap = field.NewString(tableName, "ave_behavior_duration_map")
+	_app.MaxBehaviorDurationMap = field.NewString(tableName, "max_behavior_duration_map")
 
 	_app.fillFieldMap()
 
@@ -38,9 +40,11 @@ func newApp(db *gorm.DB, opts ...gen.DOOption) app {
 type app struct {
 	appDo appDo
 
-	ALL     field.Asterisk
-	AppID   field.Int64  // 应用ID
-	AppName field.String // 应用名
+	ALL                    field.Asterisk
+	AppID                  field.Int64  // 应用ID
+	AppName                field.String // 应用名
+	AveBehaviorDurationMap field.String // 平均使用时长map
+	MaxBehaviorDurationMap field.String // 最大使用时长map
 
 	fieldMap map[string]field.Expr
 }
@@ -59,6 +63,8 @@ func (a *app) updateTableName(table string) *app {
 	a.ALL = field.NewAsterisk(table)
 	a.AppID = field.NewInt64(table, "app_id")
 	a.AppName = field.NewString(table, "app_name")
+	a.AveBehaviorDurationMap = field.NewString(table, "ave_behavior_duration_map")
+	a.MaxBehaviorDurationMap = field.NewString(table, "max_behavior_duration_map")
 
 	a.fillFieldMap()
 
@@ -81,9 +87,11 @@ func (a *app) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (a *app) fillFieldMap() {
-	a.fieldMap = make(map[string]field.Expr, 2)
+	a.fieldMap = make(map[string]field.Expr, 4)
 	a.fieldMap["app_id"] = a.AppID
 	a.fieldMap["app_name"] = a.AppName
+	a.fieldMap["ave_behavior_duration_map"] = a.AveBehaviorDurationMap
+	a.fieldMap["max_behavior_duration_map"] = a.MaxBehaviorDurationMap
 }
 
 func (a app) clone(db *gorm.DB) app {

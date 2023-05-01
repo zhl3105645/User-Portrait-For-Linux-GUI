@@ -493,6 +493,7 @@ struct Label {
     3: ChartOption option
     4: i64 label_data_type // 标签数据类型
     5: list<LabelEnumData> data // 标签数据枚举值
+    6: bool fixed // 是否固定
 }
 
 struct LabelEnumData {
@@ -530,10 +531,30 @@ struct ProfileReq {
 
 }
 
+struct Radar {
+    1: string name
+    2: i64 max // 最大
+    3: i64 cur // 当前用户值
+    4: i64 ave // 平均值
+}
+
+struct LabelValue {
+    1: i64 label_id
+    2: string label_name
+    3: string label_value
+}
+
+struct GroupLabel {
+    1: string parent_label_name
+    2: list<LabelValue> labels
+}
+
 struct ProfileResp {
     1: i64 status_code
     2: string status_msg
     3: TreeLabel label
+    4: list<Radar> radars // 雷达图数据
+    5: list<GroupLabel> group_labels // 标签数据
 }
 
 struct AddCrowdReq {
@@ -574,6 +595,16 @@ struct CrowdInPageResp {
     4: list<Crowd> crowds
 }
 
+struct CrowdsReq {
+}
+
+struct CrowdsResp {
+    1: i64 status_code
+    2: string status_msg
+    3: i64 total
+    4: list<Crowd> crowds
+}
+
 struct DeleteCrowdReq {
 
 }
@@ -581,6 +612,52 @@ struct DeleteCrowdReq {
 struct DeleteCrowdResp {
     1: i64 status_code
     2: string status_msg
+}
+
+struct GroupProfileReq {
+
+}
+
+struct StackBarLabel {
+    1: list<string> label_names // 标签名
+    2: list<list<i64>> label_cnt // 标签名对应的数据列表
+    3: list<string> label_value_desc // 标签值对应的描述
+}
+
+struct BarLabel {
+    1: list<string> x_names // 坐标名
+    2: list<i64> data // 数据
+}
+
+struct PieData {
+    1: string name
+    2: i64 value
+}
+
+struct PieLabel {
+    1: string label_name // 标签名
+    2: list<PieData> data // 饼状图数据
+}
+
+struct GroupProfileResp {
+    1: i64 status_code
+    2: string status_msg
+    3: list<Radar> radars // 雷达图数据
+    4: StackBarLabel stack_bar_label // 堆积柱状图数据
+    5: list<PieLabel> pie_label // 饼状图数据
+    6: BarLabel bar_label // 柱状图
+}
+
+struct SingleLabelReq {
+
+}
+
+struct SingleLabelResp {
+    1: i64 status_code
+    2: string status_msg
+    3: i64 chart_type // 图表类型
+    4: BarLabel bar_label // 柱状图
+    5: PieLabel pie_label // 饼图
 }
 
 service BackendService {
@@ -651,8 +728,10 @@ service BackendService {
     LabelInPageResp LabelInPage(1: LabelInPageReq request) (api.get="/api/label");
     // 删除标签
     DeleteLabelResp DeleteLabel(1: DeleteLabelReq request) (api.delete="/api/label/:id");
-    // 生成模型数据
+    // 生成标签数据
     GeneResp GeneLabel(1: GeneReq request) (api.post="/api/label/:id");
+    // 获取单个标签数据
+    SingleLabelResp SingleLabel(1: SingleLabelReq request) (api.get="/api/label/:id");
     // 全部用户信息
     UsersResp Users(1: UsersReq request) (api.get="/api/all_user");
     // 获取画像
@@ -661,8 +740,12 @@ service BackendService {
     AddCrowdResp AddCrowd(1: AddCrowdReq request) (api.post="/api/crowd");
     // 人群分页
     CrowdInPageResp CrowdInPage(1: CrowdInPageReq request) (api.get="/api/crowd");
+    // 全部人群
+    CrowdsResp Crowds(1: CrowdsReq request) (api.get="/api/crowds");
     // 生成人群数据
     GeneResp GeneCrowd(1: GeneReq request) (api.post="/api/crowd/:id");
     // 删除人群
     DeleteCrowdResp DeleteCrowd(1: DeleteCrowdReq request) (api.delete="/api/crowd/:id");
+    // 获取用户群画像
+    GroupProfileResp GroupProfile(1: GroupProfileReq request) (api.get="/api/group_profile/:id");
 }

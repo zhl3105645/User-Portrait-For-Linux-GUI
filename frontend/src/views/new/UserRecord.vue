@@ -4,7 +4,7 @@
     <el-button type="primary" style="margin-left: 5px" @click="load">查询</el-button>
 
      <!-- Form -->
-    <el-button text @click="dialogFormVisible = true">
+    <el-button type="primary" @click="dialogFormVisible = true">
       添加用户
     </el-button>
     <el-dialog v-model="dialogFormVisible" title="添加用户">

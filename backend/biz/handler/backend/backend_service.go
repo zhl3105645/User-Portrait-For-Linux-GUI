@@ -1207,3 +1207,100 @@ func DeleteCrowd(ctx context.Context, c *app.RequestContext) {
 
 	c.JSON(consts.StatusOK, resp)
 }
+
+// GroupProfile .
+// @router /api/group_profile/:id [GET]
+func GroupProfile(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.GroupProfileReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.GroupProfileResp)
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "id=%d", id)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := profile.NewGroupProfile(ac.(*model.Account).AccountID, id)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// Crowds .
+// @router /api/crowds [GET]
+func Crowds(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.CrowdsReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.CrowdsResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := crowd.NewCrowds(ac.(*model.Account).AccountID)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// SingleLabel .
+// @router /api/label/:id [GET]
+func SingleLabel(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.SingleLabelReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.SingleLabelResp)
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "id=%d", id)
+
+	al := label.NewSingleLabel(id)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}

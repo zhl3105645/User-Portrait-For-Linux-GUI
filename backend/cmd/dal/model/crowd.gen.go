@@ -8,11 +8,12 @@ const TableNameCrowd = "crowd"
 
 // Crowd mapped from table <crowd>
 type Crowd struct {
-	CrowdID         int64  `gorm:"column:crowd_id;type:bigint;primaryKey;autoIncrement:true" json:"crowd_id"` // 人群ID
-	CrowdDesc       string `gorm:"column:crowd_desc;type:varchar(256);not null" json:"crowd_desc"`            // 人群描述
-	AppID           int64  `gorm:"column:app_id;type:bigint;not null" json:"app_id"`                          // 应用ID
-	CrowdName       string `gorm:"column:crowd_name;type:varchar(256);not null" json:"crowd_name"`            // 人群名
-	CrowdDivideRule string `gorm:"column:crowd_divide_rule;type:text;not null" json:"crowd_divide_rule"`      // 人群划分规则
+	CrowdID             int64   `gorm:"column:crowd_id;type:bigint;primaryKey;autoIncrement:true" json:"crowd_id"` // 人群ID
+	CrowdDesc           string  `gorm:"column:crowd_desc;type:varchar(256);not null" json:"crowd_desc"`            // 人群描述
+	AppID               int64   `gorm:"column:app_id;type:bigint;not null" json:"app_id"`                          // 应用ID
+	CrowdName           string  `gorm:"column:crowd_name;type:varchar(256);not null" json:"crowd_name"`            // 人群名
+	CrowdDivideRule     string  `gorm:"column:crowd_divide_rule;type:text;not null" json:"crowd_divide_rule"`      // 人群划分规则
+	BehaviorDurationMap *string `gorm:"column:behavior_duration_map;type:text" json:"behavior_duration_map"`       // 行为时长map
 }
 
 // TableName Crowd's table name

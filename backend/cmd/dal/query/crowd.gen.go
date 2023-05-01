@@ -32,6 +32,7 @@ func newCrowd(db *gorm.DB, opts ...gen.DOOption) crowd {
 	_crowd.AppID = field.NewInt64(tableName, "app_id")
 	_crowd.CrowdName = field.NewString(tableName, "crowd_name")
 	_crowd.CrowdDivideRule = field.NewString(tableName, "crowd_divide_rule")
+	_crowd.BehaviorDurationMap = field.NewString(tableName, "behavior_duration_map")
 
 	_crowd.fillFieldMap()
 
@@ -41,12 +42,13 @@ func newCrowd(db *gorm.DB, opts ...gen.DOOption) crowd {
 type crowd struct {
 	crowdDo crowdDo
 
-	ALL             field.Asterisk
-	CrowdID         field.Int64  // 人群ID
-	CrowdDesc       field.String // 人群描述
-	AppID           field.Int64  // 应用ID
-	CrowdName       field.String // 人群名
-	CrowdDivideRule field.String // 人群划分规则
+	ALL                 field.Asterisk
+	CrowdID             field.Int64  // 人群ID
+	CrowdDesc           field.String // 人群描述
+	AppID               field.Int64  // 应用ID
+	CrowdName           field.String // 人群名
+	CrowdDivideRule     field.String // 人群划分规则
+	BehaviorDurationMap field.String // 行为时长map
 
 	fieldMap map[string]field.Expr
 }
@@ -68,6 +70,7 @@ func (c *crowd) updateTableName(table string) *crowd {
 	c.AppID = field.NewInt64(table, "app_id")
 	c.CrowdName = field.NewString(table, "crowd_name")
 	c.CrowdDivideRule = field.NewString(table, "crowd_divide_rule")
+	c.BehaviorDurationMap = field.NewString(table, "behavior_duration_map")
 
 	c.fillFieldMap()
 
@@ -90,12 +93,13 @@ func (c *crowd) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (c *crowd) fillFieldMap() {
-	c.fieldMap = make(map[string]field.Expr, 5)
+	c.fieldMap = make(map[string]field.Expr, 6)
 	c.fieldMap["crowd_id"] = c.CrowdID
 	c.fieldMap["crowd_desc"] = c.CrowdDesc
 	c.fieldMap["app_id"] = c.AppID
 	c.fieldMap["crowd_name"] = c.CrowdName
 	c.fieldMap["crowd_divide_rule"] = c.CrowdDivideRule
+	c.fieldMap["behavior_duration_map"] = c.BehaviorDurationMap
 }
 
 func (c crowd) clone(db *gorm.DB) crowd {

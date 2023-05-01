@@ -251,3 +251,23 @@ func _deletecrowdMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _group_profileMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _groupprofileMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _crowdsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _singlelabelMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
