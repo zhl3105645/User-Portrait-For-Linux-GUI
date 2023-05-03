@@ -271,3 +271,23 @@ func _singlelabelMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _seqminingMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _seqminingtaskinpageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _seq_mining_resultMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _seqminingresultdownloadMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

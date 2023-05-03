@@ -11,5 +11,11 @@ module.exports = {
                 }
             }
         }
+    },
+    chainWebpack: config => {
+        config.plugin('html').tap(args=>{
+            args[0].title = '用户行为画像系统'
+            return args
+        })
     }
 }

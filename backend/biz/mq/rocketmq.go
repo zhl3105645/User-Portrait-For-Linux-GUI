@@ -22,6 +22,7 @@ const (
 	RuleGene  Type = 3 // 生成规则数据
 	LabelGene Type = 5 // 生成标签数据
 	CrowdGene Type = 6 // 生成人群数据
+	SeqMining Type = 7 // 数据挖掘
 )
 
 type GeneMsg struct {

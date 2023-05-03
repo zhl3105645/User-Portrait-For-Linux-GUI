@@ -144,8 +144,23 @@ create Table crowd_relation (
   CONSTRAINT c_id foreign key (crowd_id) references crowd(crowd_id)
 );
 
+create TABLE seq_mining_task (
+  task_id bigint auto_increment comment '挖掘任务ID',
+  task_name varchar(256) not null comment '任务名',
+  create_time timestamp not null comment '任务创建时间',
+  status int not null comment '挖掘状态',
+  percent int not null comment '最小支持度',
+  event2number longtext null comment '事件数据映射编号',
+  result longtext null comment '挖掘结果',
+
+  app_id bigint not null comment '应用ID',
+
+  primary key (task_id),
+  CONSTRAINT a_id9 foreign key (app_id) references app(app_id)
+);
+
 drop table record;
-# hive
+
 create TABLE record (
     record_id bigint auto_increment comment '使用记录ID',
     user_id bigint not null comment '用户ID',

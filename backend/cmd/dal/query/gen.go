@@ -30,6 +30,7 @@ var (
 	Record        *record
 	Rule          *rule
 	RuleElement   *ruleElement
+	SeqMiningTask *seqMiningTask
 	User          *user
 )
 
@@ -48,6 +49,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	Record = &Q.Record
 	Rule = &Q.Rule
 	RuleElement = &Q.RuleElement
+	SeqMiningTask = &Q.SeqMiningTask
 	User = &Q.User
 }
 
@@ -67,6 +69,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Record:        newRecord(db, opts...),
 		Rule:          newRule(db, opts...),
 		RuleElement:   newRuleElement(db, opts...),
+		SeqMiningTask: newSeqMiningTask(db, opts...),
 		User:          newUser(db, opts...),
 	}
 }
@@ -87,6 +90,7 @@ type Query struct {
 	Record        record
 	Rule          rule
 	RuleElement   ruleElement
+	SeqMiningTask seqMiningTask
 	User          user
 }
 
@@ -108,6 +112,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Record:        q.Record.clone(db),
 		Rule:          q.Rule.clone(db),
 		RuleElement:   q.RuleElement.clone(db),
+		SeqMiningTask: q.SeqMiningTask.clone(db),
 		User:          q.User.clone(db),
 	}
 }
@@ -136,6 +141,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Record:        q.Record.replaceDB(db),
 		Rule:          q.Rule.replaceDB(db),
 		RuleElement:   q.RuleElement.replaceDB(db),
+		SeqMiningTask: q.SeqMiningTask.replaceDB(db),
 		User:          q.User.replaceDB(db),
 	}
 }
@@ -154,6 +160,7 @@ type queryCtx struct {
 	Record        IRecordDo
 	Rule          IRuleDo
 	RuleElement   IRuleElementDo
+	SeqMiningTask ISeqMiningTaskDo
 	User          IUserDo
 }
 
@@ -172,6 +179,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Record:        q.Record.WithContext(ctx),
 		Rule:          q.Rule.WithContext(ctx),
 		RuleElement:   q.RuleElement.WithContext(ctx),
+		SeqMiningTask: q.SeqMiningTask.WithContext(ctx),
 		User:          q.User.WithContext(ctx),
 	}
 }

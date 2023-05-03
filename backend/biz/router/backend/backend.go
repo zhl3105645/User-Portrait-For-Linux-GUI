@@ -38,6 +38,8 @@ func Register(r *server.Hertz) {
 		_api.GET("/model", append(_modelinpageMw(), backend.ModelInPage)...)
 		_api.GET("/rule_data", append(_ruledatainpageMw(), backend.RuleDataInPage)...)
 		_api.GET("/rules", append(_rulesMw(), backend.Rules)...)
+		_api.POST("/seq_mining", append(_seqminingMw(), backend.SeqMining)...)
+		_api.GET("/seq_mining", append(_seqminingtaskinpageMw(), backend.SeqMiningTaskInPage)...)
 		_api.GET("/tree_label", append(_treelabelsMw(), backend.TreeLabels)...)
 		_api.GET("/users", append(_userinpageMw(), backend.UserInPage)...)
 		_api.POST("/crowd", append(_crowdMw(), backend.AddCrowd)...)
@@ -69,6 +71,10 @@ func Register(r *server.Hertz) {
 		_rule := _api.Group("/rule", _ruleMw()...)
 		_rule.PUT("/:id", append(_updateruleMw(), backend.UpdateRule)...)
 		_rule.DELETE("/:id", append(_deleteruleMw(), backend.DeleteRule)...)
+		{
+			_seq_mining_result := _api.Group("/seq_mining_result", _seq_mining_resultMw()...)
+			_seq_mining_result.GET("/:id", append(_seqminingresultdownloadMw(), backend.SeqMiningResultDownload)...)
+		}
 		_api.POST("/user", append(_userMw(), backend.AddUser)...)
 		_user := _api.Group("/user", _userMw()...)
 		_user.DELETE("/:id", append(_deleteuserMw(), backend.DeleteUser)...)

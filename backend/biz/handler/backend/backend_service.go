@@ -18,6 +18,7 @@ import (
 	"backend/biz/usecase/profile"
 	"backend/biz/usecase/register"
 	"backend/biz/usecase/rule"
+	"backend/biz/usecase/seq_mining"
 	"backend/biz/usecase/upload"
 	"backend/biz/usecase/user"
 	"backend/cmd/dal/model"
@@ -1303,4 +1304,101 @@ func SingleLabel(ctx context.Context, c *app.RequestContext) {
 	resp = al.GetResp()
 
 	c.JSON(consts.StatusOK, resp)
+}
+
+// SeqMining .
+// @router /api/seq_mining [POST]
+func SeqMining(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.SeqMiningReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.SeqMiningResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := seq_mining.NewSeqMining(ac.(*model.Account).AccountID, req.GetPercent(), req.GetTaskName())
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// SeqMiningTaskInPage .
+// @router /api/seq_mining [GET]
+func SeqMiningTaskInPage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.SeqMiningTaskInPageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.SeqMiningTaskInPageResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := seq_mining.NewPageTask(ac.(*model.Account).AccountID, req.PageNum, req.PageSize, req.Search)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// SeqMiningResultDownload .
+// @router /api/seq_mining_result/:id [GET]
+func SeqMiningResultDownload(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.SeqMiningResultDownloadReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.SeqMiningResultDownloadResp)
+
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.String(consts.StatusOK, err.Error())
+		return
+	}
+	logger.CtxInfof(ctx, "id=%d", id)
+
+	al := seq_mining.NewResultDownload(id)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	//c.JSON(consts.StatusOK, resp)
+
+	bf := al.GetBuf()
+
+	c.Header("Content-Type", "application/octet-stream")
+
+	c.SetBodyStream(bf, bf.Len())
 }

@@ -10,6 +10,8 @@ const request = axios.create({
 const whiteUrls = ["/login", '/register', "/applist"]
 // 上传文件url
 const uploadUrls = ["/api/user/upload/"]
+// 下载文件url
+const downloadUrls = ["/api/seq_mining_result/"]
 
 // request 拦截器
 // 可以自请求发送前对请求做一些处理
@@ -19,6 +21,14 @@ request.interceptors.request.use(config => {
     uploadUrls.forEach((val, index) => {
         if (config.url.includes(val)) {
             config.headers['Content-Type'] = 'multipart/form-data'
+        }
+    })
+    downloadUrls.forEach((val, index) => {
+        if (config.url.includes(val)) {
+            console.log("下载")
+            config.responseType = 'blob'
+            config.headers['content-type'] = 'application/x-download;charset=utf-8'
+            config.headers['content-disposition'] = 'attachment;filename=*'
         }
     })
     

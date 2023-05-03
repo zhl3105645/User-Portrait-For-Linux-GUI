@@ -660,6 +660,46 @@ struct SingleLabelResp {
     5: PieLabel pie_label // 饼图
 }
 
+struct SeqMiningReq {
+    1: double percent (api.body="percent"); // 最小支持度
+    2: string task_name (api.body="task_name"); // 任务名
+}
+
+struct SeqMiningResp {
+    1: i64 status_code
+    2: string status_msg
+}
+
+struct SeqMiningTaskInPageReq {
+    1: i64 page_num
+    2: i64 page_size
+    3: string search
+}
+
+struct SeqMiningTask {
+    1: i64 task_id
+    2: string task_name
+    3: string create_time
+    4: i64 task_status // 任务状态
+    5: i64 percent // 最小支持度
+}
+
+struct SeqMiningTaskInPageResp {
+    1: i64 status_code
+    2: string status_msg
+    3: i64 total
+    4: list<SeqMiningTask> seq_mining_tasks
+}
+
+struct SeqMiningResultDownloadReq {
+
+}
+
+struct SeqMiningResultDownloadResp {
+    1: i64 status_code
+    2: string status_msg
+}
+
 service BackendService {
     // 未登录状态
     // 注册
@@ -748,4 +788,10 @@ service BackendService {
     DeleteCrowdResp DeleteCrowd(1: DeleteCrowdReq request) (api.delete="/api/crowd/:id");
     // 获取用户群画像
     GroupProfileResp GroupProfile(1: GroupProfileReq request) (api.get="/api/group_profile/:id");
+    // 生成模式挖掘任务
+    SeqMiningResp SeqMining(1: SeqMiningReq request) (api.post="/api/seq_mining")
+    // 模式挖掘任务 分页
+    SeqMiningTaskInPageResp SeqMiningTaskInPage(1: SeqMiningTaskInPageReq request) (api.get="/api/seq_mining")
+    // 挖掘任务结果下载
+    SeqMiningResultDownloadResp SeqMiningResultDownload(1: SeqMiningResultDownloadReq request) (api.get="/api/seq_mining_result/:id")
 }

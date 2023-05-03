@@ -47,6 +47,7 @@ func main() {
 	Crowd := g.GenerateModel("crowd")
 	CrowdRelation := g.GenerateModel("crowd_relation")
 	Record := g.GenerateModel("record")
+	SeqMining := g.GenerateModel("seq_mining_task")
 
 	// 创建有关联关系的模型文件
 	// 可以用于指定外键
@@ -61,7 +62,7 @@ func main() {
 		App, Account, Component, DataSource,
 		Label, LabelData, DataModel, ModelData,
 		Rule, RuleElement, User, Record,
-		Crowd, CrowdRelation,
+		Crowd, CrowdRelation, SeqMining,
 	)
 
 	g.Execute()

@@ -1,117 +1,176 @@
 <template>
-    <div class="container">
-    <div class="box top-left">
-      <div class="arrow arrow-bottom-right"></div>
-      1
+    <div style="margin: 10px 0">
+      <el-input v-model="search" placeholder="请输入关键字" style="width: 20%" clearable></el-input>
+      <el-button type="primary" style="margin-left: 5px" @click="load">查询</el-button>
+      <el-button type="primary" style="margin-left: 5px" @click="this.dialog_add_task_visible = true">新增任务</el-button>
+
+      <el-dialog v-model="dialog_add_task_visible" title="添加数据挖掘任务">
+        <el-form :model="add_task_form">
+          <el-form-item label="任务名">
+            <el-input v-model="add_task_form.task_name"></el-input>
+          </el-form-item>
+          <el-form-item label="最小支持度(百分比)">
+            <el-input v-model="add_task_form.percent"></el-input>
+          </el-form-item>
+        </el-form>
+        <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="this.dialog_add_task_visible = false">取消</el-button>
+          <el-button type="primary" @click="add_seq_mining_task">
+            确定添加
+          </el-button>
+        </span>
+      </template>
+      </el-dialog>
+
+      <el-table 
+        v-loading="loading"
+        :data="task_data" 
+        style="width: 100%"
+      >
+        <el-table-column prop="task_id" label="任务ID" width="100" />
+        <el-table-column prop="task_name" label="任务名" width="150" />
+        <el-table-column prop="create_time" label="创建时间" width="150" />
+        <el-table-column prop="percent" label="最小支持度(百分比)" width="200" />
+        <el-table-column prop="status_desc" label="任务状态" width="150" >
+          <template #default="scope">
+            <el-tag
+              class="mx-1"
+              :disable-transitions="false"
+            >
+              {{ scope.row.status_desc }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column  label="操作" width="200">
+          <template #default="scope">
+            <el-button type="primary" size="small" :disabled="scope.row.task_status != 3" @click="handle_download_result(scope.row.task_id)">
+              下载任务数据
+              </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div style="margin: 10px 0">
+        <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-sizes="[5, 10, 20]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+        </el-pagination>
+      </div>
+
     </div>
-    <div class="box top-right">
-      <div class="arrow arrow-bottom-left"></div>
-      2
-    </div>
-    <div class="circle">3</div>
-    <div class="box bottom-left">
-      <div class="arrow arrow-top-right"></div>
-      4
-    </div>
-    <div class="box bottom-right">
-      <div class="arrow arrow-top-left"></div>
-      5
-    </div>
-  </div>
 </template>
 
 <script>
+import request from "@/utils/request";
+
 export default {
     name: "SeqMining",
+    data() {
+      return {
+        loading: true,
+        search: "",
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+        task_data : new Array(),
+        dialog_add_task_visible: false,
+        add_task_form: {},
+        status_desc: new Map([
+          [1, "已创建"], 
+          [2, '运行中'], 
+          [3, '已完成']
+        ])
+        
+      }
+    },
+    created() {
+      this.load()
+    },
+    methods: {
+      load() {
+        this.loading = true
+        request.get("/api/seq_mining", {
+          params: {
+            "page_num": this.currentPage,
+            "page_size": this.pageSize,
+            "search": this.search
+          }
+        }).then(res => {
+          console.log(res)
+          if (res.status_code === 0) {
+            this.task_data = res.seq_mining_tasks
+            for (let i = 0; i < this.task_data.length; i++) {
+              this.task_data[i].status_desc = this.status_desc.get(this.task_data[i].task_status)
+            }
+            this.total = res.total
+          } else {
+            this.$message({
+              type: "error",
+              message: res.status_msg
+            })
+          }
+        })
+        this.loading = false
+      },
+      handleSizeChange(pageSize) {  // 改变每页的大小
+        this.pageSize = pageSize;
+        this.load();
+      },
+      handleCurrentChange(pageNum) {  //改变当前页码
+        this.currentPage = pageNum;
+        this.load()
+      },
+      add_seq_mining_task() {
+        this.add_task_form.percent = parseInt(this.add_task_form.percent)
+        console.log(this.add_task_form)
+        request.post("/api/seq_mining", this.add_task_form).then(res => {
+          console.log(res)
+          if (res.status_code === 0) {
+            this.$message({
+              type: "success",
+              message: "添加成功"
+            })
+            this.dialog_add_task_visible = false
+            this.add_seq_mining_task = {}
+            this.load()
+          } else {
+            this.$message({
+              type: "error",
+              message: res.status_msg
+            })
+          }
+        })
+      },
+      handle_download_result(task_id) {
+        request.get("/api/seq_mining_result/" + task_id).then(res => {
+
+          if (res.status_code != null && res.status_code != 0) {
+            this.$message({
+              type: "error",
+              message: "下载失败"
+            })
+            return 
+          }
+          const url = window.URL.createObjectURL(new Blob([res]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'result.zip');
+          document.body.appendChild(link);
+          link.click();
+        })
+      }
+    }
 }
 
 
 </script>
 
 <style scoped>
-.container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-}
-.box {
-  position: absolute;
-  width: 100px;
-  height: 200px;
-  background-color: lightblue;
-}
-.top-left {
-  top: 0;
-  left: 0;
-}
-.top-right {
-  top: 0;
-  right: 0;
-}
-.bottom-left {
-  bottom: 0;
-  left: 0;
-}
-.bottom-right {
-  bottom: 0;
-  right: 0;
-}
-.circle {
-  position: absolute;
-  top: calc(50% - 100px);
-  left: calc(50% - 100px);
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  background-color: lightcoral;
-}
-.arrow {
-  position: absolute;
-  width: calc(50% - (50px + (100px / sqrt(2))));
-  height: calc(50% - (100px + (100px / sqrt(2))));
-}
-.arrow-bottom-right:before,
-.arrow-bottom-left:before,
-.arrow-top-right:before,
-.arrow-top-left:before {
-    content:'';
-    position:absolute;
-    border-top:1px solid black;
-    border-right:1px solid black;
-    width:10px;height:10px;
-}
-.arrow-bottom-right:before{
-    transform-origin:right top;transform:rotate(-45deg);
-    right:-6px;top:-6px
-}
-.arrow-bottom-left:before{
-    transform-origin:left top;transform:rotate(45deg);
-    left:-6px;top:-6px
-}
-.arrow-top-right:before{
-    transform-origin:right bottom;transform:rotate(45deg);
-    right:-6px;bottom:-6px
-}
-.arrow-top-left:before{
-    transform-origin:left bottom;transform:rotate(-45deg);
-    left:-6px;bottom:-6px
-}
-.arrow-bottom-right,
-.arrow-bottom-left,
-.arrow-top-right,
-.arrow-top-left {
-    overflow:hidden
-}
-.arrow-bottom-right{
-    border-bottom-right-radius:10px
-}
-.arrow-bottom-left{
-    border-bottom-left-radius:10px
-}
-.arrow-top-right{
-    border-top-right-radius:10px
-}
-.arrow-top-left{
-    border-top-left-radius:10px
-}
+
 </style>

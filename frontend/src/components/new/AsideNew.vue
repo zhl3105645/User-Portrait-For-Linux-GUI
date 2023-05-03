@@ -7,12 +7,18 @@
         router
     >
       <el-submenu index="1">
+        <template v-slot:title>权限管理</template>
+        <el-menu-item-group>
+          <el-menu-item index="/front/permission">账号权限</el-menu-item>
+        </el-menu-item-group>
+      </el-submenu>
+      <el-submenu index="2">
         <template v-slot:title>用户管理</template>
         <el-menu-item-group>
           <el-menu-item index="/front/user_record">用户数据</el-menu-item>
         </el-menu-item-group>
       </el-submenu>
-      <el-submenu index="2">
+      <el-submenu index="3">
         <template v-slot:title>规则管理</template>
         <el-menu-item-group>
           <template v-slot:title></template>
@@ -22,7 +28,7 @@
           <el-menu-item index="/front/event_rule_data">规则数据</el-menu-item>
         </el-menu-item-group>
       </el-submenu>
-      <el-submenu index="3">
+      <el-submenu index="4">
         <template v-slot:title>标签管理</template>
         <el-menu-item-group>
           <template v-slot:title></template>
@@ -30,8 +36,8 @@
           <el-menu-item index="/front/crowd">人群</el-menu-item>
         </el-menu-item-group>
       </el-submenu>
-      <el-submenu index="4">
-        <template v-slot:title>画像管理</template>
+      <el-submenu index="5">
+        <template v-slot:title>画像查看</template>
         <el-menu-item-group>
           <template v-slot:title></template>
             <el-menu-item index="/front/profile">单用户画像</el-menu-item>

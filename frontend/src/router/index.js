@@ -12,6 +12,10 @@ const routes = [
         redirect: "/front/label",
         children: [
             {
+                path: 'permission',
+                component: () => import("@/views/new/Permission")
+            },
+            {
                 path: 'basic_behavior_data',
                 component: () => import("@/views/new/BasicBehaviorData")
             },

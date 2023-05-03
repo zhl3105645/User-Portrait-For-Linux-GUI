@@ -47,9 +47,6 @@
       <el-table-column prop="record_num" label="使用记录数" width="150" />
       <el-table-column label="操作" width="300">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click="handleDownload(scope.$index)"
-            >下载数据</el-button
-          >
           <el-button link type="primary" size="small" @click="handleClickOpenDialog(scope.$index)"
             >导入数据</el-button
           >
@@ -215,7 +212,7 @@ export default {
       })
 
       request.post("/api/user/upload/" + this.tableData[this.rowIndex].user_id, param).then(res => {
-        if (res .status_code === 0) {
+        if (res.status_code === 0) {
           this.$message({
             type: "success",
             message: "上传成功"
