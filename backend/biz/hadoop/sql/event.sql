@@ -27,9 +27,10 @@ select * from profile.test_partition;
 
 insert into table profile.test_partition values (2, "2", "2023-01-02");
 
+drop table event;
+
 create table event(
-                      user_id bigint, -- 用户ID
-                      begin_time bigint, -- 开始时间
+                      record_id bigint,
                       event_type int,
                       event_time bigint,
                       mouse_pos string,
@@ -44,6 +45,6 @@ create table event(
 )
     partitioned by (app_id int, day string); // 多级分区 应用ID 天
 
-insert into table event values (1, 12121212, 1, 121212, "(12,23)", 1,1,1,1,'A','com_name', 1, 'd', 2, '2022-01-02');
+insert into table event values (1, 1, 121212, "(12,23)", 1,1,1,1,'A','com_name', 1, 'd', 2, '2022-01-02');
 
 select * from event;
