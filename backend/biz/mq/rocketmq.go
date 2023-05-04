@@ -12,7 +12,7 @@ import (
 var pro rocketmq.Producer
 
 const (
-	EndPoint  = "127.0.0.1:9876"
+	EndPoint  = "192.168.81.131:9876"
 	TopicName = "profile"
 )
 
