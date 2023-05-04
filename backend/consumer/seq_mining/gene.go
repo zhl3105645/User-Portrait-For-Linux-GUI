@@ -9,7 +9,6 @@ import (
 	"backend/optimize_prefixspan"
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/golang/protobuf/proto"
 	"github.com/thoas/go-funk"
@@ -34,31 +33,16 @@ var (
 	db = make([]optimize_prefixspan.Sequence, 0)
 )
 
-func frequentItems(db []optimize_prefixspan.Sequence, minSupport int) []int {
-	var list []int // 满足最小支持度的item
-	m := make(map[int]int)
-	for _, seq := range db {
-		exist := make(map[int]bool)
-		for _, item := range seq {
-			exist[item] = true
-		}
-		for item, _ := range exist {
-			m[item] = m[item] + 1
-		}
-	}
-
-	for item, cnt := range m {
-		if cnt >= minSupport {
-			list = append(list, item)
-		}
-	}
-
-	return list
-}
-
 func Gene(appId int64, taskId int64) {
 	ctx := context.Background()
 	logger.Info("seq mining begin.")
+	// 初始化
+	// 事件数据 -> 编号
+	customEvent2Number = make(map[string]int)
+	// 编号起始位置
+	curNumber = 0
+	// 数据集
+	db = make([]optimize_prefixspan.Sequence, 0)
 
 	// 查询记录
 	seqMiningModel, err := query.SeqMiningTask.WithContext(ctx).Where(query.SeqMiningTask.TaskID.Eq(taskId)).First()
@@ -130,9 +114,6 @@ func Gene(appId int64, taskId int64) {
 
 		db = append(db, seqs...)
 	}
-
-	list := frequentItems(db, int(percent)*len(db)/100)
-	fmt.Printf("%v\n", list)
 
 	// 进行挖掘
 	numbers, cnts := optimize_prefixspan.PrefixSpan(db, int(percent)*len(db)/100)

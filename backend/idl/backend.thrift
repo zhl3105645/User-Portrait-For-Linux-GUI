@@ -45,6 +45,7 @@ struct AccountReq {
 struct Account {
     1: string account_name
     2: i64 account_permission
+    3: i64 account_id
 }
 
 struct AccountResp {
@@ -700,6 +701,30 @@ struct SeqMiningResultDownloadResp {
     2: string status_msg
 }
 
+struct AccountInPageReq {
+    1: i64 page_num
+    2: i64 page_size
+    3: string search
+}
+
+struct AccountInPageResp {
+    1: i64 status_code
+    2: string status_msg
+    3: list<Account> accounts
+    4: i64 total
+}
+
+struct AddAccountReq {
+    1: string account_name (api.body="account_name");
+    2: i64 account_permission (api.body="account_permission");
+    3: string account_pwd (api.body="account_pwd");
+}
+
+struct AddAccountResp {
+    1: i64 status_code
+    2: string status_msg
+}
+
 service BackendService {
     // 未登录状态
     // 注册
@@ -712,6 +737,10 @@ service BackendService {
     // 登录状态 api 开头
     // 获取账号信息
     AccountResp Account(1: AccountReq request) (api.get="/api/account");
+    // 账号 分页
+    AccountInPageResp AccountInPage(1: AccountInPageReq request) (api.get="/api/accounts");
+    // 添加账号
+    AddAccountResp AddAccount(1: AddAccountReq request) (api.post="/api/account");
     // 添加用户
     AddUserResp AddUser(1: AddUserReq request) (api.post="/api/user");
     // 删除用户
