@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%; height: 100vh; overflow: hidden"> <!--  :style="bg" 加背景图片-->
     <div style="width: 400px; margin: 100px auto">
-      <div style="font-size: 30px; text-align: center; padding: 30px 0">欢迎登录</div>
+      <div style="font-size: 30px; text-align: center; padding: 30px 0">用户行为画像系统登录</div>
       <el-form ref="form" :model="form" :rules="rules">
         <el-form-item prop="app_id">
           <el-select v-model="form.app_id" placeholder="请选择应用">
@@ -123,7 +123,7 @@ export default {
                 }
               })
     
-              this.$router.push("/front/label") // 登录界面跳转
+              this.$router.push("/front/profile") // 登录界面跳转
             } else {
               this.$message({
                 type: "error",

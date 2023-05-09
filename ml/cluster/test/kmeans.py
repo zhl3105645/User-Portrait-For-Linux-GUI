@@ -1,3 +1,4 @@
+from pandas.core import api
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.decomposition import PCA
@@ -22,14 +23,14 @@ def k_means(k, data_pca, scaler, pca):
     cluster_centers = kmeans.cluster_centers_
 
     # print("聚类结果：", labels)
-    print("聚类中心：", cluster_centers)
+    # print("聚类中心：", cluster_centers)
 
     # 将聚类结果从PCA空间转换回原始数据空间（但仍然是标准化的）
     cluster_centers_scaled = pca.inverse_transform(cluster_centers)
     # 将标准化的聚类结果转换回原始数据空间
     cluster_centers_original = scaler.inverse_transform(cluster_centers_scaled)
-    print("cluster_centers_scaled=",cluster_centers_scaled)
-    print("cluster_centers_original=",cluster_centers_original)
+    #print("cluster_centers_scaled=",cluster_centers_scaled)
+    #print("cluster_centers_original=",cluster_centers_original)
     draw_center(cluster_centers_original)
 
     score = silhouette_score(data_pca, labels)
@@ -59,6 +60,7 @@ def save_model(k, data_pca, scaler, pca):
     joblib.dump(pca, './cluster/model/kmeans_pca.pkl') 
 
 def draw_center(data):
+    plt.ylabel('行为时长(ms)')
     # 设置柱状图的宽度
     bar_width = 0.1
 
@@ -86,6 +88,14 @@ def draw_center(data):
     plt.show()
     return
 
+def draw_score(k_nums, scores):
+    plt.xlabel('参数k')
+    plt.ylabel('轮廓系数')
+    plt.plot(k_nums,scores)
+    plt.show()
+    return 
+
+
 def run():
     # 读取数据
     df = pd.read_csv('./cluster/data/test_data2.csv')
@@ -95,7 +105,7 @@ def run():
     userIds = []
     for idx in range(len(data)):
         userIds.append(data[idx][0])
-    print("user_id = " , userIds)
+    #print("user_id = " , userIds)
 
     df = df.drop('user_id', axis=1)
     data = df.values
@@ -111,14 +121,20 @@ def run():
     #print('data_pca = ')
     #print(data_pca)
 
+    k_nums = []
+    scores = []
+
     for k in range(3, 4):
         score,labels = k_means(k, data_pca, scaler,pca)
         print('k=', k, 'score=', score)
+        k_nums.append(k)
+        scores.append(score)
         # 使用column_stack函数将两个数组组合成一个二维数组
         res = np.column_stack((userIds, labels))
         # 使用savetxt函数将二维数组保存到csv文件中
         np.savetxt('./cluster/data/result.csv', res, delimiter=',',fmt='%d')
 
+    #draw_score(k_nums, scores)
 run()
 
 

@@ -6,18 +6,18 @@
             添加账号
         </el-button>
 
-        <el-dialog v-model="dialog_add_account" title="添加账号">
-            <el-form :model="add_account_form">
-                <el-form-item label="账号名">
+        <el-dialog v-model="dialog_add_account" title="添加账号" width="500px">
+            <el-form :model="add_account_form" label-width="100px" label-position="left">
+                <el-form-item label="账号名" style="width: 80%">
                     <el-input v-model="add_account_form.account_name"></el-input>
                 </el-form-item>
-                <el-form-item label="账号密码">
+                <el-form-item label="账号密码" style="width: 80%">
                     <el-input v-model="add_account_form.account_pwd"></el-input>
                 </el-form-item>
-                <el-form-item label="确认账号密码">
+                <el-form-item label="确认账号密码" style="width: 80%">
                     <el-input v-model="add_account_form.account_pwd2"></el-input>
                 </el-form-item>
-                <el-form-item label="账号权限">
+                <el-form-item label="账号权限" style="width: 80%">
                     <el-select v-model="add_account_form.account_permission" placeholder="">
                         <el-option v-for="item in permission_option" :key="item[0]" :label="item[1]" :value="item[0]"></el-option>
                     </el-select>
