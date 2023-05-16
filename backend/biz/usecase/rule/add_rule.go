@@ -2,7 +2,6 @@ package rule
 
 import (
 	"backend/biz/entity/account"
-	"backend/biz/entity/data_source"
 	"backend/biz/entity/rule"
 	"backend/biz/microtype"
 	"backend/biz/model/backend"
@@ -72,11 +71,6 @@ func (r *AddRule) Load(ctx context.Context) error {
 	if err != nil {
 		logger.Error("rule create failed. err=", err.Error())
 		return microtype.RuleCreateFailed
-	}
-
-	err = data_source.AddRuleSource(ctx, r.req.RuleType, createMo.RuleID)
-	if err != nil {
-		return err
 	}
 
 	return nil

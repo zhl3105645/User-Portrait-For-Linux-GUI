@@ -1,7 +1,6 @@
 package rule
 
 import (
-	"backend/biz/entity/data_source"
 	"backend/biz/microtype"
 	"backend/biz/model/backend"
 	"backend/cmd/dal/query"
@@ -24,12 +23,6 @@ func (u *DeleteRule) Load(ctx context.Context) error {
 		Delete()
 	if err != nil {
 		return microtype.RuleDeleteFailed
-	}
-
-	// 数据源删除
-	err = data_source.DeleteRuleSource(ctx, u.ruleId)
-	if err != nil {
-		return err
 	}
 
 	return nil
