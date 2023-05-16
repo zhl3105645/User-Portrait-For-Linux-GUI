@@ -37,7 +37,11 @@
     </el-table>
 
 
-    <el-dialog v-model="dialogBehaviorViewVisible" title="行为图">
+    <el-dialog 
+      v-model="dialogBehaviorViewVisible" 
+      title="单次使用行为图"
+      @open="open()"
+      >
       <div ref="view_chart" style="width: 750px; height: 400px;"></div>
     </el-dialog>
 
@@ -73,6 +77,7 @@ export default {
       mergeIndexMap: {},
       dialogBehaviorViewVisible: false,
       view_chart: null,
+      behavior_rule_data: null,
     }
   },
   created() {
@@ -152,90 +157,125 @@ export default {
       })
     },
     handleViewBehavior(behavior_rule_data) {
-      if (behavior_rule_data == null || behavior_rule_data.rule_elements == null) {
-        return 
-      }
-      let ruleMap = new Map()
-      behavior_rule_data.rule_elements.forEach((element, index) => {
-        if (!ruleMap.has(element.rule_desc)) {
-          ruleMap.set(element.rule_desc, true)
-        }
-      })
-      let rules = new Array()
-      let rule_desc_2_index = new Map()
-      let idx = 0
-      for (let key of ruleMap.keys()) {
-        rules.push(key)
-        rule_desc_2_index.set(key, idx)
-        idx = idx + 1
-      }
-
-      let data = new Array()
-      for (let i = 0; i < behavior_rule_data.rule_elements.length - 1; i++) {
-        let element = behavior_rule_data.rule_elements[i]
-        let next_element = behavior_rule_data.rule_elements[i+1]
-        let index = rule_desc_2_index.get(element.rule_desc)
-        let begin_time = element.timestamp 
-        let end_time = next_element.timestamp
-        let duration = end_time - begin_time
-        let d = {
-          value: [index, begin_time, end_time, duration]
-        }
-        data.push(d)
-      }
-
-
-      let option = {
-        dataZoom: [
-          {
-            type: 'slider',
-            filterMode: 'weakFilter',
-            showDataShadow: false,
-            top: 400,
-            labelFormatter: ''
-          },
-          {
-            type: 'inside',
-            filterMode: 'weakFilter'
-          }
-        ],
-        grid: {
-          height: 300
-        },
-        xAxis: {
-          type: 'value',
-          //min: startTime,
-          scale: true,
-          axisLabel: {
-            formatter: function (val) {
-              return timestampToTime(val)
-            },
-          }
-        },
-        yAxis: {
-          data: rules
-        },
-        series: [
-          {
-            type: 'custom',
-            renderItem: renderItem,
-            itemStyle: {
-              opacity: 0.8
-            },
-            encode: {
-              x: [1, 2],
-              y: 0
-            },
-            data: data
-          }
-        ]
-      };
+      this.behavior_rule_data = behavior_rule_data
       this.dialogBehaviorViewVisible = true
-      this.view_chart = echarts.init(this.$refs.view_chart);
-      console.log("my option=", option)
-      this.view_chart.setOption(option)
+    },
+    initEcharts(){
+      let behavior_rule_data = this.behavior_rule_data
+      if (behavior_rule_data == null || behavior_rule_data.rule_elements == null) {
+          return 
+        }
+        if (this.view_chart == null) {
+          console.log("view_chart null")
+          this.view_chart = echarts.init(this.$refs.view_chart,null, {renderer: 'svg'});
+        } else {
+          console.log("view_chart not null")
+          this.view_chart.clear()
+        }
+
+        let ruleMap = new Map()
+        behavior_rule_data.rule_elements.forEach((element, index) => {
+          if (!ruleMap.has(element.rule_desc)) {
+            ruleMap.set(element.rule_desc, true)
+          }
+        })
+        let rules = new Array()
+        let rule_desc_2_index = new Map()
+        let idx = 0
+        for (let key of ruleMap.keys()) {
+          rules.push(key)
+          rule_desc_2_index.set(key, idx)
+          idx = idx + 1
+        }
+
+        let data = new Array()
+        for (let i = 0; i < behavior_rule_data.rule_elements.length - 1; i++) {
+          let element = behavior_rule_data.rule_elements[i]
+          let next_element = behavior_rule_data.rule_elements[i+1]
+          let index = rule_desc_2_index.get(element.rule_desc)
+          let begin_time = element.timestamp 
+          let end_time = next_element.timestamp
+          let duration = end_time - begin_time
+          let d = {
+            value: [index, begin_time, end_time, duration]
+          }
+          data.push(d)
+        }
+
+
+        let option = {
+          toolbox: {
+              show: true,
+              feature: {
+                  mark: {show: true},
+                  saveAsImage: {show: true},
+              }
+          },
+          dataZoom: [
+            {
+              type: 'slider',
+              filterMode: 'weakFilter',
+              showDataShadow: false,
+              top: 400,
+              labelFormatter: ''
+            },
+            {
+              type: 'inside',
+              filterMode: 'weakFilter'
+            }
+          ],
+          grid: {
+            height: 300
+          },
+          xAxis: {
+            type: 'value',
+            //min: startTime,
+            scale: true,
+            axisLabel: {
+              formatter: function (val) {
+                return timestampToTime(val)
+              },
+            }
+          },
+          yAxis: {
+            data: rules
+          },
+          series: [
+            {
+              type: 'custom',
+              renderItem: renderItem,
+              itemStyle: {
+                opacity: 0.8
+              },
+              encode: {
+                x: [1, 2],
+                y: 0
+              },
+              data: data
+            }
+          ]
+        };
+        
+        console.log("my option=", option)
+        this.view_chart.setOption(option)
+    },
+    open() {
+      this.$nextTick(() => {
+        this.initEcharts()
+      })
     }
   }  
+}
+
+
+function sleep(time){
+ var timeStamp = new Date().getTime();
+ var endTime = timeStamp + time;
+ while(true){
+  if (new Date().getTime() > endTime){
+    return;
+  } 
+ }
 }
 
 function renderItem(params, api) {

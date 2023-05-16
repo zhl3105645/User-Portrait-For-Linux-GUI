@@ -146,6 +146,6 @@ func getBeginAndEndTime(events [][]string) (beginTime int64, endTime int64, err 
 // 活跃度计算公式
 func activityExp(ti time.Time, useTime int64) float64 {
 	now := time.Now()
-	day := now.Sub(ti).Abs().Hours() / 24
+	day := math.Abs(now.Sub(ti).Hours() / 24)
 	return math.Pow(math.E, -day) * float64(useTime)
 }

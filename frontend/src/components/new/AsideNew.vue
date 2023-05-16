@@ -7,9 +7,9 @@
         router
     >
       <el-submenu index="1">
-        <template v-slot:title>权限管理</template>
+        <template v-slot:title>账号管理</template>
         <el-menu-item-group>
-          <el-menu-item index="/front/permission">账号权限</el-menu-item>
+          <el-menu-item index="/front/permission">账号</el-menu-item>
         </el-menu-item-group>
       </el-submenu>
       <el-submenu index="2">

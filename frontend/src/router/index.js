@@ -9,7 +9,7 @@ const routes = [
     {
         path: '/front',
         component: LayoutNew,
-        redirect: "/front/label",
+        redirect: "/front/profile",
         children: [
             {
                 path: 'permission',

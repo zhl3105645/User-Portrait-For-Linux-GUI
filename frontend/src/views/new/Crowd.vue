@@ -5,34 +5,33 @@
         <el-button type="primary" style="margin-left: 5px" @click="this.dialog_add_crowd_visible = true">添加人群</el-button>
 
 
-        <el-dialog v-model="dialog_add_crowd_visible" title="添加人群">
-            <el-form :model="add_crowd_form">
+        <el-dialog v-model="dialog_add_crowd_visible" title="添加人群" width="650px">
+            <el-form :model="add_crowd_form" label-width="100px" label-position="left">
                 <el-form-item label="人群名">
-                    <el-input v-model="add_crowd_form.crowd_name"/>
+                    <el-input v-model="add_crowd_form.crowd_name" style="width: 60%"/>
                 </el-form-item>
                 <el-form-item label="人群描述">
-                    <el-input v-model="add_crowd_form.crowd_desc"/>
+                    <el-input v-model="add_crowd_form.crowd_desc" style="width: 60%"/>
                 </el-form-item>
                 <el-form-item label="人群划分规则">
                     <div v-for="(rule, index) in divide_rules" :key="index">
-                        <el-select v-model="rule.union_operate" style="width: 20%" v-if="index > 0" placeholder="连接方式">
-                            <el-option v-for="item in union_operate_types" :key="item.key" :label="item.desc" :value="item.key"></el-option>
-                        </el-select>
-                        
                         <!-- 标签选择 -->
-                        <el-select v-model="rule.label_id" style="width: 20%" placeholder="标签">
+                        <el-select v-model="rule.label_id" style="width: 20%;margin-left: 5px" placeholder="标签">
                             <el-option v-for="item in label_options" :key="item.label_id" :label="item.label_name" :value="item.label_id"></el-option>
                         </el-select>
                         <!-- 操作 -->
-                        <el-select v-model="rule.divide_operate" style="width: 20%" placeholder="操作符">
+                        <el-select v-model="rule.divide_operate" style="width: 20%;margin-left: 5px" placeholder="操作符">
                             <el-option v-for="item in divide_operate_types" :key="item.key" :label="item.desc" :value="item.key"></el-option>
                         </el-select>
                         <!-- 标签数据 -->
-                        <el-select v-model="rule.label_data" v-if="label_2_enum.get(rule.label_id) == true" style="width: 20%" placeholder="标签数据">
+                        <el-select v-model="rule.label_data" v-if="label_2_enum.get(rule.label_id) == true" style="width: 20%;margin-left: 5px" placeholder="标签数据">
                             <el-option v-for="item in label_2_desc.get(rule.label_id)" :key="item.data" :label="item.desc" :value="item.data"></el-option>
                         </el-select>
-                        <el-input v-model="rule.label_data" v-else style="width: 20%" placeholder="标签数据">
-                        </el-input>     
+                        <el-input v-model="rule.label_data" v-else style="width: 20%;margin-left: 5px" placeholder="标签数据">
+                        </el-input>   
+                        <el-select v-model="rule.union_operate" style="width: 20%;margin-left: 5px" v-if="index < this.divide_rules.length-1" placeholder="连接方式">
+                            <el-option v-for="item in union_operate_types" :key="item.key" :label="item.desc" :value="item.key"></el-option>
+                        </el-select>  
                     </div>
                     <el-button @click="add_divide_rule">添加规则</el-button>
                 </el-form-item>
@@ -210,7 +209,7 @@ export default {
             if (this.divide_rules.length <= 0) {
                 return 
             }
-            this.divide_rules[0].union_operate = 1
+            this.divide_rules[this.divide_rules.length-1].union_operate = 1
             this.add_crowd_form.divide_rules = this.divide_rules
             console.log(this.add_crowd_form)
             request.post("/api/crowd", this.add_crowd_form).then(res => {

@@ -60,13 +60,13 @@ export default {
         this.load_crowds()
     },
     mounted(){
-        this.behavior_duration_chart = echarts.init(this.$refs.behavior_duration_chart)
-        this.pie_chart_1 = echarts.init(this.$refs.pie_chart_1)
-        this.pie_chart_2 = echarts.init(this.$refs.pie_chart_2)
-        this.pie_chart_3 = echarts.init(this.$refs.pie_chart_3)
-        this.pie_chart_4 = echarts.init(this.$refs.pie_chart_4)
-        this.stack_bar_chart = echarts.init(this.$refs.stack_bar_chart)
-        this.bar_chart = echarts.init(this.$refs.bar_chart)
+        this.behavior_duration_chart = echarts.init(this.$refs.behavior_duration_chart,null, {renderer: 'svg'})
+        this.pie_chart_1 = echarts.init(this.$refs.pie_chart_1,null, {renderer: 'svg'})
+        this.pie_chart_2 = echarts.init(this.$refs.pie_chart_2,null, {renderer: 'svg'})
+        this.pie_chart_3 = echarts.init(this.$refs.pie_chart_3,null, {renderer: 'svg'})
+        this.pie_chart_4 = echarts.init(this.$refs.pie_chart_4,null, {renderer: 'svg'})
+        this.stack_bar_chart = echarts.init(this.$refs.stack_bar_chart,null, {renderer: 'svg'})
+        this.bar_chart = echarts.init(this.$refs.bar_chart,null, {renderer: 'svg'})
     },
     methods: {
         load_crowds() {
@@ -124,6 +124,13 @@ export default {
             }
 
             let option = {
+                // toolbox: {
+                //     show: true,
+                //     feature: {
+                //         mark: {show: true},
+                //         saveAsImage: {show: true},
+                //     }
+                // },
                 title: {
                     text: '行为时长',
                 },
@@ -184,10 +191,17 @@ export default {
             this.behavior_duration_chart.setOption(option)
         },
         set_pie_chart() {
-            if (this.pie_label.length < 1) {
+            if (this.pie_label == null || this.pie_label.length < 1) {
                 return 
             }
             let option1 = {
+                // toolbox: {
+                //     show: true,
+                //     feature: {
+                //         mark: {show: true},
+                //         saveAsImage: {show: true},
+                //     }
+                // },
                 tooltip: {
                     trigger: 'item'
                 },
@@ -221,6 +235,13 @@ export default {
                 return 
             }
             let option2 = {
+                // toolbox: {
+                //     show: true,
+                //     feature: {
+                //         mark: {show: true},
+                //         saveAsImage: {show: true},
+                //     }
+                // },
                 tooltip: {
                     trigger: 'item'
                 },
@@ -254,6 +275,13 @@ export default {
                 return 
             }
             let option3 = {
+                // toolbox: {
+                //     show: true,
+                //     feature: {
+                //         mark: {show: true},
+                //         saveAsImage: {show: true},
+                //     }
+                // },
                 tooltip: {
                     trigger: 'item'
                 },
@@ -287,6 +315,13 @@ export default {
                 return 
             }
             let option4 = {
+                // toolbox: {
+                //     show: true,
+                //     feature: {
+                //         mark: {show: true},
+                //         saveAsImage: {show: true},
+                //     }
+                // },
                 tooltip: {
                     trigger: 'item'
                 },
@@ -345,11 +380,18 @@ export default {
             }
             //console.log(series)
             let option = {
+                // toolbox: {
+                //     show: true,
+                //     feature: {
+                //         mark: {show: true},
+                //         saveAsImage: {show: true},
+                //     }
+                // },
                 tooltip: {
                     trigger: 'axis',
                 },
                 title: {
-                    text: '数据分布',
+                    text: '自定义标签',
                 },
                 xAxis: [
                     {
@@ -376,6 +418,13 @@ export default {
         },
         set_bar_chart() {
             let option = {
+                // toolbox: {
+                //     show: true,
+                //     feature: {
+                //         mark: {show: true},
+                //         saveAsImage: {show: true},
+                //     }
+                // },
                 tooltip: {
                     trigger: 'axis',
                     axisPointer: {
@@ -460,7 +509,7 @@ export default {
 }
 .top-2 {
   top: 50px;
-  left: 250px;
+  left: 240px;
   position: absolute;
   width: 200px;
   height: 200px;
@@ -468,7 +517,7 @@ export default {
 }
 .top-3 {
   top: 50px;
-  left: 500px;
+  left: 480px;
   position: absolute;
   width: 200px;
   height: 200px;
@@ -476,7 +525,7 @@ export default {
 }
 .top-4 {
   top: 50px;
-  left: 750px;
+  left: 720px;
   position: absolute;
   width: 200px;
   height: 200px;
@@ -485,7 +534,7 @@ export default {
 
 .top-5 {
   top: 50px;
-  left: 1000px;
+  left: 960px;
   position: absolute;
   width: 300px;
   height: 250px;
@@ -503,7 +552,7 @@ export default {
 .circle {
   position: absolute;
   bottom: 50px;
-  right: 0px;
+  left: 960px;
   width: 350px;
   height: 350px;
   /* background-color: rgb(224, 217, 217); */

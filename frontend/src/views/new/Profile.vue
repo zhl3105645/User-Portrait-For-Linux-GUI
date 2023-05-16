@@ -18,7 +18,7 @@
         <div v-for="item in this.group_labels[0].labels" :key="item.label_id" class="text item">{{item.label_name + ": " + item.label_value }}</div>
       </el-card>
     </div>
-    <div class="box top-right" v-if="this.group_labels.length >= 2">
+    <div class="box_large top-right" v-if="this.group_labels.length >= 2">
       <el-card class="box-card">
         <template #header>
           <div class="card-header">
@@ -78,7 +78,7 @@ export default {
   },
   mounted() {
     // this.profile_chart = echarts.init(this.$refs.profile_chart)
-    this.behavior_duration_chart = echarts.init(this.$refs.behavior_duration_chart)
+    this.behavior_duration_chart = echarts.init(this.$refs.behavior_duration_chart,null, {renderer: 'svg'})
   },
   methods: {
     load_profile(){
@@ -114,44 +114,6 @@ export default {
       })
     },
     set_chart() {
-      // let option = {
-      //   tooltip: {
-      //     trigger: 'item',
-      //     triggerOn: 'mousemove'
-      //   },
-      //   series: [
-      //     {
-      //       type: 'tree',
-      //       data: [this.tree_label],
-      //       top: '1%',
-      //       left: '7%',
-      //       bottom: '1%',
-      //       right: '20%',
-      //       symbolSize: 7,
-      //       label: {
-      //         position: 'left',
-      //         verticalAlign: 'middle',
-      //         align: 'right',
-      //         fontSize: 14
-      //       },
-      //       leaves: {
-      //         label: {
-      //           position: 'right',
-      //           verticalAlign: 'middle',
-      //           align: 'left'
-      //         }
-      //       },
-      //       emphasis: {
-      //         focus: 'descendant'
-      //       },
-      //       expandAndCollapse: true,
-      //       animationDuration: 550,
-      //       animationDurationUpdate: 750
-      //     }
-      //   ]
-      // }
-      // this.profile_chart.setOption(option)
-
       let indicator = new Array()
       let appDuration = new Array()
       let userDuration = new Array()
@@ -168,6 +130,13 @@ export default {
       let option2 = {
         // title: {
         //   text: '行为时长图'
+        // },
+        // toolbox: {
+        //     show: true,
+        //     feature: {
+        //         mark: {show: true},
+        //         saveAsImage: {show: true},
+        //     }
         // },
         legend: {
           top: "10%",
@@ -236,21 +205,26 @@ export default {
   height: 200px;
   /* background-color: lightblue; */
 }
+.box_large {
+  position: absolute;
+  width: 220px;
+  height: 200px;
+}
 .top-left {
   top: 50px;
-  left: 150px;
+  left: 300px;
 }
 .top-right {
   top: 50px;
-  right: 150px;
+  right: 280px;
 }
 .bottom-left {
   bottom: 120px;
-  left: 150px;
+  left: 300px;
 }
 .bottom-right {
   bottom: 120px;
-  right: 150px;
+  right: 300px;
 }
 .circle {
   position: absolute;

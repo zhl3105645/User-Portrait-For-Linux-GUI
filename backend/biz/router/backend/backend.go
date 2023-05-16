@@ -22,7 +22,9 @@ func Register(r *server.Hertz) {
 	root.POST("/register", append(_registerMw(), backend.Register)...)
 	{
 		_api := root.Group("/api", _apiMw()...)
+		_api.POST("/account", append(__dd_ccountMw(), backend.AddAccount)...)
 		_api.GET("/account", append(__ccountMw(), backend.Account)...)
+		_api.GET("/accounts", append(__ccountinpageMw(), backend.AccountInPage)...)
 		_api.GET("/all_user", append(_usersMw(), backend.Users)...)
 		_api.GET("/basic_behaviors", append(_basicbehaviorinpageMw(), backend.BasicBehaviorInPage)...)
 		_api.POST("/components", append(_genecomponentMw(), backend.GeneComponent)...)

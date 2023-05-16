@@ -4,8 +4,8 @@
         <div style="margin: 10px 0">
           <el-button type="primary" style="margin-left: 5px" @click="this.dialogAddLabelVisible = true">添加标签</el-button>
         
-          <el-dialog v-model="dialogAddLabelVisible" title="添加标签">
-            <el-form :model="addLabelForm">
+          <el-dialog v-model="dialogAddLabelVisible" title="添加标签" width="700px">
+            <el-form :model="addLabelForm" label-width="100px" label-position="left">
               <el-form-item label="标签名称">
                 <el-input v-model="addLabelForm.label_name"/>
               </el-form-item>
@@ -14,7 +14,7 @@
                   <el-option v-for="item in label_options" :key="item.label_id" :label="item.label_name" :value="item.label_id"></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="是否存储数据">
+              <el-form-item label="叶子标签">
                 <el-radio-group class="ml-4" v-model="store_data">
                   <el-radio label="1" size="large">是</el-radio>
                   <el-radio label="2" size="large">否</el-radio>
@@ -26,10 +26,10 @@
                   <el-radio label="2" size="large">不可枚举</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="标签语义化表述" v-if="addLabelForm.data_type==1">
+              <el-form-item label="语义化表述" v-if="addLabelForm.data_type==1">
                 <div v-for="(rule, index) in convertRules" :key="index">
                   <el-button>标签数据</el-button>
-                  <el-input v-model="rule.data" style="width: 10%"> </el-input>
+                  <el-input v-model="rule.data" style="width: 20%"> </el-input>
                   <el-button>标签描述</el-button>
                   <el-input v-model="rule.desc" style="width: 20%"> </el-input>
                 </div>

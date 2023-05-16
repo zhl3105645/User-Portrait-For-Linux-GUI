@@ -291,3 +291,13 @@ func _seqminingresultdownloadMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func __ccountinpageMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func __dd_ccountMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

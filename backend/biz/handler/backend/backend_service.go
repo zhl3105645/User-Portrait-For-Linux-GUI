@@ -1402,3 +1402,59 @@ func SeqMiningResultDownload(ctx context.Context, c *app.RequestContext) {
 
 	c.SetBodyStream(bf, bf.Len())
 }
+
+// AccountInPage .
+// @router /api/accounts [GET]
+func AccountInPage(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.AccountInPageReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.AccountInPageResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := account.NewPageAccount(ac.(*model.Account).AccountID, req.GetPageNum(), req.GetPageSize(), req.GetSearch())
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// AddAccount .
+// @router /api/account [POST]
+func AddAccount(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req backend.AddAccountReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(backend.AddAccountResp)
+
+	ac, _ := c.Get(mw.IdentityKey)
+	al := account.NewAddAccount(ac.(*model.Account).AccountID, req)
+	if err := al.Load(ctx); err != nil {
+		mErr := microtype.Unwrap(err)
+		resp.StatusCode = mErr.Code
+		resp.StatusMsg = mErr.Msg
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+
+	resp = al.GetResp()
+
+	c.JSON(consts.StatusOK, resp)
+}

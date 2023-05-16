@@ -83,7 +83,7 @@ func (g *GroupProfile) Load(ctx context.Context) error {
 	}
 
 	// 叶子标签
-	labs, err := query.Label.WithContext(ctx).Where(query.Label.IsLeaf.Eq(1)).Find()
+	labs, err := query.Label.WithContext(ctx).Where(query.Label.AppID.Eq(g.appId), query.Label.IsLeaf.Eq(1)).Find()
 	if err != nil {
 		return nil
 	}
@@ -177,7 +177,7 @@ func (g *GroupProfile) getPieLabels() []*backend.PieLabel {
 	for _, lab := range g.pieModelLabels {
 		data, ok := g.labelId2UserId2Data[lab.LabelID]
 		if !ok {
-			return nil
+			continue
 		}
 
 		pieData := make([]*backend.PieData, 0)

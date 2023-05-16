@@ -137,7 +137,7 @@ export default {
               message: "添加成功"
             })
             this.dialog_add_task_visible = false
-            this.add_seq_mining_task = {}
+            this.add_task_form = {}
             this.load()
           } else {
             this.$message({

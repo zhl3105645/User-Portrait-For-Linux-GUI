@@ -58,7 +58,7 @@
             <el-option v-for="(name, index) in keyClickTypes" :key="index" :label="name" :value="index"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="键盘点击值">
+        <el-form-item label="键盘点击键前缀">
           <el-input v-model="addElementForm.key_value"/>
         </el-form-item>
         <el-form-item label="组件前缀">
@@ -97,7 +97,7 @@
             <el-option v-for="(name, index) in keyClickTypes" :key="index" :label="name" :value="index"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="键盘点击值">
+        <el-form-item label="键盘点击键前缀">
           <el-input v-model="updateElementform.key_value" :placeholder="curRow.key_value"/>
         </el-form-item>
         <el-form-item label="组件前缀">
@@ -161,7 +161,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="key_value" label="键盘点击值" width="90" />
+        <el-table-column prop="key_value" label="键盘点击键前缀" width="110" />
         <el-table-column prop="component_name_prefix" label="组件前缀" width="200" :show-overflow-tooltip="true"/>
         <el-table-column fixed="right" label="元素操作" width="200">
           <template #default="scope">
