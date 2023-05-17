@@ -3,9 +3,11 @@
 package main
 
 import (
+	"backend/biz/hadoop"
 	"backend/biz/mq"
 	"backend/biz/mw"
 	"backend/cmd/dal"
+	"context"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/config"
 )
@@ -14,6 +16,7 @@ func main() {
 	dal.Init()
 	mw.InitJwt()
 	mq.Init()
+	hadoop.Init(context.Background())
 
 	h := server.Default(config.Option{
 		F: func(o *config.Options) {

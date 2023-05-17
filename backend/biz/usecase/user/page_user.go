@@ -2,10 +2,10 @@ package user
 
 import (
 	"backend/biz/entity/account"
-	"backend/biz/entity/event_data"
 	"backend/biz/entity/user"
 	"backend/biz/microtype"
 	"backend/biz/model/backend"
+	"backend/cmd/dal/query"
 	"context"
 	"sync"
 )
@@ -72,13 +72,18 @@ func (p *PageUser) Load(ctx context.Context) error {
 			_ = recover()
 		}()
 
-		ed := event_data.NewEvent(p.appId)
-		if err := ed.Load(ctx); err != nil {
+		recordMos, err := query.Record.WithContext(ctx).
+			LeftJoin(query.User, query.User.UserID.EqCol(query.Record.UserID)).
+			Where(query.User.AppID.Eq(p.appId)).Find()
+		if err != nil {
 			recordErr = err
 			return
 		}
 
-		p.recordNum = ed.GetEventsRecordNum()
+		p.recordNum = make(map[int64]int64)
+		for _, mo := range recordMos {
+			p.recordNum[mo.UserID] = p.recordNum[mo.UserID] + 1
+		}
 	}()
 
 	wg.Wait()

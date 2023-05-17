@@ -237,7 +237,7 @@ func innerConnect(ctx context.Context, host string, port int, auth string,
 			//	ConnectTimeout: configuration.ConnectTimeout,
 			//	SocketTimeout:  configuration.SocketTimeout,
 			//})
-			socket = thrift.NewTSSLSocketFromAddrTimeout(ad, configuration.TLSConfig, configuration.SocketTimeout)
+			socket = thrift.NewTSocketFromAddrTimeout(ad, configuration.ConnectTimeout)
 		}
 		if err != nil {
 			return

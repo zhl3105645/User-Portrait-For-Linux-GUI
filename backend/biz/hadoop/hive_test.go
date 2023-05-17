@@ -3,6 +3,7 @@ package hadoop
 import (
 	"backend/gohive"
 	"context"
+	"github.com/bytedance/gopkg/util/logger"
 	"log"
 	"testing"
 )
@@ -32,8 +33,7 @@ func TestName(t *testing.T) {
 		log.Fatal(cursor.Err)
 	}
 
-	var userId int64
-	var beginTime int64
+	var recordId int64
 	var eventType int32
 	var eventTime int64
 	var mousePos string
@@ -49,7 +49,7 @@ func TestName(t *testing.T) {
 	var day string
 	for cursor.HasMore(ctx) {
 		cursor.FetchOne(ctx,
-			&userId, &beginTime, &eventType,
+			&recordId, &eventType,
 			&eventTime, &mousePos, &mouseClickType,
 			&mouseClickBtn, &mouseMoveType, &keyClickType,
 			&keyCode, &componentName, &componentType,
@@ -62,4 +62,61 @@ func TestName(t *testing.T) {
 
 	cursor.Close()
 	connection.Close()
+}
+
+func TestQuery(t *testing.T) {
+	ctx := context.Background()
+	Init(ctx)
+
+	events, err := QueryEventsByRecordId(ctx, 1)
+	if err != nil {
+		logger.Info(err.Error())
+	}
+
+	logger.Info(events)
+
+}
+
+func TestWrite(t *testing.T) {
+	ctx := context.Background()
+	Init(ctx)
+
+	e1 := &Event{
+		RecordId:       4,
+		EventType:      1,
+		EventTime:      12,
+		MousePos:       "21",
+		MouseClickType: 2,
+		MouseClickBtn:  1,
+		MouseMoveType:  2,
+		KeyClickType:   1,
+		KeyCode:        "d",
+		ComponentName:  "dsa",
+		ComponentType:  1,
+		ComponentExtra: "dsa",
+		AppId:          2,
+		Day:            "2022-02-01",
+	}
+	e2 := &Event{
+		RecordId:       5,
+		EventType:      1,
+		EventTime:      12,
+		MousePos:       "21",
+		MouseClickType: 2,
+		MouseClickBtn:  1,
+		MouseMoveType:  2,
+		KeyClickType:   1,
+		KeyCode:        "d",
+		ComponentName:  "dsa",
+		ComponentType:  1,
+		ComponentExtra: "dsa",
+		AppId:          2,
+		Day:            "2022-02-01",
+	}
+
+	_ = WriteEvents(ctx, []string{e1.String(), e2.String()})
+}
+
+func TestWriteSQL(t *testing.T) {
+	writeSQL(1, "dsadasd")
 }
