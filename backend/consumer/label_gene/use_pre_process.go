@@ -1,45 +1,42 @@
 package label_gene
 
 import (
-	"backend/biz/entity/event_data"
 	"backend/biz/util"
-	"backend/consumer/common"
+	"backend/cmd/dal/query"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
+	"gorm.io/gorm"
 	"math"
-	"strconv"
 	"time"
 )
 
 func processUsePreLabel(ctx context.Context, appId int64, labelId int64) map[int64]string {
-	res := make(map[int64]string)
-	// 数据文件路径
-	userEventPath := common.GetUserEventPath(ctx, appId)
-	if len(userEventPath) == 0 {
-		return res
+	recordDO := query.Record
+	recordMO := recordDO.WithContext(ctx)
+	userDO := query.User
+	// 查询 mysql 已有记录
+	records, err := recordMO.Join(userDO, recordDO.UserID.EqCol(userDO.UserID)).
+		Where(userDO.AppID.Eq(appId)).Find()
+	if err != nil && !errors.Is(err, gorm.ErrEmptySlice) {
+		logger.Error("query mysql failed. Err=", err.Error())
+		return nil
 	}
 	// 开始时间，结束时间
 	beginTimeMap := make(map[int64][]int64) // u_id -> []time
 	endTimeMap := make(map[int64][]int64)
-	for userId, paths := range userEventPath {
-		beginTimeMap[userId] = make([]int64, 0, len(paths))
-		endTimeMap[userId] = make([]int64, 0, len(paths))
-		for _, path := range paths {
-			events, err := common.OpenFile(path)
-			if err != nil {
-				logger.Error("open file failed. err=", err.Error())
-				continue
-			}
-			beginTime, endTime, err := getBeginAndEndTime(events)
-			if err != nil {
-				logger.Error("get app use time failed. err=", err.Error())
-				continue
-			}
+	for _, rec := range records {
+		uId := rec.UserID
 
-			beginTimeMap[userId] = append(beginTimeMap[userId], beginTime)
-			endTimeMap[userId] = append(endTimeMap[userId], endTime)
+		if len(beginTimeMap[uId]) == 0 {
+			beginTimeMap[uId] = make([]int64, 0)
 		}
+		if len(endTimeMap[uId]) == 0 {
+			endTimeMap[uId] = make([]int64, 0)
+		}
+		beginTimeMap[uId] = append(beginTimeMap[uId], rec.BeginTime)
+		endTimeMap[uId] = append(endTimeMap[uId], rec.BeginTime+rec.UseTime)
 	}
 
 	// 处理得到使用时长、使用时间段、活跃度
@@ -121,26 +118,6 @@ func getUseFreLabels(beginTimeMap map[int64][]int64, endTimeMap map[int64][]int6
 	}
 
 	return
-}
-
-func getBeginAndEndTime(events [][]string) (beginTime int64, endTime int64, err error) {
-	if len(events) < 3 {
-		return 0, 0, fmt.Errorf("length < 3")
-	}
-
-	beginEvent := events[1]
-	endEvent := events[len(events)-1]
-	if len(beginEvent) < 2 || len(endEvent) < 2 || beginEvent[0] != string(event_data.AppStart) || endEvent[0] != string(event_data.AppQuit) {
-		return 0, 0, fmt.Errorf("app start or stop data error")
-	}
-
-	beginTime, err1 := strconv.ParseInt(beginEvent[1], 10, 64)
-	endTime, err2 := strconv.ParseInt(endEvent[1], 10, 64)
-	if err1 != nil || err2 != nil {
-		return 0, 0, fmt.Errorf("time is not int")
-	}
-
-	return beginTime, endTime, nil
 }
 
 // 活跃度计算公式

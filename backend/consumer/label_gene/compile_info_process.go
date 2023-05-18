@@ -1,36 +1,53 @@
 package label_gene
 
 import (
-	"backend/biz/entity/event_data"
 	"backend/biz/entity/rule"
+	"backend/biz/hadoop"
 	"backend/biz/util"
-	"backend/consumer/common"
+	"backend/cmd/dal/model"
+	"backend/cmd/dal/query"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
+	"gorm.io/gorm"
 	"strings"
 )
 
 func ProcessCompileInfo(ctx context.Context, appId int64) map[int64]string {
 	res := make(map[int64]string)
-	// 数据文件路径
-	userEventPath := common.GetUserEventPath(ctx, appId)
-	if len(userEventPath) == 0 {
-		return res
+
+	recordDO := query.Record
+	recordMO := recordDO.WithContext(ctx)
+	userDO := query.User
+	// 查询 mysql 已有记录
+	records, err := recordMO.Join(userDO, recordDO.UserID.EqCol(userDO.UserID)).
+		Where(userDO.AppID.Eq(appId)).Find()
+	if err != nil && !errors.Is(err, gorm.ErrEmptySlice) {
+		logger.Error("query mysql failed. Err=", err.Error())
+		return nil
+	}
+	userId2Records := make(map[int64][]*model.Record)
+	for _, rec := range records {
+		if len(userId2Records[rec.UserID]) == 0 {
+			userId2Records[rec.UserID] = make([]*model.Record, 0)
+		}
+		userId2Records[rec.UserID] = append(userId2Records[rec.UserID], rec)
 	}
 
 	// 采集各个用户的报警和错误信息 - 每次编译或运行只记录一次相同的报警
 	warningCntMap := make(map[int64]map[string]int64) // user_id -> warning -> cnt
 	errorCntMap := make(map[int64]map[string]int64)   // user_id -> error -> cnt
-	for userId, paths := range userEventPath {
+	for userId, recs := range userId2Records {
 		warningCnt := make(map[string]int64)
 		errorCnt := make(map[string]int64)
-		for _, path := range paths {
-			events, err := common.OpenFile(path)
+		for _, rec := range recs {
+			events, err := hadoop.QueryEventsByRecordId(ctx, rec.RecordID)
 			if err != nil {
-				logger.Error("open file failed. err=", err.Error())
+				logger.Error(fmt.Sprintf("query hadoop failed. recordId=%d, err=%s", rec.RecordID, err.Error()))
 				continue
 			}
+			logger.Info(fmt.Sprintf("reordId=%d, 记录长度=%d", rec.RecordID, len(events)))
 
 			warnMap, errMap := getCompileInfo(events)
 			for msg, cnt := range warnMap {
@@ -98,7 +115,7 @@ func ProcessCompileInfo(ctx context.Context, appId int64) map[int64]string {
 	return res
 }
 
-func getCompileInfo(events [][]string) (warnMap map[string]int64, errMap map[string]int64) {
+func getCompileInfo(events []*hadoop.Event) (warnMap map[string]int64, errMap map[string]int64) {
 	warnMap = make(map[string]int64)
 	errMap = make(map[string]int64)
 
@@ -139,26 +156,27 @@ func getCompileInfo(events [][]string) (warnMap map[string]int64, errMap map[str
 		}
 
 		// 报警内容
-		if event_data.ComponentExtraIndex < len(event) {
-			msg := event[event_data.ComponentExtraIndex]
-			if _, ok := existMap[msg]; ok {
-				continue
+		msg := event.ComponentExtra
+		if msg == "" {
+			continue
+		}
+		if _, ok := existMap[msg]; ok {
+			continue
+		}
+		if strings.HasPrefix(msg, "[警告]") {
+			if cnt, ok := warnMap[msg]; ok {
+				warnMap[msg] = cnt + 1
+			} else {
+				warnMap[msg] = 1
 			}
-			if strings.HasPrefix(msg, "[警告]") {
-				if cnt, ok := warnMap[msg]; ok {
-					warnMap[msg] = cnt + 1
-				} else {
-					warnMap[msg] = 1
-				}
-				existMap[msg] = true
-			} else if strings.HasPrefix(msg, "[错误]") {
-				if cnt, ok := errMap[msg]; ok {
-					errMap[msg] = cnt + 1
-				} else {
-					errMap[msg] = 1
-				}
-				existMap[msg] = true
+			existMap[msg] = true
+		} else if strings.HasPrefix(msg, "[错误]") {
+			if cnt, ok := errMap[msg]; ok {
+				errMap[msg] = cnt + 1
+			} else {
+				errMap[msg] = 1
 			}
+			existMap[msg] = true
 		}
 	}
 

@@ -1,17 +1,19 @@
 package seq_mining
 
 import (
-	"backend/biz/entity/event_data"
+	"backend/biz/hadoop"
 	"backend/biz/usecase/seq_mining"
 	"backend/cmd/dal/model"
 	"backend/cmd/dal/query"
-	"backend/consumer/common"
 	"backend/optimize_prefixspan"
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/golang/protobuf/proto"
 	"github.com/thoas/go-funk"
+	"gorm.io/gorm"
 	"sort"
 )
 
@@ -64,30 +66,38 @@ func Gene(appId int64, taskId int64) {
 		return
 	}
 
-	// 数据文件
-	ed := event_data.NewEvent(appId)
-	if err := ed.Load(ctx); err != nil {
-		logger.Error("err=", err.Error())
+	recordDO := query.Record
+	recordMO := recordDO.WithContext(ctx)
+	userDO := query.User
+
+	// 查询 mysql 已有记录
+	records, err := recordMO.Join(userDO, recordDO.UserID.EqCol(userDO.UserID)).
+		Where(userDO.AppID.Eq(appId)).Find()
+	if err != nil && !errors.Is(err, gorm.ErrEmptySlice) {
+		logger.Error("query mysql failed. Err=", err.Error())
 		return
 	}
 
-	paths := ed.GetFilePath()
-
-	for _, path := range paths {
+	for idx, rec := range records {
 		// 读取行为原始数据
-		events, err := common.OpenFile(path)
+		events, err := hadoop.QueryEventsByRecordId(ctx, rec.RecordID)
 		if err != nil {
+			logger.Error(fmt.Sprintf("query hadoop failed. idx=%d, recordId=%d, err=%s", idx, rec.RecordID, err.Error()))
 			continue
 		}
+		logger.Info(fmt.Sprintf("查询第%d次记录完成，reordId=%d, 记录长度=%d", idx, rec.RecordID, len(events)))
+
+		if len(events) <= 0 {
+			logger.Warn("event length = 0")
+			continue
+		}
+
 		numbers := make([]int, 0, len(events))
 		// 将原始数据转换为可区分 event 并对其编号
 		// 将事件数据转换成编号序列 & 限制过长相同序列
 		lastNumber := -1
 		sameNumberLength := 0
-		for idx, event := range events {
-			if idx == 0 { // 去除头部
-				continue
-			}
+		for _, event := range events {
 			id, ok := getCustomEventNumber(event)
 			if !ok {
 				continue
@@ -103,6 +113,7 @@ func Gene(appId int64, taskId int64) {
 			lastNumber = id
 			numbers = append(numbers, id)
 		}
+		logger.Info("number length = ", len(numbers))
 		// 将编号序列按照最大大小进行划分
 		number2Slice := funk.ChunkInts(numbers, maxSeqLength)
 		seqs := make([]optimize_prefixspan.Sequence, 0, len(number2Slice))
@@ -162,23 +173,19 @@ func Gene(appId int64, taskId int64) {
 	logger.Info("seq mining end.")
 }
 
-func getCustomEventNumber(event []string) (int, bool) {
-	if len(event) <= event_data.ComponentNameIndex {
-		return 0, false
-	}
-	idxs := []int{event_data.EventTypeIndex, event_data.MouseClickTypeIndex, event_data.MouseClickButtonIndex, event_data.KeyClickTypeIndex, event_data.KeyCodeIndex, event_data.ComponentNameIndex}
+func getCustomEventNumber(event *hadoop.Event) (int, bool) {
 	customEvent := ""
 	// 去除鼠标移动事件
-	if event[event_data.EventTypeIndex] == string(event_data.MouseMove) {
+	if event.EventType == hadoop.MouseMove {
 		return 0, false
 	}
-	for _, idx := range idxs {
-		// 若是键盘输入且不是快捷键，则忽略键盘输入值
-		if idx == event_data.KeyCodeIndex && event[event_data.EventTypeIndex] != string(event_data.Shortcut) {
-			continue
-		}
-		customEvent = customEvent + "|" + event[idx]
+
+	if event.EventType == hadoop.Shortcut {
+		customEvent = fmt.Sprintf("%d|%d|%d|%d|%s|%s", event.EventType, event.MouseClickType, event.MouseClickBtn, event.KeyClickType, event.KeyCode, event.ComponentName)
+	} else {
+		customEvent = fmt.Sprintf("%d|%d|%d|%d|%s|%s", event.EventType, event.MouseClickType, event.MouseClickBtn, event.KeyClickType, "", event.ComponentName)
 	}
+
 	if number, ok := customEvent2Number[customEvent]; ok {
 		return number, true
 	}

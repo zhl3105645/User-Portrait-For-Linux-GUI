@@ -1,7 +1,7 @@
 package rule
 
 import (
-	"backend/biz/entity/event_data"
+	"backend/biz/hadoop"
 	"backend/biz/model/backend"
 	"fmt"
 	"strconv"
@@ -199,46 +199,13 @@ func GetEventCnt(elements []*backend.RuleElement) map[int64]int64 {
 }
 
 // 判断是否符合规则
-func MatchEvent(event []string, value []string) bool {
-	if event_data.ComponentNameIndex >= len(event) {
-		return false
-	}
-	eventTyp := event[event_data.EventTypeIndex]
-	mouseClickTyp := event[event_data.MouseClickTypeIndex]
-	mouseClickButton := event[event_data.MouseClickButtonIndex]
-	keyClickTyp := event[event_data.KeyClickTypeIndex]
-	keyValue := event[event_data.KeyCodeIndex]
-	comName := event[event_data.ComponentNameIndex]
-
-	eventTypV := int64(0)
-	mouseClickTypV := int64(0)
-	mouseClickButtonV := int64(0)
-	keyClickTypV := int64(0)
-
-	if eventTyp != "" {
-		v, err := strconv.ParseFloat(eventTyp, 64)
-		if err == nil {
-			eventTypV = int64(v)
-		}
-	}
-	if mouseClickTyp != "" {
-		v, err := strconv.ParseFloat(mouseClickTyp, 64)
-		if err == nil {
-			mouseClickTypV = int64(v)
-		}
-	}
-	if mouseClickButton != "" {
-		v, err := strconv.ParseFloat(mouseClickButton, 64)
-		if err == nil {
-			mouseClickButtonV = int64(v)
-		}
-	}
-	if keyClickTyp != "" {
-		v, err := strconv.ParseFloat(keyClickTyp, 64)
-		if err == nil {
-			keyClickTypV = int64(v)
-		}
-	}
+func MatchEvent(event *hadoop.Event, value []string) bool {
+	eventTypV := int64(event.EventType)
+	mouseClickTypV := int64(event.MouseClickType)
+	mouseClickButtonV := int64(event.MouseClickBtn)
+	keyClickTypV := int64(event.KeyClickType)
+	keyValue := event.KeyCode
+	comName := event.ComponentName
 
 	for _, v := range value {
 		ele := ParseEventElement(v)

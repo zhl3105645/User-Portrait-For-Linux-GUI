@@ -1,8 +1,11 @@
 package hadoop
 
 import (
+	"backend/cmd/dal"
+	"backend/cmd/dal/query"
 	"backend/gohive"
 	"context"
+	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
 	"log"
 	"testing"
@@ -67,14 +70,24 @@ func TestName(t *testing.T) {
 func TestQuery(t *testing.T) {
 	ctx := context.Background()
 	Init(ctx)
+	dal.Init()
 
-	events, err := QueryEventsByRecordId(ctx, 1)
+	recordMos, err := query.Record.WithContext(ctx).
+		Join(query.User, query.User.UserID.EqCol(query.Record.UserID)).
+		Where(query.User.AppID.Eq(2)).Find()
 	if err != nil {
-		logger.Info(err.Error())
+		logger.Error(err.Error())
+		return
 	}
 
-	logger.Info(events)
-
+	for idx, mo := range recordMos {
+		events, err := QueryEventsByRecordId(ctx, mo.RecordID)
+		if err != nil {
+			logger.Error(fmt.Sprintf("第%d次记录失败，err=%s", idx, err.Error()))
+			continue
+		}
+		logger.Info(fmt.Sprintf("第%d次记录完成，记录长度=%d", idx, len(events)))
+	}
 }
 
 func TestWrite(t *testing.T) {

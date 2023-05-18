@@ -1,43 +1,60 @@
 package label_gene
 
 import (
-	"backend/biz/entity/event_data"
 	"backend/biz/entity/rule"
+	"backend/biz/hadoop"
 	"backend/biz/util"
-	"backend/consumer/common"
+	"backend/cmd/dal/model"
+	"backend/cmd/dal/query"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
-	"strconv"
+	"gorm.io/gorm"
 	"strings"
 )
 
 func processEventCntLabel(ctx context.Context, appId int64, labelId int64) map[int64]string {
 	res := make(map[int64]string)
-	// 数据文件路径
-	userEventPath := common.GetUserEventPath(ctx, appId)
-	if len(userEventPath) == 0 {
-		return res
+
+	recordDO := query.Record
+	recordMO := recordDO.WithContext(ctx)
+	userDO := query.User
+	// 查询 mysql 已有记录
+	records, err := recordMO.Join(userDO, recordDO.UserID.EqCol(userDO.UserID)).
+		Where(userDO.AppID.Eq(appId)).Find()
+	if err != nil && !errors.Is(err, gorm.ErrEmptySlice) {
+		logger.Error("query mysql failed. Err=", err.Error())
+		return nil
+	}
+	userId2Records := make(map[int64][]*model.Record)
+	for _, rec := range records {
+		if len(userId2Records[rec.UserID]) == 0 {
+			userId2Records[rec.UserID] = make([]*model.Record, 0)
+		}
+		userId2Records[rec.UserID] = append(userId2Records[rec.UserID], rec)
 	}
 
 	// 处理数据
-	userIds := make([]int64, 0, len(userEventPath))
+	userIds := make([]int64, 0)
 	plMap := make(map[int64]string)         // 编程语言 u_id -> program language
 	codeSpeedMap := make(map[int64]float64) // 打字速度 u_id -> code speed
 	shortcutCntMap := make(map[int64]int64) // 快捷键次数 u_id -> cnt
 	gitCntMap := make(map[int64]int64)      // git 操作次数 u_id -> cnt
-	for userId, paths := range userEventPath {
+	for userId, recs := range userId2Records {
 		userIds = append(userIds, userId)
 		cCnt, cppCnt := int64(0), int64(0)
 		keyClickCnt, keyClickDuration := int64(0), int64(0)
 		shortcutCnt := int64(0)
 		gitCnt := int64(0)
-		for _, path := range paths {
-			events, err := common.OpenFile(path)
+		for _, rec := range recs {
+			events, err := hadoop.QueryEventsByRecordId(ctx, rec.RecordID)
 			if err != nil {
-				logger.Error("open file failed. err=", err.Error())
+				logger.Error(fmt.Sprintf("query hadoop failed. recordId=%d, err=%s", rec.RecordID, err.Error()))
 				continue
 			}
+			logger.Info(fmt.Sprintf("reordId=%d, 记录长度=%d", rec.RecordID, len(events)))
+
 			switch labelId {
 			case ProgramLanguage:
 				c, cpp := processProgramLanguage(events)
@@ -97,7 +114,7 @@ func processEventCntLabel(ctx context.Context, appId int64, labelId int64) map[i
 	return res
 }
 
-func processGitCnt(events [][]string) int64 {
+func processGitCnt(events []*hadoop.Event) int64 {
 	cnt := int64(0)
 	// git操作
 	value := []string{
@@ -113,13 +130,10 @@ func processGitCnt(events [][]string) int64 {
 	return cnt
 }
 
-func processShortcutCnt(events [][]string) int64 {
+func processShortcutCnt(events []*hadoop.Event) int64 {
 	cnt := int64(0)
 	for _, event := range events {
-		if event_data.EventTypeIndex >= len(events) {
-			continue
-		}
-		if event[event_data.EventTypeIndex] == string(event_data.Shortcut) {
+		if event.EventType == hadoop.Shortcut {
 			cnt++
 		}
 	}
@@ -127,7 +141,7 @@ func processShortcutCnt(events [][]string) int64 {
 	return cnt
 }
 
-func processCodeSpeed(events [][]string) (keyClickCnt int64, duration int64) {
+func processCodeSpeed(events []*hadoop.Event) (keyClickCnt int64, duration int64) {
 	keyClickCnt = 0
 	duration = 0
 	// 代码区键盘输入
@@ -140,12 +154,7 @@ func processCodeSpeed(events [][]string) (keyClickCnt int64, duration int64) {
 	lastTime := int64(0)
 	for i := 1; i < len(events); i++ {
 		event := events[i]
-		timeStr := event[event_data.EventTimeIndex]
-		timeStamp, err := strconv.ParseInt(timeStr, 10, 64)
-		if err != nil {
-			logger.Error("event time parse failed. err=", err.Error())
-			continue
-		}
+		timeStamp := event.EventTime
 		if rule.MatchEvent(event, value) {
 			if match == true { // 计算次数 & 时间
 				keyClickCnt++
@@ -162,15 +171,11 @@ func processCodeSpeed(events [][]string) (keyClickCnt int64, duration int64) {
 	return keyClickCnt, duration
 }
 
-func processProgramLanguage(events [][]string) (cCnt int64, cppCnt int64) {
+func processProgramLanguage(events []*hadoop.Event) (cCnt int64, cppCnt int64) {
 	cMap := make(map[string]bool)
 	cppMap := make(map[string]bool)
 	for _, event := range events {
-		if event_data.ComponentExtraIndex > len(event)-1 {
-			continue
-		}
-
-		extra := event[event_data.ComponentExtraIndex]
+		extra := event.ComponentExtra
 		if strings.HasSuffix(extra, ".c") {
 			cMap[extra] = true
 		} else if strings.HasSuffix(extra, ".cpp") {

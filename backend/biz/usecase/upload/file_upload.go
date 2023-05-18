@@ -5,13 +5,14 @@ import (
 	"backend/biz/hadoop"
 	"backend/biz/microtype"
 	"backend/biz/model/backend"
+	"backend/biz/mq"
 	"backend/cmd/dal/model"
 	"backend/cmd/dal/query"
 	"context"
 	"encoding/csv"
+	"encoding/json"
 	"github.com/bytedance/gopkg/util/logger"
 	"mime/multipart"
-	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -38,7 +39,7 @@ func (f *FileUpload) Load(ctx context.Context) error {
 	}
 	f.appId = userMo.AppID
 
-	logger.Info("file upload begin time = ", time.Now().UnixMilli())
+	logger.Info("file input begin time = ", time.Now().UnixMilli())
 
 	writeEvents := make([]string, 0)
 	recordIds := make([]int64, 0)
@@ -93,7 +94,7 @@ func (f *FileUpload) Load(ctx context.Context) error {
 
 			// 转换数据模型
 			day := time.UnixMilli(beginTime).Format("2006-01-02")
-			dbEvents := f.transEvent(mo.RecordID, day, events)
+			dbEvents := transEvent(f.appId, mo.RecordID, day, events)
 			mu.Lock()
 			writeEvents = append(writeEvents, dbEvents...)
 			mu.Unlock()
@@ -102,25 +103,52 @@ func (f *FileUpload) Load(ctx context.Context) error {
 
 	wg.Wait()
 	logger.Info("file data extract end, time = ", time.Now().UnixMilli())
-	// 写入hadoop
-	ok := hadoop.WriteEvents(ctx, writeEvents)
-	// hadoop 写入失败, mysql 回滚
-	if !ok {
-		logger.Error("hadoop write failed.")
-		_, _ = query.Record.WithContext(ctx).Where(query.Record.RecordID.In(recordIds...)).Delete()
+
+	extraStruct := struct {
+		RecordIds []int64
+		Events    []string
+	}{
+		RecordIds: recordIds,
+		Events:    writeEvents,
 	}
 
-	logger.Info("file upload end time = ", time.Now().UnixMilli())
+	extra, err := json.Marshal(extraStruct)
+	if err != nil {
+		return err
+	}
+
+	msg := &mq.GeneMsg{
+		AppId: f.appId,
+		Type:  mq.FileInput,
+		Param: f.userId,
+		Extra: string(extra),
+	}
+	msgJson, err := json.Marshal(msg)
+	if err != nil {
+		return microtype.JsonMarshalFailed
+	}
+
+	err = mq.SendSyncMessage(string(msgJson))
+	if err != nil {
+		return microtype.MQSendFailed
+	}
 
 	return nil
 }
 
-func (f *FileUpload) transEvent(recordId int64, day string, events [][]string) []string {
+func (f *FileUpload) GetResp() *backend.UserDataUploadResp {
+	return &backend.UserDataUploadResp{
+		StatusCode: microtype.SuccessErr.Code,
+		StatusMsg:  microtype.SuccessErr.Msg,
+	}
+}
+
+func transEvent(appId int64, recordId int64, day string, events [][]string) []string {
 	res := make([]string, 0, len(events))
 	for _, event := range events {
 		r := &hadoop.Event{
 			RecordId: recordId,
-			AppId:    int32(f.appId),
+			AppId:    int32(appId),
 			Day:      day,
 		}
 		if event_data.EventTypeIndex < len(event) {
@@ -218,13 +246,6 @@ func (f *FileUpload) transEvent(recordId int64, day string, events [][]string) [
 	return res
 }
 
-func (f *FileUpload) GetResp() *backend.UserDataUploadResp {
-	return &backend.UserDataUploadResp{
-		StatusCode: microtype.SuccessErr.Code,
-		StatusMsg:  microtype.SuccessErr.Msg,
-	}
-}
-
 func readFile(file *multipart.FileHeader) ([][]string, error) {
 	filePtr, err := file.Open()
 	if err != nil {
@@ -241,32 +262,6 @@ func readFile(file *multipart.FileHeader) ([][]string, error) {
 	}
 
 	return events, nil
-}
-
-func writeFile(filePath string, fileName string, events [][]string) error {
-	_, err := os.Open(filePath)
-	if os.IsNotExist(err) {
-		err := os.Mkdir(filePath, os.ModeDir)
-		if err != nil {
-			return err
-		}
-	} else if err != nil {
-		return microtype.DirOpenFailed
-	}
-
-	newFile, err := os.Create(filePath + "\\" + fileName)
-	if err != nil {
-		return err
-	}
-	defer newFile.Close()
-
-	writer := csv.NewWriter(newFile)
-	err = writer.WriteAll(events)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // 开始时间，使用时长

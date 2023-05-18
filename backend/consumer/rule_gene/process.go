@@ -3,10 +3,8 @@ package rule_gene
 import (
 	"backend/biz/entity/event_data"
 	"backend/biz/entity/rule"
-	"backend/cmd/dal/model"
+	"backend/biz/hadoop"
 	"fmt"
-	"github.com/bytedance/gopkg/util/logger"
-	"github.com/golang/protobuf/proto"
 	"strconv"
 	"strings"
 )
@@ -16,29 +14,13 @@ type RuleData struct {
 	Time int64 // 发生时间
 }
 
-func process(events [][]string, eventRules []*rule.EventRuleModel, behaviorRules []*rule.BehaviorRuleModel, ruleDescMap map[int64]string) (*model.Record, map[int64]int64) {
-	beginTimeMs := int64(0)
-	useTimeMs := int64(0)
-	beginTime, endTime, err := getAppUseTime(events)
-	if err != nil {
-		logger.Error("get app use time failed. err=", err.Error())
-		return nil, nil
-	}
-	beginTimeMs = beginTime
-	useTimeMs = endTime - beginTime
-
+func process(events []*hadoop.Event, eventRules []*rule.EventRuleModel, behaviorRules []*rule.BehaviorRuleModel, ruleDescMap map[int64]string) (string, string, map[int64]int64) {
 	eventRuleData := make([]*RuleData, 0, len(events))
-	lastEventTimeMs, _ := strconv.ParseInt(events[1][1], 10, 64)
-	for i := 2; i < len(events)-1; i++ {
+	lastEventTimeMs := events[0].EventTime
+	for i := 1; i < len(events)-1; i++ {
 		e := events[i]
-		if len(e) < 11 {
-			continue
-		}
 
-		eventTimeMs, err := strconv.ParseInt(e[event_data.EventTimeIndex], 10, 64)
-		if err != nil {
-			continue
-		}
+		eventTimeMs := e.EventTime
 
 		// 事件规则数据
 		if eventTimeMs-lastEventTimeMs > event_data.MaxNoOperateTimeS*1000 {
@@ -79,13 +61,7 @@ func process(events [][]string, eventRules []*rule.EventRuleModel, behaviorRules
 	// 行为时长map
 	durationMap := rule.GetBehaviorDuration(eles)
 
-	return &model.Record{
-		UserID:            0,
-		BeginTime:         beginTimeMs,
-		UseTime:           useTimeMs,
-		EventRuleValue:    proto.String(eventData),
-		BehaviorRuleValue: proto.String(behaviorData),
-	}, durationMap
+	return eventData, behaviorData, durationMap
 }
 
 // 返回行为ID序列
@@ -177,47 +153,17 @@ func getBehaviorRuleIDs(eventRuleData []*RuleData, behaviorRules []*rule.Behavio
 	return newRes
 }
 
-func getEventRuleID(event []string, eventRules []*rule.EventRuleModel) int64 {
+func getEventRuleID(event *hadoop.Event, eventRules []*rule.EventRuleModel) int64 {
 	if eventRules == nil {
 		return 0
 	}
 
-	eventTyp := event[event_data.EventTypeIndex]
-	mouseClickTyp := event[event_data.MouseClickTypeIndex]
-	mouseClickButton := event[event_data.MouseClickButtonIndex]
-	keyClickTyp := event[event_data.KeyClickTypeIndex]
-	keyValue := event[event_data.KeyCodeIndex]
-	comName := event[event_data.ComponentNameIndex]
-
-	eventTypV := int64(0)
-	mouseClickTypV := int64(0)
-	mouseClickButtonV := int64(0)
-	keyClickTypV := int64(0)
-
-	if eventTyp != "" {
-		v, err := strconv.ParseFloat(eventTyp, 64)
-		if err == nil {
-			eventTypV = int64(v)
-		}
-	}
-	if mouseClickTyp != "" {
-		v, err := strconv.ParseFloat(mouseClickTyp, 64)
-		if err == nil {
-			mouseClickTypV = int64(v)
-		}
-	}
-	if mouseClickButton != "" {
-		v, err := strconv.ParseFloat(mouseClickButton, 64)
-		if err == nil {
-			mouseClickButtonV = int64(v)
-		}
-	}
-	if keyClickTyp != "" {
-		v, err := strconv.ParseFloat(keyClickTyp, 64)
-		if err == nil {
-			keyClickTypV = int64(v)
-		}
-	}
+	eventTypV := int64(event.EventType)
+	mouseClickTypV := int64(event.MouseClickType)
+	mouseClickButtonV := int64(event.MouseClickBtn)
+	keyClickTypV := int64(event.KeyClickType)
+	keyValue := event.KeyCode
+	comName := event.ComponentName
 
 	for _, eventRule := range eventRules {
 		if eventRule == nil {

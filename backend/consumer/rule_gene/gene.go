@@ -1,11 +1,10 @@
 package rule_gene
 
 import (
-	"backend/biz/entity/event_data"
 	"backend/biz/entity/rule"
+	"backend/biz/hadoop"
 	"backend/cmd/dal/model"
 	"backend/cmd/dal/query"
-	"backend/consumer/config"
 	"context"
 	"encoding/csv"
 	"encoding/json"
@@ -17,21 +16,14 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 )
 
 func Gene(appId int64) {
-	//defer geneDone(appId)
-
 	ctx := context.Background()
 	var (
-		wg sync.WaitGroup
-		// 错误
-		dbDataErr   error
-		fileDataErr error
 		// 数据
-		dbRecords                  []*model.Record             // db 记录
-		fileRecord                 map[string]*model.Record    // 文件记录 userId_beginTime -> 记录
+		mysqlRecords               []*model.Record             // mysql 记录
+		hadoopRecord               map[int64]model.Record      // hadoop记录 record_id -> 记录
 		userId2BehaviorDurationMap map[int64][]map[int64]int64 // user_id -> []行为时长map
 	)
 
@@ -39,150 +31,85 @@ func Gene(appId int64) {
 	recordMO := recordDO.WithContext(ctx)
 	userDO := query.User
 
-	// 查询数据库中的行为记录
-	wg.Add(1)
-	go func() {
-		defer func() {
-			wg.Done()
-			_ = recover()
-		}()
-
-		// 查询已有记录
-		res, err := recordMO.Join(userDO, recordDO.UserID.EqCol(userDO.UserID)).
-			Where(userDO.AppID.Eq(appId)).Find()
-		if err != nil && !errors.Is(err, gorm.ErrEmptySlice) {
-			dbDataErr = err
-			logger.Error("dbDataErr=", dbDataErr.Error())
-			return
-		}
-		dbRecords = res
-
-		s, _ := json.Marshal(dbRecords)
-		logger.Info("dbRecords=", string(s))
-	}()
-
-	// 查询文件中的行为记录
-	wg.Add(1)
-	go func() {
-		defer func() {
-			wg.Done()
-			_ = recover()
-		}()
-
-		// 文件结果
-		fileRecord = make(map[string]*model.Record)
-		// 行为时长记录
-		userId2BehaviorDurationMap = make(map[int64][]map[int64]int64)
-
-		// 事件规则以及行为规则
-		eventRules, behaviorRules, err := rule.GetRuleModels(ctx, appId)
-		if err != nil {
-			fileDataErr = err
-			logger.Error("fileDataErr=", fileDataErr.Error())
-			return
-		}
-		// 规则描述map
-		ruleDescMap := make(map[int64]string)
-		for _, r := range eventRules {
-			if r == nil {
-				continue
-			}
-
-			ruleDescMap[r.RuleID] = r.RuleDesc
-		}
-		for _, r := range behaviorRules {
-			if r == nil {
-				continue
-			}
-
-			ruleDescMap[r.RuleID] = r.RuleDesc
-		}
-
-		// 数据文件
-		ed := event_data.NewEvent(appId)
-		if err := ed.Load(ctx); err != nil {
-			fileDataErr = err
-			logger.Error("fileDataErr=", fileDataErr.Error())
-			return
-		}
-
-		paths := ed.GetFilePath()
-		for _, path := range paths {
-			uId, err := getUserId(path)
-			if err != nil {
-				continue
-			}
-
-			events, err := openFile(path)
-			if err != nil {
-				continue
-			}
-
-			record, behaviorDurationMap := process(events, eventRules, behaviorRules, ruleDescMap)
-			if record == nil {
-				continue
-			}
-
-			record.UserID = uId
-
-			key := fmt.Sprintf("%d_%d", uId, record.BeginTime)
-			fileRecord[key] = record
-			if len(behaviorDurationMap) > 0 {
-				if _, ok := userId2BehaviorDurationMap[uId]; !ok {
-					userId2BehaviorDurationMap[uId] = make([]map[int64]int64, 0)
-				}
-				userId2BehaviorDurationMap[uId] = append(userId2BehaviorDurationMap[uId], behaviorDurationMap)
-			}
-		}
-
-		s, _ := json.Marshal(fileRecord)
-		logger.Info("fileRecord=", string(s))
-	}()
-
-	wg.Wait()
-	if dbDataErr != nil || fileDataErr != nil {
+	// 查询 mysql 已有记录
+	res, err := recordMO.Join(userDO, recordDO.UserID.EqCol(userDO.UserID)).
+		Where(userDO.AppID.Eq(appId)).Find()
+	if err != nil && !errors.Is(err, gorm.ErrEmptySlice) {
+		logger.Error("query mysql failed. Err=", err.Error())
 		return
 	}
+	mysqlRecords = res
 
-	// 汇总 四类
-	// 文件存在 : db不存在 db存在但无行为数据 db存在也有数据 （后两者都要更新）
-	// 文件不存在 : 删除 （全量更新，这里做增量即可）
-	set1 := make([]*model.Record, 0) // 添加
-	set2 := make([]model.Record, 0)  // 更新
+	s, _ := json.Marshal(mysqlRecords)
+	logger.Info("mysqlRecords=", string(s))
 
-	for _, fileRec := range fileRecord {
-		if fileRec == nil {
+	// 事件规则以及行为规则
+	eventRules, behaviorRules, err := rule.GetRuleModels(ctx, appId)
+	if err != nil {
+		logger.Error("query rule failed. Err=", err.Error())
+		return
+	}
+	// 规则描述map
+	ruleDescMap := make(map[int64]string)
+	for _, r := range eventRules {
+		if r == nil {
 			continue
 		}
-		exist := false
-		for _, dbRec := range dbRecords {
-			// db存在
-			if dbRec.UserID == fileRec.UserID && dbRec.BeginTime == fileRec.BeginTime {
-				set2 = append(set2, *fileRec)
-				exist = true
-				break
-			}
+
+		ruleDescMap[r.RuleID] = r.RuleDesc
+	}
+	for _, r := range behaviorRules {
+		if r == nil {
+			continue
 		}
-		// db不存在
-		if !exist {
-			set1 = append(set1, fileRec)
+
+		ruleDescMap[r.RuleID] = r.RuleDesc
+	}
+
+	// hadoop结果
+	hadoopRecord = make(map[int64]model.Record)
+	// 行为时长记录
+	userId2BehaviorDurationMap = make(map[int64][]map[int64]int64)
+
+	for idx, mo := range mysqlRecords {
+		events, err := hadoop.QueryEventsByRecordId(ctx, mo.RecordID)
+		if err != nil {
+			logger.Error(fmt.Sprintf("query hadoop failed. idx=%d, recordId=%d, err=%s", idx, mo.RecordID, err.Error()))
+			continue
+		}
+		logger.Info(fmt.Sprintf("查询第%d次记录完成，reordId=%d, 记录长度=%d", idx, mo.RecordID, len(events)))
+
+		if len(events) <= 0 {
+			logger.Warn("event length = 0")
+			continue
+		}
+
+		eventRuleData, behaviorRuleData, behaviorDurationMap := process(events, eventRules, behaviorRules, ruleDescMap)
+		if eventRuleData == "" || behaviorRuleData == "" {
+			continue
+		}
+
+		hadoopRecord[mo.RecordID] = model.Record{
+			EventRuleValue:    proto.String(eventRuleData),
+			BehaviorRuleValue: proto.String(behaviorRuleData),
+		}
+		if len(behaviorDurationMap) > 0 {
+			if _, ok := userId2BehaviorDurationMap[mo.UserID]; !ok {
+				userId2BehaviorDurationMap[mo.UserID] = make([]map[int64]int64, 0)
+			}
+			userId2BehaviorDurationMap[mo.UserID] = append(userId2BehaviorDurationMap[mo.UserID], behaviorDurationMap)
 		}
 	}
 
+	s, _ = json.Marshal(hadoopRecord)
+	logger.Info("hadoopRecord=", string(s))
+
 	// 更新
-	for _, rec := range set2 {
-		_, err := recordMO.Where(recordDO.UserID.Eq(rec.UserID),
-			recordDO.BeginTime.Eq(rec.BeginTime)).
-			Updates(rec)
+	for id, rec := range hadoopRecord {
+		_, err = recordMO.Where(recordDO.RecordID.Eq(id)).Updates(rec)
 		if err != nil {
 			logger.Error("update record failed. err=", err.Error())
 		}
-	}
-
-	// 添加
-	err := recordMO.Create(set1...)
-	if err != nil {
-		logger.Error("create record failed. err=", err.Error())
 	}
 
 	// 更新用户的平均时长 && 更新应用的平均使用时长和用户最长使用时长
@@ -303,13 +230,4 @@ func getUserId(path string) (int64, error) {
 		return 0, fmt.Errorf("用户ID解析失败")
 	}
 	return id, nil
-}
-
-func geneDone(appId int64) {
-	// running -> stop
-	config.StatusChan <- &config.StatusChange{
-		AppId:    appId,
-		TaskType: config.RuleGene,
-		Status:   config.Stop,
-	}
 }

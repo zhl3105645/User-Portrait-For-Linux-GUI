@@ -3,7 +3,6 @@ package label_gene
 import (
 	"backend/cmd/dal/model"
 	"backend/cmd/dal/query"
-	"backend/consumer/config"
 	"context"
 	"errors"
 	"github.com/bytedance/gopkg/util/logger"
@@ -11,8 +10,6 @@ import (
 )
 
 func Gene(appId int64, labelId int64) {
-	//defer geneDone(appId)
-
 	ctx := context.Background()
 
 	// 标签信息
@@ -92,13 +89,4 @@ func Gene(appId int64, labelId int64) {
 	}
 
 	return
-}
-
-func geneDone(appId int64) {
-	// running -> stop
-	config.StatusChan <- &config.StatusChange{
-		AppId:    appId,
-		TaskType: config.LabelGene,
-		Status:   config.Stop,
-	}
 }

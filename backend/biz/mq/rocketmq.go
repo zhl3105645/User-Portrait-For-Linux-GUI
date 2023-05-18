@@ -19,6 +19,7 @@ const (
 type Type int
 
 const (
+	FileInput Type = 1 // 文件数据导入
 	RuleGene  Type = 3 // 生成规则数据
 	LabelGene Type = 5 // 生成标签数据
 	CrowdGene Type = 6 // 生成人群数据
@@ -26,9 +27,10 @@ const (
 )
 
 type GeneMsg struct {
-	AppId int64 // 应用ID
-	Type  Type  // 消息类型
-	Param int64 // 具体参数
+	AppId int64  // 应用ID
+	Type  Type   // 消息类型
+	Param int64  // 具体参数
+	Extra string // 大型参数
 }
 
 func Init() {

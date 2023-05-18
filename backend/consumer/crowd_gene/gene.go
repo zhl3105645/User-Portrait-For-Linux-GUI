@@ -12,7 +12,7 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-func Gene(appId int64, crowdId int64) {
+func Gene(crowdId int64) {
 	ctx := context.Background()
 
 	cr, err := query.Crowd.WithContext(ctx).Where(query.Crowd.CrowdID.Eq(crowdId)).First()

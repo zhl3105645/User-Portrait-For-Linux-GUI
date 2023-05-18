@@ -1,34 +1,51 @@
 package label_gene
 
 import (
-	"backend/biz/entity/event_data"
 	"backend/biz/entity/rule"
+	"backend/biz/hadoop"
 	"backend/biz/util"
-	"backend/consumer/common"
+	"backend/cmd/dal/model"
+	"backend/cmd/dal/query"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
+	"gorm.io/gorm"
 	"strings"
 )
 
 func ProcessGitDesc(ctx context.Context, appId int64) map[int64]string {
 	res := make(map[int64]string)
-	// 数据文件路径
-	userEventPath := common.GetUserEventPath(ctx, appId)
-	if len(userEventPath) == 0 {
-		return res
+
+	recordDO := query.Record
+	recordMO := recordDO.WithContext(ctx)
+	userDO := query.User
+	// 查询 mysql 已有记录
+	records, err := recordMO.Join(userDO, recordDO.UserID.EqCol(userDO.UserID)).
+		Where(userDO.AppID.Eq(appId)).Find()
+	if err != nil && !errors.Is(err, gorm.ErrEmptySlice) {
+		logger.Error("query mysql failed. Err=", err.Error())
+		return nil
+	}
+	userId2Records := make(map[int64][]*model.Record)
+	for _, rec := range records {
+		if len(userId2Records[rec.UserID]) == 0 {
+			userId2Records[rec.UserID] = make([]*model.Record, 0)
+		}
+		userId2Records[rec.UserID] = append(userId2Records[rec.UserID], rec)
 	}
 
 	// 采集各个用户的git数据
 	gitMsgCntMap := make(map[int64]map[string]int64) // user_id -> git msg -> cnt
-	for userId, paths := range userEventPath {
+	for userId, recs := range userId2Records {
 		gitMsgCnt := make(map[string]int64) // git msg -> cnt
-		for _, path := range paths {
-			events, err := common.OpenFile(path)
+		for _, rec := range recs {
+			events, err := hadoop.QueryEventsByRecordId(ctx, rec.RecordID)
 			if err != nil {
-				logger.Error("open file failed. err=", err.Error())
+				logger.Error(fmt.Sprintf("query hadoop failed. recordId=%d, err=%s", rec.RecordID, err.Error()))
 				continue
 			}
+			logger.Info(fmt.Sprintf("reordId=%d, 记录长度=%d", rec.RecordID, len(events)))
 
 			for msg, cnt := range getGitMsgCntMap(events) {
 				if v, ok := gitMsgCnt[msg]; ok {
@@ -96,7 +113,7 @@ func scoreGitMsg(msg string) int64 {
 	return score
 }
 
-func getGitMsgCntMap(events [][]string) map[string]int64 {
+func getGitMsgCntMap(events []*hadoop.Event) map[string]int64 {
 	res := make(map[string]int64)
 
 	msgLineEdit := []string{
@@ -110,9 +127,7 @@ func getGitMsgCntMap(events [][]string) map[string]int64 {
 	for _, event := range events {
 		if rule.MatchEvent(event, msgLineEdit) {
 			// 更新输入框内容
-			if event_data.ComponentExtraIndex < len(event) {
-				curMsg = event[event_data.ComponentExtraIndex]
-			}
+			curMsg = event.ComponentExtra
 		} else if rule.MatchEvent(event, commitBtn) {
 			if curMsg == "" {
 				continue

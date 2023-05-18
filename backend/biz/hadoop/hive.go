@@ -63,12 +63,12 @@ func Init(ctx context.Context) {
 
 func QueryEventsByRecordId(ctx context.Context, recordId int64) ([]*Event, error) {
 	if recordId <= 0 {
-		return nil, fmt.Errorf("recordId < 0")
+		return nil, fmt.Errorf("recordId len <= 0")
 	}
 	cursor := HiveConnection.Cursor()
 	defer cursor.Close()
 
-	sql := fmt.Sprintf("select * from event where record_id = 1")
+	sql := fmt.Sprintf("select * from event where record_id = %d", recordId)
 	cursor.Exec(ctx, sql)
 	if cursor.Err != nil {
 		return nil, cursor.Err
@@ -140,7 +140,7 @@ func WriteEvents(ctx context.Context, events []string) bool {
 	errCnt := 0
 	// 一次写入大小
 	eventsSlice := funk.ChunkStrings(events, 5000)
-	logger.Info("event slice lengtg = ", len(eventsSlice))
+	logger.Info("event slice length = ", len(eventsSlice))
 	for idx, slice := range eventsSlice {
 		sql := "insert into table event values" + strings.Join(slice, ",")
 

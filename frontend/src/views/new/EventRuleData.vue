@@ -101,6 +101,16 @@ export default {
         if (res.status_code === 0) {
           this.merge(res.rule_data)
           this.tableData = res.rule_data
+          for (let i = 0; i < this.tableData.length; i++) {
+            if (this.tableData[i].behavior_rule_data == null) {
+              this.tableData[i].behavior_rule_data = {
+                "rule_elements": new Array()
+              }
+            } else if (this.tableData[i].behavior_rule_data.rule_elements == null) {
+              this.tableData[i].behavior_rule_data.rule_elements = new Array()
+            }
+          }
+          console.log(this.tableData)
           this.total = res.total
         } else {
           this.$message({

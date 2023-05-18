@@ -29,3 +29,5 @@ select  count(distinct record_id) from event;
 select count(*) from event;
 
 truncate table event;
+
+select * from event where record_id in (1, 2);
