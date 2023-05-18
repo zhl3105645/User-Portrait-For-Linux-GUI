@@ -1,3 +1,6 @@
-- test: python代码，系统层面采集用户事件
-- qt_collector: C++静态库，针对QT应用采集数据
-- plot: 数据绘图代码
+- test：python代码，系统层面采集用户事件
+- qt_collector：C++静态库，针对QT应用采集数据
+- plot：数据绘图代码
+- ml：机器学习相关代码
+- backend：系统后端代码
+- frontend：系统前端代码
