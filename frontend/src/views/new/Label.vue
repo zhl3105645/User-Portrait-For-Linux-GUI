@@ -1,9 +1,9 @@
 <template>
-    <div class="container">
+    <div class="container" id="image">
       <div class="left-half">
         <div style="margin: 10px 0">
           <el-button type="primary" style="margin-left: 5px" @click="this.dialogAddLabelVisible = true">添加标签</el-button>
-        
+
           <el-dialog v-model="dialogAddLabelVisible" title="添加标签" width="700px">
             <el-form :model="addLabelForm" label-width="100px" label-position="left">
               <el-form-item label="标签名称">
@@ -76,6 +76,7 @@
 <script>
 import request from "@/utils/request";
 import * as echarts from 'echarts'
+import domToImage from 'dom-to-image'
 
 export default {
   name: "Label",
@@ -348,6 +349,28 @@ export default {
         ]
       }
       this.single_label_chart.setOption(option)
+    },
+    save_svg_image() {
+      // 通过id获取dom
+      const node = document.getElementById('image');
+      domToImage
+          .toSvg(node)
+          .then(function (dataUrl) {
+              // 输出图片的Base64,dataUrl，下载到本地
+              // 生成一个a元素
+              const a = document.createElement('a');
+              // 创建一个单击事件
+              const event = new MouseEvent('click');
+              // 设置图片名称没有设置则为默认
+              a.download = '截图';
+              // 将生成的URL设置为a.href属性
+              a.href = dataUrl;
+              // 触发a的单击事件
+              a.dispatchEvent(event);
+          })
+          .catch(function (error) {
+                console.error(error);
+          })
     }
   }
 }

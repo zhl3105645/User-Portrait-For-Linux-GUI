@@ -1,5 +1,5 @@
 <template>
-  <div style="margin: 10px 0">
+  <div style="margin: 10px 0" id="image">
     <el-input v-model="search" placeholder="请输入关键字" style="width: 20%" clearable></el-input>
     <el-button type="primary" style="margin-left: 5px" @click="load">查询</el-button>
     <el-button type="primary" style="margin-left: 5px" @click="dialogAddRuleVisible = true">新增规则</el-button>
@@ -190,7 +190,7 @@
 
 <script>
 import request from "@/utils/request";
-
+import domToImage from 'dom-to-image'
 
 export default {
   name: "EventRule",
@@ -452,6 +452,28 @@ export default {
         let rows = this.mergeIndexMap.get(rowIndex)
         return [rows, 1]
       }
+    },
+    save_svg_image() {
+      // 通过id获取dom
+      const node = document.getElementById('image');
+      domToImage
+          .toSvg(node)
+          .then(function (dataUrl) {
+              // 输出图片的Base64,dataUrl，下载到本地
+              // 生成一个a元素
+              const a = document.createElement('a');
+              // 创建一个单击事件
+              const event = new MouseEvent('click');
+              // 设置图片名称没有设置则为默认
+              a.download = '截图';
+              // 将生成的URL设置为a.href属性
+              a.href = dataUrl;
+              // 触发a的单击事件
+              a.dispatchEvent(event);
+          })
+          .catch(function (error) {
+                console.error(error);
+          })
     }
   }
 }

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/thoas/go-funk"
-	"log"
 	"os"
 	"sort"
 	"strings"
@@ -47,7 +46,8 @@ func Init(ctx context.Context) {
 	connection, errConn := gohive.Connect("192.168.81.131", 10000, "NONE", configuration)
 
 	if errConn != nil {
-		log.Fatal(errConn)
+		logger.Error(errConn)
+		return
 	}
 
 	// 使用profile数据库
@@ -55,7 +55,8 @@ func Init(ctx context.Context) {
 
 	cursor.Exec(ctx, "use profile")
 	if cursor.Err != nil {
-		log.Fatal(cursor.Err)
+		logger.Error(cursor.Err)
+		return
 	}
 
 	HiveConnection = connection

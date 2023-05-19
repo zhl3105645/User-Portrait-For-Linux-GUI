@@ -1,9 +1,8 @@
 <template>
-    <div style="margin: 10px 0">
+    <div style="margin: 10px 0" id="image">
         <el-input v-model="search" placeholder="请输入关键字" style="width: 20%" clearable></el-input>
         <el-button type="primary" style="margin-left: 5px" @click="load">查询</el-button>
         <el-button type="primary" style="margin-left: 5px" @click="this.dialog_add_crowd_visible = true">添加人群</el-button>
-
 
         <el-dialog v-model="dialog_add_crowd_visible" title="添加人群" width="650px">
             <el-form :model="add_crowd_form" label-width="100px" label-position="left">
@@ -91,6 +90,7 @@
 <script>
 import request from "@/utils/request";
 import * as echarts from 'echarts'
+import domToImage from 'dom-to-image'
 
 export default {
     name: "Crowd",
@@ -272,7 +272,29 @@ export default {
                 message: '已取消删除'
                 });          
             })
-        }
+        },
+        save_svg_image() {
+      // 通过id获取dom
+      const node = document.getElementById('image');
+      domToImage
+          .toSvg(node)
+          .then(function (dataUrl) {
+              // 输出图片的Base64,dataUrl，下载到本地
+              // 生成一个a元素
+              const a = document.createElement('a');
+              // 创建一个单击事件
+              const event = new MouseEvent('click');
+              // 设置图片名称没有设置则为默认
+              a.download = '截图';
+              // 将生成的URL设置为a.href属性
+              a.href = dataUrl;
+              // 触发a的单击事件
+              a.dispatchEvent(event);
+          })
+          .catch(function (error) {
+                console.error(error);
+          })
+    }
     }
     
 }
