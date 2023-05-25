@@ -9,9 +9,6 @@ github.com/apache/rocketmq-client-go/v2 v2.1.1 h1:WY/LkOYSQaVyV+HOqdiIgF4LE3beZ/
 github.com/apache/rocketmq-client-go/v2 v2.1.1/go.mod h1:GZzExtXY9zpI6FfiVJYAhw2IXQtgnHUuWpULo7nr5lw=
 github.com/apache/thrift v0.13.0 h1:5hryIiq9gtn+MiLVn0wP37kb/uTeRZgN08WoCsAhIhI=
 github.com/apache/thrift v0.13.0/go.mod h1:cp2SuWMxlEZw2r+iP2GNCdIi4C1qmUzdZFSVb+bacwQ=
-github.com/beltran/gohive v1.5.3 h1:fGvLt4IoVbXMbg4B14igkwCd435ODug95C9tQcbKCmg=
-github.com/beltran/gohive v1.5.3/go.mod h1:BJbXAhof7gWk5+kl0y6Ox8TFDJ1xv6gwDksF7l15LFI=
-github.com/beltran/gosasl v0.0.0-20200715011608-d5475aebb293/go.mod h1:Qx8cW6jkI8riyzmklj80kAIkv+iezFUTBiGU0qHhHes=
 github.com/beltran/gosasl v0.0.0-20220331024818-65cde6a69a35 h1:iQwgRNFGmoKDj0bCxzMOxaT7EHFVFArnm20WqHHvuKE=
 github.com/beltran/gosasl v0.0.0-20220331024818-65cde6a69a35/go.mod h1:Qx8cW6jkI8riyzmklj80kAIkv+iezFUTBiGU0qHhHes=
 github.com/beltran/gssapi v0.0.0-20200324152954-d86554db4bab h1:ayfcn60tXOSYy5zUN1AMSTQo4nJCf7hrdzAVchpPst4=
@@ -50,7 +47,6 @@ github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LB
 github.com/go-sql-driver/mysql v1.7.0 h1:ueSltNNllEqE3qcWBTD0iQd3IpL/6U+mJxLkazJ7YPc=
 github.com/go-sql-driver/mysql v1.7.0/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
-github.com/go-zookeeper/zk v1.0.1/go.mod h1:gpJdHazfkmlg4V0rt0vYeHYJHSL8hHFwV0qOd+HRTJE=
 github.com/go-zookeeper/zk v1.0.3 h1:7M2kwOsc//9VeeFiPtf+uSJlVpU66x9Ba5+8XK7/TDg=
 github.com/go-zookeeper/zk v1.0.3/go.mod h1:nOB03cncLtlp4t+UAkGSV+9beXP/akpekBwL+UX1Qcw=
 github.com/gofrs/uuid v4.0.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRxnplIgP/c0N/04lM=

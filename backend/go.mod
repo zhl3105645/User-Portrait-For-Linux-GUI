@@ -5,11 +5,13 @@ go 1.18
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
 	github.com/apache/thrift v0.18.1
-	github.com/beltran/gohive v1.5.3
+	github.com/beltran/gosasl v0.0.0-20220331024818-65cde6a69a35
 	github.com/bytedance/gopkg v0.0.0-20220413063733-65bf48ffb3a7
 	github.com/cloudwego/hertz v0.6.0
+	github.com/go-zookeeper/zk v1.0.3
 	github.com/golang/protobuf v1.5.0
 	github.com/hertz-contrib/jwt v1.0.2
+	github.com/pkg/errors v0.9.1
 	github.com/thoas/go-funk v0.9.3
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.4.7
@@ -19,7 +21,6 @@ require (
 )
 
 require (
-	github.com/beltran/gosasl v0.0.0-20220331024818-65cde6a69a35 // indirect
 	github.com/beltran/gssapi v0.0.0-20200324152954-d86554db4bab // indirect
 	github.com/bytedance/go-tagexpr/v2 v2.9.2 // indirect
 	github.com/bytedance/sonic v1.8.1 // indirect
@@ -28,7 +29,6 @@ require (
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
-	github.com/go-zookeeper/zk v1.0.3 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.1 // indirect
 	github.com/golang/mock v1.3.1 // indirect
 	github.com/henrylee2cn/ameda v1.4.10 // indirect
@@ -42,7 +42,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nyaruka/phonenumbers v1.0.55 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.4.2 // indirect
 	github.com/stathat/consistent v1.0.0 // indirect
