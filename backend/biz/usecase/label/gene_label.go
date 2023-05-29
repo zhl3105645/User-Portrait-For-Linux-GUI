@@ -32,7 +32,7 @@ func (g *GeneLabel) Load(ctx context.Context) error {
 
 	msg := &mq.GeneMsg{
 		AppId: g.appId,
-		Type:  mq.CrowdGene,
+		Type:  mq.LabelGene,
 		Param: g.labelId,
 	}
 	msgJson, err := json.Marshal(msg)
