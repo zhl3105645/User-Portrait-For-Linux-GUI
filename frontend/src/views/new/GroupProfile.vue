@@ -380,13 +380,13 @@ export default {
             }
             //console.log(series)
             let option = {
-                // toolbox: {
-                //     show: true,
-                //     feature: {
-                //         mark: {show: true},
-                //         saveAsImage: {show: true},
-                //     }
-                // },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        mark: {show: true},
+                        saveAsImage: {show: true},
+                    }
+                },
                 tooltip: {
                     trigger: 'axis',
                 },

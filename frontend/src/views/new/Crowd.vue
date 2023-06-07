@@ -51,10 +51,10 @@
             :data="crowds" 
             style="width: 100%"
             >
-        <el-table-column fixed prop="crowd_id" label="人群ID" width="150" />
+        <el-table-column fixed prop="crowd_id" label="人群ID" width="100" />
         <el-table-column prop="crowd_name" label="人群名" width="150" />
         <el-table-column  prop="crowd_desc" label="人群描述" width="200" />
-        <el-table-column  prop="user_num" label="用户数量" width="150" />
+        <el-table-column  prop="user_num" label="用户数量" width="100" />
         <el-table-column label="操作" width="400">
             <template #default="scope">
                 <el-button type="primary" size="small" @click="handel_update_crowd(scope.$index)"

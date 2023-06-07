@@ -30,7 +30,7 @@ def k_means(k, data_pca, scaler, pca):
     # 将标准化的聚类结果转换回原始数据空间
     cluster_centers_original = scaler.inverse_transform(cluster_centers_scaled)
     #print("cluster_centers_scaled=",cluster_centers_scaled)
-    #print("cluster_centers_original=",cluster_centers_original)
+    print("cluster_centers_original=",cluster_centers_original)
     draw_center(cluster_centers_original)
 
     score = silhouette_score(data_pca, labels)

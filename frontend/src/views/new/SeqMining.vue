@@ -28,11 +28,11 @@
         :data="task_data" 
         style="width: 100%"
       >
-        <el-table-column prop="task_id" label="任务ID" width="100" />
-        <el-table-column prop="task_name" label="任务名" width="150" />
+        <el-table-column prop="task_id" label="任务ID" width="60" />
+        <el-table-column prop="task_name" label="任务名" width="100" />
         <el-table-column prop="create_time" label="创建时间" width="150" />
-        <el-table-column prop="percent" label="最小支持度(百分比)" width="200" />
-        <el-table-column prop="status_desc" label="任务状态" width="150" >
+        <el-table-column prop="percent" label="最小支持度(百分比)" width="150" />
+        <el-table-column prop="status_desc" label="任务状态" width="100" >
           <template #default="scope">
             <el-tag
               class="mx-1"
@@ -42,10 +42,13 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column  label="操作" width="200">
+        <el-table-column  label="操作" width="400">
           <template #default="scope">
             <el-button type="primary" size="small" :disabled="scope.row.task_status != 3" @click="handle_download_result(scope.row.task_id)">
-              下载任务数据
+              下载挖掘结果
+              </el-button>
+              <el-button type="primary" size="small">
+              重新运行
               </el-button>
           </template>
         </el-table-column>
